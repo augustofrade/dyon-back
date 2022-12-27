@@ -1,11 +1,11 @@
 import express from "express";
+import EventoController from "../controllers/evento.controller";
 
-const eventoRouter = express();
+const router = express.Router();
 
-eventoRouter.use(express.json());
+// Listar todos eventos
+router
+    .route("/eventos")
+    .get((req, res) => EventoController.get(req, res));
 
-eventoRouter.get("/listar", (req, res) => {
-    res.status(200).json({ sucesso: 1 });
-});
-
-export { eventoRouter };
+export default router;

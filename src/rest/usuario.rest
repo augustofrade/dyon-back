@@ -1,0 +1,48 @@
+
+### USUARIOS GERAIS
+POST http://localhost:3000/api/users
+Content-Type: application/json
+
+{
+    "username": "User",
+    "senha": "1231111",
+    "email": "user@mail.com"
+}
+
+###
+POST http://localhost:3000/api/users/email
+Content-Type: application/json
+
+{
+    "email": "user@mail.com"
+}
+
+###
+GET http://localhost:3000/api/users/all
+
+
+
+
+### PARTICIPANTES
+
+POST http://localhost:3000/api/participante
+Content-Type: application/json
+
+{
+    "username": "Joaozin",
+    "senha": "1231111",
+    "email": "joaozin@mail.com",
+    "nomeCompleto": "Arroba burger",
+    "cpf": "1234121132"
+}
+
+###
+POST http://localhost:3000/api/participante/email
+Content-Type: application/json
+
+{
+    "email": "joaozin@mail.com"
+}
+
+###
+GET http://localhost:3000/api/participante/all

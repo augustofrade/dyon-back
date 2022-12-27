@@ -2,13 +2,88 @@
 API da aplicação Dyon, consumida pelo front-end desenvolvido em React.
 
 ## Executar
-Para compilar, executar e observar, digitar no terminal: `npm run dev`
+Para compilar, executar e observar alterações, digitar no terminal: `npm run dev`
 	
 ## Pacotes
 - Express
 - Cors
 - TS-Node-Dev
 - Dotenv
+- Mongoose
+- Slugify
+
+## Rotas da API e Controllers
+Por questões de reutilização de código e acoplamento, a lógica/regras de negócio são separadas da declaração das rotas e seus métodos HTTP.
+
+Desta maneira, as rotas da API estão localizadas no diretório **routes/** e mapeadas no arquivo **router.ts** no mesmo diretório.
+
+E a lógica, por sua vez, no diretório **controllers**. Cada rota possui uma controller, que é definida como uma classe com métodos estáticos, sendo públicos os chamados pela respectiva rota, e privados aqueles que não são.
+
+### Adicionando um novo grupo de todas
+Para adicionar um novo grupo de rotas basta criar seu respectivo arquivo conforme os que já existem, exportar o objeto *router*, importá-lo em **router.ts** e adicioná-lo ao router principal.
+
+## Schemas e Models
+O banco de dados utilizado é o MongoDB por meio da ODM Mongoose, logo, para que seja feita a manipulação dos dados e consulta ao banco de dados, é necessário que haja um Schema de alguma coleção (tabela) desejada (ex: Usuário), e seu respectivo model para que a manipulação seja possível.
+- O **Schema** é a definição do documento e coleção, onde são definidas as propriedadas esperadas. É possivel criá-lo a partir de `new mongoose.Schema({...})`.
+- O **Model** é utilizado para a manipulação do documento (inserir, editar, excluir, visualizar), sendo o retorno de `mongoose.model("nomeDocumento", docSchema)"`. Esta função recebe como primeiro parâmetro o nome desejado para o documento (ex: nomeDocumento), e como segundo parâmetro o schema elaborado para ele (ex: docSchema).
+Além disso, por estar sendo utilizado o typescript, é necessário criar uma interface (ex: IUsuario) para definir o generics tanto do Schema tanto do Model.
+[Documentação do Mongoose](https://mongoosejs.com/docs/guide.html)
+
+## Schema Discriminators
+O discriminator é uma espécie de herança que o Mongoose oferece para criar diferentes documentos a partir de apenas um, de modo que todos tenham propriedades em comum, porém algumas diferentes entre si, sendo salvos em apenas uma coleção (tabela).
+
+No Dyon, há dois tipos de usuário: Participante e Instituição. Ambos possuem e-mail e senha, porém o primeiro possui informações pessoais, como cpf, data de nascimento e nome completo; enquanto o segundo, informações empresariais, como nome fantasia, razão social e cnpj. Os discriminators permitem que esses dois tipos de usuário sejam salvos sob uma única coleção, porém sejam distintos entre si, havendo a possibilidade de se registrar um ou outro, usar métodos próprios ou em comum (explicado na próxima seção), buscar todos os tipos de usuário, apenas Participantes, ou apenas Instituições, etc.
+
+É importante ressaltar que para ser definido um novo Schema e Model por meio do discriminator é utilizado `modelBase.discriminator<IDerivado, BaseModel>("Derivado", derivadoSchema)` ao invés de `mongoose.model<IDerivado, DerivadoModel>("Derivado", derivadoSchema)`, onde **derivado** é o novo tipo de documento e **base** o documento base com as informações em comum. A definição de generics com *IDerivado* e *BaseModel* é necessário para que o mongoose e typescript saibam que é uma herança de *Derivado* apartir do *Base*. `BaseModel` pode ser também uma interface herdada para `DerivadoModel`, caso haja novos métodos apenas para o documento *Derivado* etc.
+
+A definição de generics e criação de propriedades são explicadas na seção seguinte.
+
+[Documentação de Discriminator](https://mongoosejs.com/docs/discriminators.html)
+
+## Definindo métodos estáticos para Models
+É possível definir métodos estáticos para os Models para então utilizá-lo em uma instância do model. É útil para organizar consultas próprias ao banco sem redundância no código. Para fazê-lo basta:
+- Criar a interface necessária do typescript para o Schema (ex: IUsuario), ou seja, apenas as **propriedades** do documento;
+- Criar a interface necessária do typescript para o Model (ex: UsuarioModel) contendo apenas os **métodos** customizados do Model.
+- Definir o generics do tipo de Schema e Model como as interfaces criadas anteriormente, ex: <IUsuario>.
+- Adicionar no segundo parâmetro de `mongoose.Schema<D, T>({}, {})`, a propriedade statics, do tipo objeto, com os métodos como propriedades desejados definidos na interface de Model. Ex:
+```
+// interfaces/IUsuario.ts
+interface IUsuario {
+    username: string;
+    email: string;
+    senha: string;
+    emailConfirmado: boolean;
+}
+
+// model/usuario.model.ts
+interface UsuarioModel extends mongoose.Model<IUsuario> {
+    findByEmail(email: string): IUsuario
+}
+
+const usuarioSchema = new mongoose.Schema<IUsuario, UsuarioModel>(
+{
+        username: {
+            type: String,
+            required: true,
+            index: true,
+            unique: true
+        },,
+        senha: {
+            type: String,
+            require: true,
+        },
+    },
+    {
+        statics: {
+            async findByEmail (email: string) {
+                return this.findOne({ email });
+            },
+        }
+    }
+);
+
+const Usuario = mongoose.model<IUsuario, UsuarioModel>("Usuario", usuarioSchema);
+```
 
 ## JSDoc
 Sendo importante documentar os métodos e interfaces da API, é possível fazê-lo na norma JSDoc:
@@ -25,7 +100,7 @@ Exemplo:
 * @property  {string}  value - Value of example
 * @property  {string}  available - Availability of example
 */
-interface exemple {
+interface example {
     ...
 }
 ```
@@ -43,7 +118,14 @@ Devido às configurações ESLint com Typescript, é **necessário** primeiro de
 Diretórios:
 - **/enums**
 - **/interfaces**
-  
+
+## Fazendo uso do banco de dados
+O banco de dados não é local, sendo hospedado em nuvem no MongoDB Atlas. Para que seja permitido seu uso, logo consultas ao banco de dados do Dyon, é necessário adicionar seu IP na allow list.
+
+## Diretório Rest
+Nele está contido requisições de teste ou padrão para os documentos do banco de dados, sendo utilizado pela extensão *REST Client* do VS Code.
+
+Para fazer as requisições, basta clicar em "Send Request" acima de cada uma.
 
 ## Ajuda
 - Os imports e exports estão sendo feitos na norma do ES6:
