@@ -19,7 +19,7 @@ Desta maneira, as rotas da API estão localizadas no diretório **routes/** e ma
 
 E a lógica, por sua vez, no diretório **controllers**. Cada rota possui uma controller, que é definida como uma classe com métodos estáticos, sendo públicos os chamados pela respectiva rota, e privados aqueles que não são.
 
-### Adicionando um novo grupo de todas
+### Adicionando um novo grupo de rotas
 Para adicionar um novo grupo de rotas basta criar seu respectivo arquivo conforme os que já existem, exportar o objeto *router*, importá-lo em **router.ts** e adicioná-lo ao router principal.
 
 ## Schemas e Models
@@ -28,6 +28,9 @@ O banco de dados utilizado é o MongoDB por meio da ODM Mongoose, logo, para que
 - O **Model** é utilizado para a manipulação do documento (inserir, editar, excluir, visualizar), sendo o retorno de `mongoose.model("nomeDocumento", docSchema)"`. Esta função recebe como primeiro parâmetro o nome desejado para o documento (ex: nomeDocumento), e como segundo parâmetro o schema elaborado para ele (ex: docSchema).
 Além disso, por estar sendo utilizado o typescript, é necessário criar uma interface (ex: IUsuario) para definir o generics tanto do Schema tanto do Model.
 [Documentação do Mongoose](https://mongoosejs.com/docs/guide.html)
+
+## Subdocumentos
+Subdocumentos
 
 ## Schema Discriminators
 O discriminator é uma espécie de herança que o Mongoose oferece para criar diferentes documentos a partir de apenas um, de modo que todos tenham propriedades em comum, porém algumas diferentes entre si, sendo salvos em apenas uma coleção (tabela).
@@ -47,7 +50,6 @@ A definição de generics e criação de propriedades são explicadas na seção
 - Definir o generics do tipo de Schema e Model como as interfaces criadas anteriormente, ex: <IUsuario>.
 - Adicionar no segundo parâmetro de `mongoose.Schema<D, T>({}, {})`, a propriedade statics, do tipo objeto, com os métodos como propriedades desejados definidos na interface de Model. Ex:
 ```
-// interfaces/IUsuario.ts
 interface IUsuario {
     username: string;
     email: string;
@@ -55,7 +57,6 @@ interface IUsuario {
     emailConfirmado: boolean;
 }
 
-// model/usuario.model.ts
 interface UsuarioModel extends mongoose.Model<IUsuario> {
     findByEmail(email: string): IUsuario
 }

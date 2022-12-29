@@ -1,12 +1,19 @@
 import mongoose from "mongoose";
 import Usuario, { IUsuario, UsuarioModel } from "./usuario.model";
+import enderecoSchema, { IEndereco } from "../schema/endereco.schema";
 
 export interface IParticipante extends IUsuario {
     nomeCompleto: string;
     cpf: string;
+    endereco: IEndereco
 }
 
-const participanteSchema = new mongoose.Schema<IParticipante, UsuarioModel>(
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ParticipanteModel extends UsuarioModel {
+    // Adicionar métodos próprios mais tarde
+}
+
+const ParticipanteSchema = new mongoose.Schema<IParticipante, ParticipanteModel>(
     {
         nomeCompleto: {
             type: String,
@@ -15,13 +22,11 @@ const participanteSchema = new mongoose.Schema<IParticipante, UsuarioModel>(
         cpf: {
             type: String,
             require: true
-        }
-    },
-    {
-        discriminatorKey: "kind"
+        },
+        endereco: enderecoSchema
     }
 );
 
-const Participante = Usuario.discriminator<IParticipante, UsuarioModel>("Participante", participanteSchema);
+const Participante = Usuario.discriminator<IParticipante, ParticipanteModel>("Participante", ParticipanteSchema);
 
 export default Participante;
