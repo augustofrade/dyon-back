@@ -52,8 +52,7 @@ const EnderecoSchema = new mongoose.Schema<IEndereco>(
         
     },
     {
-        discriminatorKey: "kind",
-        timestamps: true
+        _id: false
     }
 );
 

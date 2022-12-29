@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import Usuario, { IUsuario, UsuarioModel } from "./usuario.model";
-import enderecoSchema, { IEndereco } from "../schema/endereco.schema";
+import EnderecoSchema, { IEndereco } from "../schema/endereco.schema";
 
 export interface IParticipante extends IUsuario {
     nomeCompleto: string;
@@ -23,7 +23,7 @@ const ParticipanteSchema = new mongoose.Schema<IParticipante, ParticipanteModel>
             type: String,
             require: true
         },
-        endereco: enderecoSchema
+        endereco: EnderecoSchema
     }
 );
 

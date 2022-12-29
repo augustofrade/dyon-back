@@ -6,14 +6,15 @@ class ParticipanteController {
 
     public static async register(req: Request, res: Response) {
         try {            
-            const { username, email, senha, nomeCompleto, cpf } = req.body;
+            const { username, email, senha, nomeCompleto, cpf, endereco } = req.body;
             
             const usuarioCriado = await ParticipanteModel.create({
                 username,
                 email,
                 senha,
                 nomeCompleto,
-                cpf
+                cpf,
+                endereco
             });
             
             res.status(201).json(usuarioCriado);

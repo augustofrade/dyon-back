@@ -23,21 +23,23 @@ E a lógica, por sua vez, no diretório **controllers**. Cada rota possui uma co
 Para adicionar um novo grupo de rotas basta criar seu respectivo arquivo conforme os que já existem, exportar o objeto *router*, importá-lo em **router.ts** e adicioná-lo ao router principal.
 
 ## Schemas e Models
-O banco de dados utilizado é o MongoDB por meio da ODM Mongoose, logo, para que seja feita a manipulação dos dados e consulta ao banco de dados, é necessário que haja um Schema de alguma coleção (tabela) desejada (ex: Usuário), e seu respectivo model para que a manipulação seja possível.
-- O **Schema** é a definição do documento e coleção, onde são definidas as propriedadas esperadas. É possivel criá-lo a partir de `new mongoose.Schema({...})`.
+O banco de dados utilizado é o MongoDB por meio da ODM Mongoose, logo, para que seja feita a manipulação dos dados e consulta ao banco de dados, é necessário que haja um Schema de alguma coleção ("tabela") desejada (ex: Usuario), e seu respectivo model para que a manipulação seja possível.
+- O **Schema** é a definição do documento e coleção, onde são definidas as propriedadas esperadas. É possivel criá-lo a partir de `new mongoose.Schema({ ... })`.
 - O **Model** é utilizado para a manipulação do documento (inserir, editar, excluir, visualizar), sendo o retorno de `mongoose.model("nomeDocumento", docSchema)"`. Esta função recebe como primeiro parâmetro o nome desejado para o documento (ex: nomeDocumento), e como segundo parâmetro o schema elaborado para ele (ex: docSchema).
 Além disso, por estar sendo utilizado o typescript, é necessário criar uma interface (ex: IUsuario) para definir o generics tanto do Schema tanto do Model.
 [Documentação do Mongoose](https://mongoosejs.com/docs/guide.html)
 
 ## Subdocumentos
-Subdocumentos
+Os subdocumentos são documentos/objetos que são definidos como propriedades de outros documentos. Eles não possuem um Model próprio, visto que serão usados apenas para definir sub-propriedades de alguma propriedade desejada, como no caso de um **endereço** (schema/endereco.schema.ts), que possui logradouro, cep, cidade, dentre outros.
+
+Subdocumentos são **diferentes** de documentos aninhados no âmbito de que subdocumentos possuem a propriedade `_id` por padrão e que não é possível alterar suas propriedades sem que eles estejam criados dentro do documento pai; enquanto documentos aninhados estão sempre presentes, mesmo que vazios, não possuem Schema nem a propriedade `_id`. Para remover esta propriedade dos subdocumentos, basta apenas definir `_id: false`, no objeto do segundo parâmetro da declaração do Schema: `new mongoose.Schema({ ... }, { _id: false })`.
 
 ## Schema Discriminators
-O discriminator é uma espécie de herança que o Mongoose oferece para criar diferentes documentos a partir de apenas um, de modo que todos tenham propriedades em comum, porém algumas diferentes entre si, sendo salvos em apenas uma coleção (tabela).
+O discriminator é um mecanismo de herança que o Mongoose oferece para criar diferentes coleções a partir de apenas uma, de modo que todas tenham propriedades em comum, porém algumas diferentes entre si, sendo salvas como apenas uma coleção ("tabela").
 
 No Dyon, há dois tipos de usuário: Participante e Instituição. Ambos possuem e-mail e senha, porém o primeiro possui informações pessoais, como cpf, data de nascimento e nome completo; enquanto o segundo, informações empresariais, como nome fantasia, razão social e cnpj. Os discriminators permitem que esses dois tipos de usuário sejam salvos sob uma única coleção, porém sejam distintos entre si, havendo a possibilidade de se registrar um ou outro, usar métodos próprios ou em comum (explicado na próxima seção), buscar todos os tipos de usuário, apenas Participantes, ou apenas Instituições, etc.
 
-É importante ressaltar que para ser definido um novo Schema e Model por meio do discriminator é utilizado `modelBase.discriminator<IDerivado, BaseModel>("Derivado", derivadoSchema)` ao invés de `mongoose.model<IDerivado, DerivadoModel>("Derivado", derivadoSchema)`, onde **derivado** é o novo tipo de documento e **base** o documento base com as informações em comum. A definição de generics com *IDerivado* e *BaseModel* é necessário para que o mongoose e typescript saibam que é uma herança de *Derivado* apartir do *Base*. `BaseModel` pode ser também uma interface herdada para `DerivadoModel`, caso haja novos métodos apenas para o documento *Derivado* etc.
+É importante ressaltar que para ser definido um novo Schema e Model por meio do discriminator é utilizado `modelBase.discriminator<IDerivado, DerivadoModel>("Derivado", DerivadoSchema)` ao invés de `mongoose.model<IDerivado, DerivadoModel>("Derivado", DerivadoSchema)`, onde **derivado** é o novo tipo de coleção e **base** a coleção base com as informações em comum. A definição de generics com *IDerivado* e *BaseModel* é necessário para que o mongoose e typescript saibam que é uma herança de *Derivado* apartir do *Base*.
 
 A definição de generics e criação de propriedades são explicadas na seção seguinte.
 
