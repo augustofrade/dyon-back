@@ -1,6 +1,6 @@
 
 ### USUARIOS GERAIS
-POST http://localhost:3000/api/users
+POST http://localhost:3000/api/usuario
 Content-Type: application/json
 
 {
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3000/api/users/email
+POST http://localhost:3000/api/usuario/email
 Content-Type: application/json
 
 {
@@ -18,14 +18,14 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:3000/api/users/all
+GET http://localhost:3000/api/usuario/all
 
 
 
 
 ### PARTICIPANTES
 
-POST http://localhost:3000/api/participante
+POST http://localhost:3000/api/participante/register
 Content-Type: application/json
 
 {

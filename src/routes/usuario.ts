@@ -5,15 +5,15 @@ const router = express.Router();
 
 // Cadastrar usuário
 router
-    .route("/users")
+    .route("/register")
     .post((req, res) => UsuarioController.register(req, res));
 
 router
-    .route("/users/email")
+    .route("/email")
     .post((req, res) => UsuarioController.findByEmail(req, res));
 
 router
-    .route("/users/all")
+    .route("/all")
     .get((req, res) => UsuarioController.getAll(req, res));
 
 
