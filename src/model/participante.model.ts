@@ -17,11 +17,11 @@ const ParticipanteSchema = new mongoose.Schema<IParticipante, ParticipanteModel>
     {
         nomeCompleto: {
             type: String,
-            require: true
+            required: true
         },
         cpf: {
             type: String,
-            require: true
+            required: true
         },
         endereco: EnderecoSchema
     }

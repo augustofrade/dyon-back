@@ -5,7 +5,11 @@ const router = express.Router();
 
 // Listar todos eventos
 router
-    .route("/")
+    .route("/todos")
+    .get((req, res) => EventoController.getAll(req, res));
+
+router
+    .route("/:id")
     .get((req, res) => EventoController.get(req, res));
 
 export default router;

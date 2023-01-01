@@ -11,6 +11,7 @@ Para compilar, executar e observar alterações, digitar no terminal: `npm run d
 - Dotenv
 - Mongoose
 - Slugify
+- Nano ID
 
 ## Rotas da API e Controllers
 Por questões de reutilização de código e acoplamento, a lógica/regras de negócio são separadas da declaração das rotas e seus métodos HTTP.
