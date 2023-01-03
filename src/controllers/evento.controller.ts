@@ -10,17 +10,7 @@ class EventoController {
     }
 
     public static async get(req: Request, res: Response): Promise<void> {
-        const email = new Email();
-        const sucesso = await email.definir(
-            {
-                assunto: "Opewea é do Dyon",
-                destinatario: "santos.andradepaula@gmail.com",
-                remetente: email.REMETENTE,
-                html: "<p>Oie</p>",
-                texto: "texto"
-            }
-        ).enviar();
-        res.send({ sucesso });
+        res.send({ sucesso: true });
     }
 }
 

@@ -29,7 +29,10 @@ const EventoSchema = new mongoose.Schema<IEvento, EventoModel>(
             type: String,
             default: () => gerarIdAleatorio()
         },
-        slug: String,
+        slug: {
+            type: String,
+            required: true
+        },
         criador: {
             type: Types.ObjectId,
             ref: "Instituicao",
@@ -65,6 +68,11 @@ const EventoSchema = new mongoose.Schema<IEvento, EventoModel>(
         }]
     }
 );
+
+EventoSchema.pre("save", function(next) {
+    this.slug = this.titulo.replace(/[^\w\s]+/gi, "").toLowerCase().replace(/ /g, "-");
+    next();
+});
 
 const Evento = mongoose.model<IEvento, EventoModel>("Evento", EventoSchema);
 
