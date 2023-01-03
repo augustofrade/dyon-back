@@ -89,6 +89,28 @@ const usuarioSchema = new mongoose.Schema<IUsuario, UsuarioModel>(
 const Usuario = mongoose.model<IUsuario, UsuarioModel>("Usuario", usuarioSchema);
 ```
 
+## Envio de E-mails
+O envio de e-mails é realizado por meio da classe Email.ts (*util/Email.ts*) que utiliza de implementações de serviços de envio de e-mail (atualmente apenas o NodeMailer) por meio do Design Pattern Strategy.
+
+Para enviar um e-mail:
+```
+const email = new Email();
+const sucesso = await email.definir(
+    {
+        assunto: <string>,
+        destinatario: <string>,
+        remetente: <string>,
+        html: <string|undefined>,
+        texto: <string|undefined>
+    }
+).enviar();
+```
+
+**Classe *Email***
+- constructor(): `<IEmailProvider|undefined>` - método que será enviado o e-mail, o padrão (undefined) é a implementação *NodemailerTransport*;
+- definir(): `<IEmail>` - objecto que define os dados do e-mail seguindo a interface *IEmail*;
+- enviar(): envia o e-mail ao destinatário
+
 ## JSDoc
 Sendo importante documentar os métodos e interfaces da API, é possível fazê-lo na norma JSDoc:
 - Escrita logo acima do tipo (type, class, interface, function, métodos, etc).
