@@ -6,15 +6,15 @@ const router = express.Router();
 // Cadastrar participante
 router
     .route("/register")
-    .post((req, res) => ParticipanteController.register(req, res));
+    .post(ParticipanteController.register);
 
 router
     .route("/email")
-    .post((req, res) => ParticipanteController.findByEmail(req, res));
+    .post(ParticipanteController.findByEmail);
 
 router
     .route("/all")
-    .get((req, res) => ParticipanteController.getAll(req, res));
+    .get(ParticipanteController.getAll);
 
 
 

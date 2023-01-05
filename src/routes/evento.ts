@@ -6,10 +6,10 @@ const router = express.Router();
 // Listar todos eventos
 router
     .route("/todos")
-    .get((req, res) => EventoController.getAll(req, res));
+    .get(EventoController.getAll);
 
 router
     .route("/:id")
-    .get((req, res) => EventoController.get(req, res));
+    .get(EventoController.get);
 
 export default router;

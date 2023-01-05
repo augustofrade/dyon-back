@@ -5,6 +5,7 @@ import express from "express";
 import routes from "./routes/router";
 import * as dotenv from "dotenv";
 import dbConnect from "./db";
+import cookieParser from "cookie-parser";
 import popularCategorias from "./util/popularCategorias";
 
 // Receber valor do arquivo .ENV
@@ -16,6 +17,7 @@ const PORT = process.env.PORT || 3000;
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.static("./public"));
 // Colocar CORS depois (já instalado)
 

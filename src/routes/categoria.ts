@@ -6,6 +6,6 @@ const router = express.Router();
 // Listar todas categorias
 router
     .route("/")
-    .get((req, res) => CategoriaController.getAll(req, res));
+    .get(CategoriaController.getAll);
 
 export default router;
