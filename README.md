@@ -49,9 +49,10 @@ Abaixo estão listadas as rotas de autorização
 Realiza login
 
 **Parâmetros**:
-|email|*string*|E-mail do usuário|
-|-----|--------|-----------------|
-|senha|*string*|Senha do usuário |
+|Parâmetro|  tipo  |    Descrição    |
+|  email  |*string*|E-mail do usuário|
+|---------|--------|-----------------|
+|  senha  |*string*|Senha do usuário |
 
 ### /auth/logout
 Realiza logout
@@ -60,7 +61,7 @@ Realiza logout
 
 ### /auth/token
 Gera novo Access Token
-Necessita de cookie nomeado "*token*" contendo um Refresh Token válido.
+- Necessita de cookie nomeado "*token*" contendo um Refresh Token válido.
 
 ## Schemas e Models
 O banco de dados utilizado é o MongoDB por meio da ODM Mongoose, logo, para que seja feita a manipulação dos dados e consulta ao banco de dados, é necessário que haja um Schema de alguma coleção ("tabela") desejada (ex: Usuario), e seu respectivo model para que a manipulação seja possível.
