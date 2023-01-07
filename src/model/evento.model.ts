@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { IInstituicao } from "./insituicao.model";
+import { IInstituicao } from "./instituicao.model";
 import { ICategoria } from "./categoria.model";
 import mongoose, { Types } from "mongoose";
 import EnderecoSchema, { IEndereco } from "../schema/endereco.schema";

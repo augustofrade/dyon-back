@@ -12,6 +12,8 @@ Para compilar, executar e observar alterações, digitar no terminal: `npm run d
 - Mongoose
 - Slugify
 - Nano ID
+- Cookie Parser
+- jsonwebtoken
 
 ## Rotas da API e Controllers
 Por questões de reutilização de código e acoplamento, a lógica/regras de negócio são separadas da declaração das rotas e seus métodos HTTP.
@@ -22,6 +24,43 @@ E a lógica, por sua vez, no diretório **controllers**. Cada rota possui uma co
 
 ### Adicionando um novo grupo de rotas
 Para adicionar um novo grupo de rotas basta criar seu respectivo arquivo conforme os que já existem, exportar o objeto *router*, importá-lo em **router.ts** e adicioná-lo ao router principal.
+
+## Autenticação
+Ao fazer login, o usuário deve poder se manter autenticado, logo será retornado dois tokens para ele:
+- **Refresh Token**: mantém a sessão do usuário.
+  - Deve durar 1 mês.
+  - Deve ser salvo nos cookies e configurado da seguinte maneira: `{ httpOnly: true, secure: true, sameSite: ”None” }`.
+- **Access Token**: utilizado em conjunto do refresh token para permitir o acesso à rotas e recursos protegidos. A cada requisição à API é verificado se não foi expirado, e caso tenha sido, é gerado um novo.
+  - Deve durar 5 minutos.
+  - Deve ser utilizado no header “Authorization”, com Bearer, das requisições.
+
+Para acessar rotas protegidas, é verificado o **Access Token**. Caso tenha sido expirado e a requisição possua um Refresh Token em seus cookies, é gerado e retornado um novo Access Token. Isso garante que caso o Access Token seja roubado, ele não possa mais ser utilizado após um curto período de tempo. Além disso, sem o Refresh Token ou com um que seja inválido, não serão gerados mais Access Tokens.
+
+- Os tokens são gerados com hashes no padrão JWT.
+- No caso da biblioteca utilizada (jsonwebtoken), é ser informado apenas o payload, o secret e opções da signature.
+  - Payload: objeto com os dados desejados. No caso, apenas o id do usuário. ex: { id: user._id }.
+  - Opções da signature: tempo de expiração, etc.
+
+Para fazer que seja necessário a autenticação em alguma rota ou grupo de rotas, deve-se utilizar o middleware **authAccessToken.middleware.ts** como callback do router ou uma rota em específico: `router.use(authAccessToken)` ou `router.route(" ... ").get(authAccessToken, handler)`.
+
+Abaixo estão listadas as rotas de autorização
+
+### /auth/login
+Realiza login
+
+**Parâmetros**:
+|email|*string*|E-mail do usuário|
+|-----|--------|-----------------|
+|senha|*string*|Senha do usuário |
+
+### /auth/logout
+Realiza logout
+
+- Necessita de cookie nomeado "*token*" contendo um Refresh Token válido.
+
+### /auth/token
+Gera novo Access Token
+Necessita de cookie nomeado "*token*" contendo um Refresh Token válido.
 
 ## Schemas e Models
 O banco de dados utilizado é o MongoDB por meio da ODM Mongoose, logo, para que seja feita a manipulação dos dados e consulta ao banco de dados, é necessário que haja um Schema de alguma coleção ("tabela") desejada (ex: Usuario), e seu respectivo model para que a manipulação seja possível.
@@ -49,7 +88,7 @@ A definição de generics e criação de propriedades são explicadas na seção
 ## Definindo métodos estáticos para Models
 É possível definir métodos estáticos para os Models para então utilizá-lo em uma instância do model. É útil para organizar consultas próprias ao banco sem redundância no código. Para fazê-lo basta:
 - Criar a interface necessária do typescript para o Schema (ex: IUsuario), ou seja, apenas as **propriedades** do documento;
-- Criar a interface necessária do typescript para o Model (ex: UsuarioModel) contendo apenas os **métodos** customizados do Model.
+- Criar a interface necessária do typescript para o Model (ex: IUsuarioModel) contendo apenas os **métodos** customizados do Model.
 - Definir o generics do tipo de Schema e Model como as interfaces criadas anteriormente, ex: <IUsuario>.
 - Adicionar no segundo parâmetro de `mongoose.Schema<D, T>({}, {})`, a propriedade statics, do tipo objeto, com os métodos como propriedades desejados definidos na interface de Model. Ex:
 ```
@@ -60,11 +99,11 @@ interface IUsuario {
     emailConfirmado: boolean;
 }
 
-interface UsuarioModel extends mongoose.Model<IUsuario> {
+interface IUsuarioModel extends mongoose.Model<IUsuario> {
     findByEmail(email: string): IUsuario
 }
 
-const usuarioSchema = new mongoose.Schema<IUsuario, UsuarioModel>(
+const usuarioSchema = new mongoose.Schema<IUsuario, IUsuarioModel>(
 {
         username: {
             type: String,
@@ -86,7 +125,7 @@ const usuarioSchema = new mongoose.Schema<IUsuario, UsuarioModel>(
     }
 );
 
-const Usuario = mongoose.model<IUsuario, UsuarioModel>("Usuario", usuarioSchema);
+const Usuario = mongoose.model<IUsuario, IUsuarioModel>("Usuario", usuarioSchema);
 ```
 
 ## Envio de E-mails

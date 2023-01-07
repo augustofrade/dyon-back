@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable no-unused-vars */
-import mongoose from "mongoose";
+import mongoose, { Document, Schema, Model } from "mongoose";
 import bcrypt from "bcrypt";
 
 export interface IUsuario {
@@ -7,15 +8,21 @@ export interface IUsuario {
     email: string;
     senha: string;
     emailConfirmado: boolean;
+    refreshToken: string[];
 }
 
 
-export interface UsuarioModel extends mongoose.Model<IUsuario> {
-    findByEmail(email: string): IUsuario
+// Métodos de instância
+export interface IUsuarioDocument extends IUsuario, Document {
+    checkPassword: (password: string) => Promise<boolean>;
 }
 
+// Métodos estáticos
+export interface IUsuarioModel extends Model<IUsuarioDocument> {
+    findByEmail: (email: string) => Promise<IUsuarioDocument>;
+}
 
-const UsuarioSchema = new mongoose.Schema<IUsuario, UsuarioModel>(
+const UsuarioSchema: Schema<IUsuarioDocument> = new Schema(
     {
         username: {
             type: String,
@@ -37,26 +44,25 @@ const UsuarioSchema = new mongoose.Schema<IUsuario, UsuarioModel>(
             type: Boolean,
             default: false
         },
-        
+        refreshToken: {
+            type: [String],
+            default: []
+        }
     },
     {
         discriminatorKey: "tipo",
-        timestamps: true,
-        statics: {
-            async findByEmail (email: string) {
-                return this.findOne({ email });
-            },
-        }
+        timestamps: true
     }
 );
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-UsuarioSchema.methods.comparePassword = function (password: string, cb: any) {
-    bcrypt.compare(password, this.password, function (err, result) {
-        if(err) return cb(err);
+UsuarioSchema.methods.checkPassword = async function (password: string) {
+    const senhasConferem = bcrypt.compare(password, this.senha);
+    return senhasConferem;
+};
 
-        cb(null, result);
-    });
+UsuarioSchema.statics.findByEmail = async function (email: string) {
+    return this.findOne({ email });
 };
 
 UsuarioSchema.pre("save", function (next) {
@@ -81,6 +87,6 @@ UsuarioSchema.pre("save", function (next) {
     });
 });
 
-const Usuario = mongoose.model<IUsuario, UsuarioModel>("Usuario", UsuarioSchema);
+const Usuario = mongoose.model<IUsuarioDocument, IUsuarioModel>("Usuario", UsuarioSchema);
 
 export default Usuario;

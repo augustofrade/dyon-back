@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Usuario, { IUsuario, UsuarioModel } from "./usuario.model";
+import Usuario, { IUsuario, IUsuarioModel } from "./usuario.model";
 import EnderecoSchema, { IEndereco } from "../schema/endereco.schema";
 
 export interface IParticipante extends IUsuario {
@@ -9,7 +9,7 @@ export interface IParticipante extends IUsuario {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ParticipanteModel extends UsuarioModel {
+export interface ParticipanteModel extends IUsuarioModel {
     // Adicionar métodos próprios mais tarde
 }
 
