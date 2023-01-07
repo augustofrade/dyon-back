@@ -49,9 +49,10 @@ Abaixo estão listadas as rotas de autorização
 Realiza login
 
 **Parâmetros**:
+
 |Parâmetro|  tipo  |    Descrição    |
-|  email  |*string*|E-mail do usuário|
 |---------|--------|-----------------|
+|  email  |*string*|E-mail do usuário|
 |  senha  |*string*|Senha do usuário |
 
 ### /auth/logout
