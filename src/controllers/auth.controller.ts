@@ -64,19 +64,19 @@ class AuthController {
      * @returns Response
      */
     public static async logout(req: Request, res: Response) {
-        // Verificar se foi passado um token
         if(!req.cookies?.token)
             return res.status(204).json({ msg: "Usuário não está autenticado" });
         
-        const refreshToken: string = req.cookies.token;        
+        const refreshToken: string = req.cookies.token;
         const usuarioComToken = await Usuario.findOne({ refreshToken });
-        // Verificar se algum usuário possui esse token
         if(!usuarioComToken)
             return res.status(204).json({ msg: "Token inválido" });
 
+        // TODO: colocar essa lógica no model
         // Remover token da lista de Refresh Tokens do usuário
         usuarioComToken.refreshToken = usuarioComToken.refreshToken.filter(token => token !== refreshToken);
         usuarioComToken.save();
+
         // Remover refresh token dos cookies
         res.clearCookie("token");
 
