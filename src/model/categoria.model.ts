@@ -1,54 +1,37 @@
-import mongoose from "mongoose";
+import { prop, getModelForClass, ReturnModelType } from "@typegoose/typegoose";
 import ICategoriaVM from "../interfaces/ICategoriaVM";
 
+class Categoria {
+    @prop()
+    public _id!: string;
 
-export interface ICategoria {
-    _id: string;
-    titulo: string;
-    imagem: Buffer;
-}
+    @prop({ required: true, index: true })
+    public titulo!: string;
 
-export interface CategoriaModel extends mongoose.Model<ICategoria> {
-    findAndConvertBase64(): ICategoriaVM[]
-}
+    @prop()
+    public imagem!: Buffer;
 
-const CategoriaSchema = new mongoose.Schema<ICategoria, CategoriaModel>(
-    {
-        _id: String,
-        titulo: {
-            type: String,
-            required: true,
-            index: true
-        },
-        imagem: {
-            type: Buffer,
-            contentType: String,
-        }
-    },
-    {
-        statics: {
-            /**
-             * Método provisório para exibir as thumbnails de categorias na página de categorias
-             * Analisar se neste caso vale a pena salvar como base 64 mesmo ou continuar como blob
-             * @returns ICategoriaVM[]
-             */
-            async findAndConvertBase64() {
-                return (await this.find()).map((c: ICategoria) => {
-                    const imagem = c.imagem.toString("base64");
-                    
-                    const categoria: ICategoriaVM = {
-                        slug: c._id,
-                        titulo: c.titulo,
-                        imagem
-                    };
 
-                    return categoria;
-                });
-            }
-        }
+    /**
+    * Método provisório para exibir as thumbnails de categorias na página de categorias
+    * Analisar se neste caso vale a pena salvar como base 64 mesmo ou continuar como blob
+    * @returns ICategoriaVM[]
+    */
+    static async findAndConvertBase64(this: ReturnModelType<typeof Categoria>) {
+        return (await this.find()).map((c: Categoria) => {
+            const imagem = c.imagem.toString("base64");
+            
+            const categoria: ICategoriaVM = {
+                slug: c._id,
+                titulo: c.titulo,
+                imagem
+            };
+
+            return categoria;
+        });
     }
-);
+}
 
-const Categoria = mongoose.model<ICategoria, CategoriaModel>("Categoria", CategoriaSchema);
+const CategoriaModel = getModelForClass(Categoria);
 
-export default Categoria;
+export { CategoriaModel, Categoria };

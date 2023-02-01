@@ -1,32 +1,18 @@
-import mongoose from "mongoose";
-import Usuario, { IUsuario, IUsuarioModel } from "./usuario.model";
-import EnderecoSchema, { IEndereco } from "../schema/endereco.schema";
+import { prop, getDiscriminatorModelForClass } from "@typegoose/typegoose";
+import { Endereco } from "../schema/endereco.schema";
+import { Usuario, UsuarioModel } from "./usuario.model";
 
-export interface IParticipante extends IUsuario {
-    nomeCompleto: string;
-    cpf: string;
-    endereco: IEndereco
+class Participante extends Usuario {
+    @prop({ required: true })
+    public nomeCompleto!: string;
+
+    @prop({ required: true })
+    public cpf!: string;
+
+    @prop({ required: true })
+    public endereco!: Endereco;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ParticipanteModel extends IUsuarioModel {
-    // Adicionar métodos próprios mais tarde
-}
+const ParticipanteModel = getDiscriminatorModelForClass(UsuarioModel, Participante);
 
-const ParticipanteSchema = new mongoose.Schema<IParticipante, ParticipanteModel>(
-    {
-        nomeCompleto: {
-            type: String,
-            required: true
-        },
-        cpf: {
-            type: String,
-            required: true
-        },
-        endereco: EnderecoSchema
-    }
-);
-
-const Participante = Usuario.discriminator<IParticipante, ParticipanteModel>("Participante", ParticipanteSchema);
-
-export default Participante;
+export { ParticipanteModel, Participante };

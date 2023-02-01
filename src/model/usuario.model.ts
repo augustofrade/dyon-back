@@ -1,71 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable no-unused-vars */
-import mongoose, { Document, Schema, Model } from "mongoose";
+import { Types } from "mongoose";
+import { pre, prop, modelOptions, getModelForClass, DocumentType, ReturnModelType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
 
-export interface IUsuario {
-    username: string;
-    email: string;
-    senha: string;
-    emailConfirmado: boolean;
-    refreshToken: string[];
-}
-
-
-// Métodos de instância
-export interface IUsuarioDocument extends IUsuario, Document {
-    checkPassword: (password: string) => Promise<boolean>;
-}
-
-// Métodos estáticos
-export interface IUsuarioModel extends Model<IUsuarioDocument> {
-    findByEmail: (email: string) => Promise<IUsuarioDocument>;
-}
-
-const UsuarioSchema: Schema<IUsuarioDocument> = new Schema(
-    {
-        username: {
-            type: String,
-            required: true,
-            index: true,
-            unique: true
-        },
-        email: {
-            type: String,
-            require: true,
-            index: true,
-            unique: true
-        },
-        senha: {
-            type: String,
-            require: true,
-        },
-        emailConfirmado: {
-            type: Boolean,
-            default: false
-        },
-        refreshToken: {
-            type: [String],
-            default: []
-        }
-    },
-    {
-        discriminatorKey: "tipo",
-        timestamps: true
-    }
-);
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-UsuarioSchema.methods.checkPassword = async function (password: string) {
-    const senhasConferem = bcrypt.compare(password, this.senha);
-    return senhasConferem;
-};
-
-UsuarioSchema.statics.findByEmail = async function (email: string) {
-    return this.findOne({ email });
-};
-
-UsuarioSchema.pre("save", function (next) {
+@pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
 
     // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -85,8 +22,36 @@ UsuarioSchema.pre("save", function (next) {
             next();
         });
     });
-});
+})
+@modelOptions({ schemaOptions: { discriminatorKey: "tipo", timestamps: true } })
+class Usuario {
+    @prop({ required: true, index: true, unique: true })
+    public username!: string;
 
-const Usuario = mongoose.model<IUsuarioDocument, IUsuarioModel>("Usuario", UsuarioSchema);
+    @prop({ required: true, index: true, unique: true })
+    public email!: string;
 
-export default Usuario;
+    @prop({ required: true })
+    public senha!: string;
+
+    @prop({ default: false })
+    public emailConfirmado!: string;
+
+    @prop({ default: [], type: String })
+    public refreshToken!: Types.Array<boolean>;
+
+
+    async checkPassword(this: DocumentType<Usuario>, password: string) {
+        const senhasConferem = bcrypt.compare(password, this.senha);
+        return senhasConferem;
+    }
+
+    static async findByEmail(this: ReturnModelType<typeof Usuario>, email: string) {
+        return this.findOne({ email });
+    }
+}
+
+
+const UsuarioModel = getModelForClass(Usuario);
+
+export { UsuarioModel, Usuario };
