@@ -2,7 +2,7 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response } from "express";
 
-import Usuario from "../model/usuario.model";
+import { UsuarioModel } from "../model/usuario.model";
 
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
@@ -35,7 +35,7 @@ class AuthController {
         if(!email || !senha)
             return res.status(400).json({ msg: "E-mail e senha são obrigatórios" });
 
-        const usuario = await Usuario.findByEmail(email);
+        const usuario = await UsuarioModel.findOne({ email });
         if(!usuario)
             return res.status(204).json({ msg: "Usuário não encontrado" });
         
@@ -43,9 +43,9 @@ class AuthController {
         if(!senhaCorreta)
             return res.status(403).json({ msg: "Senha incorreta" });
         
-        const refreshToken = gerarRefreshToken(usuario);
+        const refreshToken = gerarRefreshToken({ id: usuario._id, email: usuario.email });
 
-        const accessToken = gerarAccesToken(usuario);
+        const accessToken = gerarAccesToken({ id: usuario._id, email: usuario.email });
 
         usuario.refreshToken.push(refreshToken);
         usuario.save();
@@ -68,13 +68,13 @@ class AuthController {
             return res.status(204).json({ msg: "Usuário não está autenticado" });
         
         const refreshToken: string = req.cookies.token;
-        const usuarioComToken = await Usuario.findOne({ refreshToken });
+        const usuarioComToken = await UsuarioModel.findOne({ refreshToken });
         if(!usuarioComToken)
             return res.status(204).json({ msg: "Token inválido" });
 
         // TODO: colocar essa lógica no model
         // Remover token da lista de Refresh Tokens do usuário
-        usuarioComToken.refreshToken = usuarioComToken.refreshToken.filter(token => token !== refreshToken);
+        usuarioComToken.refreshToken.pull(refreshToken);
         usuarioComToken.save();
 
         // Remover refresh token dos cookies
@@ -95,7 +95,7 @@ class AuthController {
             return res.status(401).json({ msg: "Usuário não está autenticado" });
         
         const refreshToken = req.cookies.token;
-        const usuarioComToken = await Usuario.findOne({ refreshToken });
+        const usuarioComToken = await UsuarioModel.findOne({ refreshToken });
         if(!usuarioComToken)
             return res.status(401).json({ msg: "Token inválido" });
         
@@ -107,7 +107,7 @@ class AuthController {
                     return res.status(403).json({ msg: "Token inválido" });
                 }
                 else {
-                    const novoAccessToken = gerarAccesToken(usuarioComToken);
+                    const novoAccessToken = gerarAccesToken({ id: usuarioComToken._id, email: usuarioComToken.email });
                     return res.json({ token: novoAccessToken });
                 }
             }

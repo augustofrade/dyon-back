@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import ParticipanteModel from "../model/participante.model";
+import { ParticipanteModel } from "../model/participante.model";
 
 
 class ParticipanteController {
@@ -29,7 +29,7 @@ class ParticipanteController {
     }
 
     public static async findByEmail(req: Request, res: Response) {
-        const user = await ParticipanteModel.findByEmail(req.body.email); // null caso nao encontrado
+        const user = await ParticipanteModel.findOne({ email: req.body.email }); // null caso nao encontrado
         res.json(user);
     }
 }

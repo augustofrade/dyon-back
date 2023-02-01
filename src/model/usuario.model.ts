@@ -38,7 +38,7 @@ class Usuario {
     public emailConfirmado!: string;
 
     @prop({ default: [], type: String })
-    public refreshToken!: Types.Array<boolean>;
+    public refreshToken!: Types.Array<string>;
 
 
     async checkPassword(this: DocumentType<Usuario>, password: string) {

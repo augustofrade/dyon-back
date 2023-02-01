@@ -2,8 +2,7 @@
 /* eslint-disable no-empty-function */
 
 
-import IEmail from "../interfaces/IEmail";
-import IEmailProvider from "../interfaces/IEmailProvider";
+import { IEmail, IEmailProvider } from "../types/interface";
 import NodemailerTransport from "./email-implementacoes/NodemailerTransport";
 
 

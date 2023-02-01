@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import CategoriaModel from "../model/categoria.model";
+import { CategoriaModel } from "../model/categoria.model";
 
 
 class CategoriaController {

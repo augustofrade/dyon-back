@@ -1,5 +1,5 @@
 import { prop, getModelForClass, ReturnModelType } from "@typegoose/typegoose";
-import ICategoriaVM from "../interfaces/ICategoriaVM";
+import { ICategoriaVM } from "../types/interface";
 
 class Categoria {
     @prop()

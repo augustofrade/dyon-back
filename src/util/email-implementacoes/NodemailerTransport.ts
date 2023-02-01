@@ -1,7 +1,6 @@
-/* eslint-disable no-empty-function */
-import IEmail from "../../interfaces/IEmail";
-import IEmailProvider from "../../interfaces/IEmailProvider";
 import nodemailer from "nodemailer";
+import { IEmail, IEmailProvider } from "./../../types/interface";
+/* eslint-disable no-empty-function */
 
 export default class NodemailerTransport implements IEmailProvider {
     private transporter: nodemailer.Transporter;

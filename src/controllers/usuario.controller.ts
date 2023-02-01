@@ -1,14 +1,20 @@
 import { Request, Response } from "express";
-import UserModel, { IUsuario } from "../model/usuario.model";
+import { UsuarioModel } from "../model/usuario.model";
 
 
+/**
+ * **Métodos utilizados apenas para testes**
+ * 
+ * para criar contas e afins, utilizar a controller e métodos respectivos
+ * dos Models de Participante e Instituicao
+ */
 class UsuarioController {
 
     public static async register(req: Request, res: Response) {
         try {            
             const { username, email, senha } = req.body;
             
-            const usuarioCriado: IUsuario = await UserModel.create({
+            const usuarioCriado = await UsuarioModel.create({
                 username,
                 email,
                 senha
@@ -21,12 +27,12 @@ class UsuarioController {
     }
 
     public static async getAll(req: Request, res: Response) {
-        const allUsers = await UserModel.find();
+        const allUsers = await UsuarioModel.find();
         res.json(allUsers);
     }
 
     public static async findByEmail(req: Request, res: Response) {
-        const user = await UserModel.findByEmail(req.body.email);
+        const user = await UsuarioModel.findByEmail(req.body.email);
         res.json(user);
     }
 }
