@@ -2,8 +2,8 @@ import { prop, getModelForClass, ReturnModelType } from "@typegoose/typegoose";
 import { ICategoriaVM } from "../types/interface";
 
 class Categoria {
-    @prop()
-    public _id!: string;
+    @prop({ required: true, index: true })
+    public slug!: string;
 
     @prop({ required: true, index: true })
     public titulo!: string;
@@ -18,11 +18,11 @@ class Categoria {
     * @returns ICategoriaVM[]
     */
     static async findAndConvertBase64(this: ReturnModelType<typeof Categoria>) {
-        return (await this.find()).map((c: Categoria) => {
+        return (await this.find()).map(c => {
             const imagem = c.imagem.toString("base64");
             
             const categoria: ICategoriaVM = {
-                slug: c._id,
+                slug: c.slug,
                 titulo: c.titulo,
                 imagem
             };

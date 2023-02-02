@@ -1,6 +1,7 @@
 import { Types } from "mongoose";
 import { pre, prop, modelOptions, getModelForClass, DocumentType, ReturnModelType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
+import gerarIdAleatorio from "../util/gerarIDAleatorio";
 
 @pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
@@ -25,8 +26,8 @@ import bcrypt from "bcrypt";
 })
 @modelOptions({ schemaOptions: { discriminatorKey: "tipo", timestamps: true } })
 class Usuario {
-    @prop({ required: true, index: true, unique: true })
-    public username!: string;
+    @prop({ unique: true, index: true, default: () => gerarIdAleatorio() })
+    public _publicId!: string;
 
     @prop({ required: true, index: true, unique: true })
     public email!: string;

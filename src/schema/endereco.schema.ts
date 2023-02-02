@@ -1,4 +1,5 @@
 import { prop, modelOptions } from "@typegoose/typegoose";
+import estadosEnum from "../types/enums/estadosEnum";
 
 @modelOptions({ schemaOptions: { _id: false } })
 class Endereco {
@@ -11,7 +12,7 @@ class Endereco {
     @prop({ required: true })
     public cidade!: string;
 
-    @prop({ required: true, index: true })
+    @prop({ required: true, index: true, enum: estadosEnum })
     public uf!: string;
 
     @prop({ required: true, index: true })
