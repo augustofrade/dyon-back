@@ -112,26 +112,14 @@ class Usuario {
 ```
 
 ## Envio de E-mails
-O envio de e-mails é realizado por meio da classe Email.ts (*util/Email.ts*) que utiliza de implementações de serviços de envio de e-mail (atualmente apenas o NodeMailer) por meio do Design Pattern Strategy.
+O envio de e-mails é realizado por meio da classe singleton Email.ts (*email/Email.ts*) com a implementação do Nodemailer. Os métodos públicos lidam apenas com o template desejado, ex: template de cadastro etc.
+
+Os métodos de envio de e-mail retornam **Promise<>** com o retorno do envio de e-mail do nodemailer. Logo, é possível enviá-lo de maneira síncrona com async/await ou assícrona com function chaining ou não. Vale lembrar que **não é verificado** se o endereço do destinatário existe ou não.
 
 Para enviar um e-mail:
 ```
-const email = new Email();
-const sucesso = await email.definir(
-    {
-        assunto: <string>,
-        destinatario: <string>,
-        remetente: <string>,
-        html: <string|undefined>,
-        texto: <string|undefined>
-    }
-).enviar();
+Email.Instance.metodoDesejado(destinatario, opcoes);
 ```
-
-**Classe *Email***
-- constructor(): `<IEmailProvider|undefined>` - método que será enviado o e-mail, o padrão (undefined) é a implementação *NodemailerTransport*;
-- definir(): `<IEmail>` - objecto que define os dados do e-mail seguindo a interface *IEmail*;
-- enviar(): envia o e-mail ao destinatário
 
 ## JSDoc
 Sendo importante documentar os métodos da API, é possível fazê-lo na norma JSDoc:

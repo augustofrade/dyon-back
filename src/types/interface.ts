@@ -16,14 +16,12 @@ export interface ICategoriaVM {
 }
 
 export interface IEmail {
-    remetente?: string;
-    destinatario: string;
     assunto: string;
     texto?: string;
-    html?: string;
+    html: string;
 }
 
-export interface IEmailProvider {
-    enviarEmail(email: IEmail): Promise<boolean>;
-    
+export interface TokenGenerico {
+    hash: string;
+    expiracao: Date;
 }

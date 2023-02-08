@@ -24,10 +24,7 @@ class AuthController {
      * e se as credenciais enviadas em **req.body** estão corretas
      * 
      * Caso sejam válidas, é gerado um **Refresh Token** que é colocado nos cookies
-     * e um **Access Token** que é retornado em JSON como resposta
-     * @param req Objeto de Requisição
-     * @param res Objeto de Resposta
-     * @returns Response
+     * e um **Access Token** que é retornado em JSON como resposta.
      */
     public static async login(req: Request, res: Response) {
         const { email, senha } = req.body;
@@ -59,9 +56,6 @@ class AuthController {
      * 
      * Realiza o logout do usuário removendo seu Refresh Token atual de seus cookies
      * e de seu documento no banco de dados, tornando-o inutilizável.
-     * @param req Objeto de Requisição
-     * @param res Objeto de Resposta
-     * @returns Response
      */
     public static async logout(req: Request, res: Response) {
         if(!req.cookies?.token)
@@ -86,9 +80,6 @@ class AuthController {
     /**
      * Gera um novo Access Token caso o Refresh Token dos cookies seja válido,
      * para que o usuário possa acessar rotas que necessitam de autenticação.
-     * @param req Objeto da Requisição
-     * @param res Objeto da Resposta
-     * @returns Response
      */
     public static async gerarNovoAccessToken(req: Request, res: Response) {
         if(!req.cookies?.token)

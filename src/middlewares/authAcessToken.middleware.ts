@@ -6,9 +6,6 @@ import jwt from "jsonwebtoken";
  * - Se foi passado no cabeçalho de Authorization da requisição
  * - Se não sofreu alterações (jwt.verify())
  * - Se já expirou
- * @param req Request
- * @param res Response
- * @param next NextFunction
  */
 const authAcessToken  = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const authHeader: string | undefined = req.headers["authorization"];

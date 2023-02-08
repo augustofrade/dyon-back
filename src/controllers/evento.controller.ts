@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import Email from "../util/Email";
 // import EventoModel from "../model/evento.model";
 
 class EventoController {

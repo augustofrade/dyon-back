@@ -38,6 +38,9 @@ class Usuario {
     @prop({ default: false })
     public emailConfirmado!: string;
 
+    @prop()
+    public emailToken?: string;
+
     @prop({ default: [], type: String })
     public refreshToken!: Types.Array<string>;
 

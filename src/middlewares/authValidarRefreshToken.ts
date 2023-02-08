@@ -8,9 +8,6 @@ import { Request, Response, NextFunction } from "express";
  * - O Refresh Token é válido
  * 
  * É utilizado na rota de login para que **não seja necessário realizar a verificação na mesma**
- * @param req Request
- * @param res Response
- * @param next NextFunction
  */
 const authValidarRefreshToken = (req: Request, res: Response, next: NextFunction) => {
     const refreshToken: string | undefined = req.cookies.token;
