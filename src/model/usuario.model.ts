@@ -31,7 +31,7 @@ class Usuario {
     @prop({ required: true, index: true, unique: true })
     public email!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, minlength: 6 })
     public senha!: string;
 
     @prop({ default: false })

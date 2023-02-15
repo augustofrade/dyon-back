@@ -8,17 +8,17 @@ class ParticipanteController {
 
     public static async register(req: Request, res: Response) {
         try {            
-            const { username, email, senha, nomeCompleto, cpf, endereco } = req.body;
-            // TODO: adicionar o resto das propriedades do PARTICIPANTE
+            const { email, senha, nomeCompleto, cpf, endereco, dataNascimento } = req.body;
+            // TODO: adicionar categoriasFavoritas quando já houver validação da rota
             const emailToken = gerarTokenGenerico();
             const usuarioCriado = await ParticipanteModel.create({
-                username,
                 email,
                 senha,
                 emailToken,
                 nomeCompleto,
                 cpf,
-                endereco
+                endereco,
+                dataNascimento
             });
             Email.Instance.enviarEmailDeCadastro(email, nomeCompleto, emailToken);
             res.status(201).json(usuarioCriado);

@@ -1,14 +1,14 @@
+import { pre, prop, Ref } from "@typegoose/typegoose";
 import { Types } from "mongoose";
-import { prop, pre, Ref } from "@typegoose/typegoose";
 
-import { Endereco } from "../schema/endereco.schema";
-import { Categoria } from "./categoria.model";
-import { Instituicao } from "./instituicao.model";
 import { Avaliacao } from "../schema/avaliacao.schema";
+import { Endereco } from "../schema/endereco.schema";
 import { Periodo } from "../schema/periodo.schema";
-import { Inscricao } from "./inscricao.model";
 import gerarIdAleatorio from "../util/gerarIDAleatorio";
 import gerarSlug from "../util/gerarSlug";
+import { Categoria } from "./categoria.model";
+import { Inscricao } from "./inscricao.model";
+import { Instituicao } from "./instituicao.model";
 
 @pre<Evento>("save", function() {
     this.slug = gerarSlug(this.titulo);
@@ -23,10 +23,10 @@ class Evento {
     @prop({ required: true, ref: () => Instituicao })
     public criador!: Ref<Instituicao>;
 
-    @prop({ required: true })
+    @prop({ required: true, minlength: 10, maxLength: 50 })
     public titulo!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, minLength: 20 })
     public descricao!: string;
 
     @prop({ required: true })

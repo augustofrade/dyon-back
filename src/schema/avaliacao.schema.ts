@@ -6,7 +6,7 @@ class Avaliacao {
     @prop({ required: true, ref: () => Usuario })
     public autor!: Ref<Usuario>;
 
-    @prop({ required: true })
+    @prop({ required: true, min: 0, max: 10 })
     public nota!: number;
 
     @prop()

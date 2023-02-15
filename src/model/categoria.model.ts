@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { prop, getModelForClass, ReturnModelType } from "@typegoose/typegoose";
 import { ICategoriaVM } from "../types/interface";
 

@@ -5,19 +5,19 @@ import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
 
 class Instituicao extends Usuario {
-    @prop({ required: true })
+    @prop({ required: true, minlength: 3, maxLength: 40 })
     public nomeFantasia!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, minLength: 3, maxLength: 60 })
     public razaoSocial!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, maxLength: 80 })
     public nomeRepresentante!: string;
 
-    @prop({ required: true })
+    @prop({ required: true,  })
     public cnpj!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, minlength: 18, maxlength: 18 })
     public telefone!: string;
 
     @prop({ required: true, default: [], ref: () => Categoria })

@@ -16,7 +16,7 @@ import gerarUsername from "../util/gerarUsername";
 })
 class Participante extends Usuario {
 
-    @prop({ required: true })
+    @prop({ required: true, minLength: 10, maxLength: 60 })
     public nomeCompleto!: string;
 
     @prop()
@@ -25,7 +25,7 @@ class Participante extends Usuario {
     @prop({ required: true, enum: generoEnum })
     public genero!: string;
 
-    @prop({ required: true })
+    @prop({ required: true, minLength: 14, maxLength: 14 })
     public cpf!: string;
 
     @prop({ required: true })
