@@ -8,9 +8,6 @@ router
     .route("/register")
     .post(ParticipanteController.register);
 
-router
-    .route("/email")
-    .post(ParticipanteController.findByEmail);
 
 router
     .route("/all")

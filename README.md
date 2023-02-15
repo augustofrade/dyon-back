@@ -104,7 +104,7 @@ Enquanto para os **métodos de instância**, basta declarar na classe um método
 class Usuario {
     // ...
 
-    async checkPassword(this: DocumentType<Usuario>, password: string) {
+    async verificarSenha(this: DocumentType<Usuario>, password: string) {
         const senhasConferem = bcrypt.compare(password, this.senha);
         return senhasConferem;
     }
@@ -153,11 +153,6 @@ Deve-se separar padrões de objetos (interfaces) e enums (propriedades imutávei
 
 ## Fazendo uso do banco de dados
 O banco de dados não é local, sendo hospedado em nuvem no MongoDB Atlas. Para que seja permitido seu uso, logo consultas ao banco de dados do Dyon, é necessário adicionar seu IP na allow list.
-
-## Diretório Rest
-Nele está contido requisições de teste ou padrão para os documentos do banco de dados, sendo utilizado pela extensão *REST Client* do VS Code.
-
-Para fazer as requisições, basta clicar em "Send Request" acima de cada uma.
 
 ## Ajuda
 Os imports e exports estão sendo feitos na norma do ES6:

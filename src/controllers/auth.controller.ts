@@ -36,7 +36,7 @@ class AuthController {
         if(!usuario)
             return res.status(204).json({ msg: "Usuário não encontrado" });
         
-        const senhaCorreta = await usuario.checkPassword(senha);
+        const senhaCorreta = await usuario.verificarSenha(senha);
         if(!senhaCorreta)
             return res.status(403).json({ msg: "Senha incorreta" });
         

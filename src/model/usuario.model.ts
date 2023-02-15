@@ -1,7 +1,6 @@
 import { Types } from "mongoose";
 import { pre, prop, modelOptions, getModelForClass, DocumentType, ReturnModelType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
-import gerarIdAleatorio from "../util/gerarIDAleatorio";
 
 @pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
@@ -26,8 +25,8 @@ import gerarIdAleatorio from "../util/gerarIDAleatorio";
 })
 @modelOptions({ schemaOptions: { discriminatorKey: "tipo", timestamps: true } })
 class Usuario {
-    @prop({ unique: true, index: true, default: () => gerarIdAleatorio() })
-    public _publicId!: string;
+    @prop({ unique: true, index: true })
+    public username!: string;
 
     @prop({ required: true, index: true, unique: true })
     public email!: string;
@@ -45,13 +44,9 @@ class Usuario {
     public refreshToken!: Types.Array<string>;
 
 
-    async checkPassword(this: DocumentType<Usuario>, password: string) {
+    async verificarSenha(this: DocumentType<Usuario>, password: string) {
         const senhasConferem = bcrypt.compare(password, this.senha);
         return senhasConferem;
-    }
-
-    static async findByEmail(this: ReturnModelType<typeof Usuario>, email: string) {
-        return this.findOne({ email });
     }
 }
 

@@ -1,12 +1,19 @@
 import { generoEnum } from "./../types/enums";
-import { prop, getDiscriminatorModelForClass, Ref } from "@typegoose/typegoose";
+import { prop, Ref, pre } from "@typegoose/typegoose";
 import { Endereco } from "../schema/endereco.schema";
-import { Usuario, UsuarioModel } from "./usuario.model";
+import { Usuario } from "./usuario.model";
 import { Categoria } from "./categoria.model";
 import { Instituicao } from "./instituicao.model";
 import { Evento } from "./evento.model";
 import { Inscricao } from "./inscricao.model";
+import gerarUsername from "../util/gerarUsername";
 
+
+@pre<Participante>("save", function() {
+    if(this.isModified("nomeSocial" || this.isModified("nomeCompleto"))) {
+        this.username = gerarUsername( this.nomeSocial ?? this.nomeCompleto);
+    }
+})
 class Participante extends Usuario {
 
     @prop({ required: true })
@@ -40,6 +47,4 @@ class Participante extends Usuario {
     public inscricoes!: Ref<Inscricao>[];
 }
 
-const ParticipanteModel = getDiscriminatorModelForClass(UsuarioModel, Participante);
-
-export { ParticipanteModel, Participante };
+export { Participante };

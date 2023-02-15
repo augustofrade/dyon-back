@@ -1,4 +1,4 @@
-import { prop, pre, Ref, getModelForClass, modelOptions } from "@typegoose/typegoose";
+import { prop, pre, Ref, modelOptions } from "@typegoose/typegoose";
 import { Periodo } from "../schema/periodo.schema";
 import { Participante } from "./participante.model";
 import { Operador } from "./operador.model";
@@ -24,6 +24,4 @@ class Inscricao {
     public confirmadaPor!: Ref<Operador>;
 }
 
-const InscricaoModel = getModelForClass(Inscricao);
-
-export { InscricaoModel, Inscricao };
+export { Inscricao };

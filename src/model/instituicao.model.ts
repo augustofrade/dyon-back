@@ -1,8 +1,8 @@
-import { prop, getDiscriminatorModelForClass, Ref } from "@typegoose/typegoose";
+import { prop, Ref } from "@typegoose/typegoose";
 import { Endereco } from "../schema/endereco.schema";
 import { Categoria } from "./categoria.model";
 import { Operador } from "./operador.model";
-import { Usuario, UsuarioModel } from "./usuario.model";
+import { Usuario } from "./usuario.model";
 
 class Instituicao extends Usuario {
     @prop({ required: true })
@@ -26,10 +26,9 @@ class Instituicao extends Usuario {
     @prop({ required: true })
     public endereco!: Endereco;
 
-    @prop({ default: [] })
+    @prop({ default: [], ref: () => Operador })
     public operadores!: Ref<Operador>[];
 }
 
-const InstituicaoModel = getDiscriminatorModelForClass(UsuarioModel, Instituicao);
 
-export { InstituicaoModel, Instituicao };
+export { Instituicao };

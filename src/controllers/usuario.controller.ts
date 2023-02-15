@@ -14,11 +14,6 @@ class UsuarioController {
         const allUsers = await UsuarioModel.find();
         res.json(allUsers);
     }
-
-    public static async findByEmail(req: Request, res: Response) {
-        const user = await UsuarioModel.findByEmail(req.body.email);
-        res.json(user);
-    }
 }
 
 export default UsuarioController;

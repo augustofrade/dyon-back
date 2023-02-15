@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Email from "../email/Email";
-import { ParticipanteModel } from "../model/participante.model";
+import { ParticipanteModel } from "../model/models";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 
 
@@ -30,11 +30,6 @@ class ParticipanteController {
     public static async getAll(req: Request, res: Response) {
         const allUsers = await ParticipanteModel.find();
         res.json(allUsers);
-    }
-
-    public static async findByEmail(req: Request, res: Response) {
-        const user = await ParticipanteModel.findOne({ email: req.body.email }); // null caso nao encontrado
-        res.json(user);
     }
 }
 

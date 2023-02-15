@@ -1,5 +1,4 @@
-import { prop, getDiscriminatorModelForClass } from "@typegoose/typegoose";
-import { UsuarioModel } from "./usuario.model";
+import { prop } from "@typegoose/typegoose";
 
 class Operador {
     @prop({ required: true })
@@ -12,6 +11,4 @@ class Operador {
     public ativo!: boolean;
 }
 
-const OperadorModel = getDiscriminatorModelForClass(UsuarioModel, Operador);
-
-export { OperadorModel, Operador };
+export { Operador };

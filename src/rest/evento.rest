@@ -1,2 +1,0 @@
-GET http://localhost:3000/api/evento/1234
-Content-Type: application/json

@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { prop, pre, Ref, getModelForClass } from "@typegoose/typegoose";
+import { prop, pre, Ref } from "@typegoose/typegoose";
 
 import { Endereco } from "../schema/endereco.schema";
 import { Categoria } from "./categoria.model";
@@ -57,6 +57,4 @@ class Evento {
     public inscricoes!: Types.Array<Inscricao>;
 }
 
-const Eventomodel = getModelForClass(Evento);
-
-export { Eventomodel, Evento };
+export { Evento };
