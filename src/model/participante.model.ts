@@ -7,6 +7,7 @@ import { Instituicao } from "./instituicao.model";
 import { Evento } from "./evento.model";
 import { Inscricao } from "./inscricao.model";
 import gerarUsername from "../util/gerarUsername";
+import { PerfilConfig } from "../schema/perfilConfig.schema";
 
 
 @pre<Participante>("save", function() {
@@ -30,6 +31,9 @@ class Participante extends Usuario {
 
     @prop({ required: true })
     public dataNascimento!: Date;
+
+    @prop({ default: {} })
+    public configuracoes!: PerfilConfig;
 
     @prop({ required: true })
     public endereco!: Endereco;

@@ -1,5 +1,6 @@
 import { prop, Ref } from "@typegoose/typegoose";
 import { Endereco } from "../schema/endereco.schema";
+import { PerfilConfig } from "../schema/perfilConfig.schema";
 import { Categoria } from "./categoria.model";
 import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
@@ -16,6 +17,9 @@ class Instituicao extends Usuario {
 
     @prop({ required: true,  })
     public cnpj!: string;
+
+    @prop({ default: {} })
+    public configuracoes!: PerfilConfig;
 
     @prop({ required: true, minlength: 18, maxlength: 18 })
     public telefone!: string;
