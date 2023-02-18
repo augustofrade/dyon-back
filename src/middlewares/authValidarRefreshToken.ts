@@ -19,7 +19,7 @@ const authValidarRefreshToken = (req: Request, res: Response, next: NextFunction
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET as string,
             (err, payload) => {
-                if(err || !(<JwtPayload>payload).idUser ) {
+                if(err || !(<JwtPayload>payload).userId ) {
                     // Caso o token seja inválido
                     res.clearCookie("token");
                     next();

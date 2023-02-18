@@ -94,7 +94,7 @@ class AuthController {
             refreshToken,
             process.env.REFRESH_TOKEN_SECRET as string,
             (err: any, payload: any) => {
-                if(err || !(<JwtPayload>payload).idUser) {
+                if(err || !(<JwtPayload>payload).userId) {
                     return res.status(403).json({ msg: "Token inválido" });
                 }
                 else {

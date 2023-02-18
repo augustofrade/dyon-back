@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { pre, prop, modelOptions, getModelForClass, DocumentType, ReturnModelType } from "@typegoose/typegoose";
+import { pre, prop, modelOptions, getModelForClass, DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
 
 @pre<Usuario>("save", function(next) {

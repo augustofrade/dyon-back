@@ -32,6 +32,9 @@ class Evento {
     @prop({ required: true })
     public localidade!: Endereco;
 
+    @prop({ min: 1 })
+    public inscricoesMaximo?: number;
+
     @prop({ required: true })
     public inscricoesInicio!: Date;
 

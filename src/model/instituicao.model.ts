@@ -1,16 +1,22 @@
-import { prop, Ref } from "@typegoose/typegoose";
+import { pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
+
 import { Endereco } from "../schema/endereco.schema";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
+import gerarUsername from "../util/gerarUsername";
 import { Categoria } from "./categoria.model";
+import { Evento } from "./evento.model";
 import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
 
+
+@pre<Instituicao>("save", function() {
+    if(this.isModified("nomeSocial" || this.isModified("nomeFantasia"))) {
+        this.username = gerarUsername(this.nomeFantasia);
+    }
+})
 class Instituicao extends Usuario {
     @prop({ required: true, minlength: 3, maxLength: 40 })
     public nomeFantasia!: string;
-
-    @prop({ required: true, minLength: 3, maxLength: 60 })
-    public razaoSocial!: string;
 
     @prop({ required: true, maxLength: 80 })
     public nomeRepresentante!: string;
@@ -32,6 +38,17 @@ class Instituicao extends Usuario {
 
     @prop({ default: [], ref: () => Operador })
     public operadores!: Ref<Operador>[];
+
+    @prop({ default: [], ref: () => Evento })
+    public eventos!: Ref<Evento>[];
+
+    static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
+        return this.findOne({ username }).select("-senha -username -cnpj -configuracoes -telefone -updateDate");
+    }
+
+    static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {
+        return this.findById(id).select("endereco");
+    }
 }
 
 
