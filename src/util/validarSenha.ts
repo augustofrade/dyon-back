@@ -1,6 +1,6 @@
-const validarSenha = (senha: string): string => {
+const validarSenha = (senha: string): boolean => {
     // TODO: validar senha com regex
-    return senha;
+    return true;
 };
 
 export default validarSenha;

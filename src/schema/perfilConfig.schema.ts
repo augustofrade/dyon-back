@@ -1,17 +1,22 @@
 import { prop } from "@typegoose/typegoose";
 
 class PerfilConfig {
-    @prop({ default: true })
-    public exibirInscricoes!: boolean;
+    // Participante
+    @prop()
+    public exibirInscricoes?: boolean;
 
-    @prop({ default: true })
-    public exibirCategorias!: boolean;
+    @prop()
+    public exibirCategorias?: boolean;
 
-    @prop({ default: true })
-    public exibirSeguindo!: boolean;
+    @prop()
+    public exibirSeguindo?: boolean;
 
-    @prop({ default: true })
-    public exibirHistorico!: boolean;
+    @prop()
+    public exibirHistorico?: boolean;
+
+    // Instituicao
+    @prop()
+    public exibirEndereco?: boolean;
 }
 
 export { PerfilConfig };

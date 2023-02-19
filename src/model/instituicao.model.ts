@@ -1,3 +1,4 @@
+import { IInstituicaoConfig } from "../types/interface";
 import { pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 
 import { Endereco } from "../schema/endereco.schema";
@@ -7,6 +8,9 @@ import { Categoria } from "./categoria.model";
 import { Evento } from "./evento.model";
 import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
+
+
+const configsPadrao = (): IInstituicaoConfig => ({ exibirEndereco: true });
 
 
 @pre<Instituicao>("save", function() {
@@ -24,7 +28,7 @@ class Instituicao extends Usuario {
     @prop({ required: true,  })
     public cnpj!: string;
 
-    @prop({ default: {} })
+    @prop({ default: () => configsPadrao() })
     public configuracoes!: PerfilConfig;
 
     @prop({ required: true, minlength: 18, maxlength: 18 })

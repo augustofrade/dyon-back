@@ -1,4 +1,4 @@
-import { InstituicaoModel } from "./../model/models";
+import { InstituicaoModel, ParticipanteModel } from "./../model/models";
 import {  Request, Response } from "express";
 import validarSenha from "../util/validarSenha";
 
@@ -44,7 +44,8 @@ export default class InstituicaoController {
         if(await instituicao.verificarSenha(senhaAtual))
            return res.status(400).json({ msg: "A senha informada está incorreta", erro: true });
 
-        // TODO: validar senha com validarSenha(senhaConfirmar)
+        if(!validarSenha(novaSenha))
+            return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         
         instituicao.senha = novaSenha;
         instituicao.save();
@@ -52,7 +53,43 @@ export default class InstituicaoController {
     }
 
     static async atualizarPrivacidade(req: Request, res: Response) {
-        // TODO: criar props de configuracoes próprias da instituicao
+        const instituicao = await InstituicaoModel.findById(res.locals.userId);
+        if(!instituicao)
+            return res.status(404).json({ msg: "Erro interno", erro: true });
+        
+        try {
+
+            instituicao.configuracoes.exibirEndereco = req.body.exibirEndereco;
+            instituicao.save();
+            res.status(200).json({ msg: "Configurações de privacidade salvas com sucesso" });
+        } catch(err) {
+            res.status(400).json({ msg: "Não foi possível salvar as configurações de privacidade. Tente novamente.", erro: true });
+        }
+        
+    }
+
+    static async seguirInstituicao(req: Request, res: Response) {
+        const usuario = await ParticipanteModel.findById(res.locals.userId);
+        if(!usuario)
+            return res.status(404).json({ msg: "Erro interno", erro: true });
+        
+        const instituicao = await InstituicaoModel.findOne({ username: req.params.username });
+        if(!instituicao)
+            return res.status(404).json({ msg: "Perfil de instituição não encontrado", erro: true });
+        
+        try {
+            if(usuario.seguindo.includes(instituicao._id)) {
+                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $pull: { seguindo: { _id: instituicao._id } } });
+            } else {
+                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $push: { seguindo: { _id: instituicao._id } } });
+            }
+
+            res.status(200).json({ msg: "Agora" });
+        } catch(err) {
+            res.status(400).json({ msg: `Ocorreu um erro ao tentar seguir ${instituicao.nomeFantasia}`, erro: true });
+        }
+
+        
     }
 
     static async obterEndereco(req: Request, res: Response) {

@@ -10,6 +10,14 @@ import gerarUsername from "../util/gerarUsername";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
 
 
+const configsPadrao = () => ({
+    exibirInscricoes: true,
+    exibirCategorias: true,
+    exibirSeguindo: true,
+    exibirHistorico: true
+});
+
+
 @pre<Participante>("save", function() {
     if(this.isModified("nomeSocial" || this.isModified("nomeCompleto"))) {
         this.username = gerarUsername( this.nomeSocial ?? this.nomeCompleto);
@@ -32,7 +40,7 @@ class Participante extends Usuario {
     @prop({ required: true })
     public dataNascimento!: Date;
 
-    @prop({ default: {} })
+    @prop({ default: () => configsPadrao() })
     public configuracoes!: PerfilConfig;
 
     @prop({ required: true })

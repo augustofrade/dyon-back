@@ -6,6 +6,17 @@ export interface IUsuario {
     email: string;
 }
 
+export interface IInstituicaoConfig {
+    exibirEndereco: boolean;
+}
+
+export interface IParticipanteConfig {
+    exibirInscricoes: boolean;
+    exibirCategorias: boolean;
+    exibirSeguindo: boolean;
+    exibirHistorico: boolean;
+}
+
 /**
  * Estrutura dos objetos de categorias que serão enviados ao front-end
  */
