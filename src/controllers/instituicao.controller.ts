@@ -17,6 +17,10 @@ export default class InstituicaoController {
         }
     }
 
+    static async excluirConta(req: Request, res: Response) {
+        // TODO: excluir conta e redirecionar para /auth/logout
+    }
+
     static async obterDadosPerfil(req: Request, res: Response) {
         const instituicao = await InstituicaoModel.obterDadosPerfil(req.params.username);
         if(!instituicao)
@@ -80,11 +84,12 @@ export default class InstituicaoController {
         try {
             if(usuario.seguindo.includes(instituicao._id)) {
                 await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $pull: { seguindo: { _id: instituicao._id } } });
+                res.status(200).json({ msg: `Deixou de seguir ${instituicao.nomeFantasia}` });
             } else {
                 await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $push: { seguindo: { _id: instituicao._id } } });
+                res.status(200).json({ msg: `Começou a seguir ${instituicao.nomeFantasia}` });
             }
 
-            res.status(200).json({ msg: "Agora" });
         } catch(err) {
             res.status(400).json({ msg: `Ocorreu um erro ao tentar seguir ${instituicao.nomeFantasia}`, erro: true });
         }

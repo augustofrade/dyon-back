@@ -47,6 +47,8 @@ class Instituicao extends Usuario {
     public eventos!: Ref<Evento>[];
 
     static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
+        // TODO: excluir infos do perfil de acordo com as configurações
+
         return this.findOne({ username }).select("-senha -username -cnpj -configuracoes -telefone -updateDate");
     }
 

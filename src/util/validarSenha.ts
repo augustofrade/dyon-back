@@ -1,6 +1,5 @@
 const validarSenha = (senha: string): boolean => {
-    // TODO: validar senha com regex
-    return true;
+    return new RegExp("^(?=[^a-z]*[a-z])(?=[^A-Z]*[A-Z])(?=\\D*\\d)(?=[^!#%]*[!#%])[A-Za-z0-9!#%]{8,32}$").test(senha);
 };
 
 export default validarSenha;

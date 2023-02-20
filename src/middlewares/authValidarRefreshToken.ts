@@ -7,7 +7,7 @@ import { Request, Response, NextFunction } from "express";
  * - Possui um Refresh Token nos cookies
  * - O Refresh Token é válido
  * 
- * É utilizado na rota de login para que **não seja necessário realizar a verificação na mesma**
+ * É utilizado na rota de login e cadastro para que **não seja necessário realizar a verificação na mesma**
  */
 const authValidarRefreshToken = (req: Request, res: Response, next: NextFunction) => {
     const refreshToken: string | undefined = req.cookies.token;
