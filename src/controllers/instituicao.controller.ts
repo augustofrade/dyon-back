@@ -32,7 +32,7 @@ export default class InstituicaoController {
     static async obterDadosPerfil(req: Request, res: Response) {
         const instituicao = await InstituicaoModel.obterDadosPerfil(req.params.username);
         if(!instituicao)
-            return res.json({ msg: "Instituicao não encontrada", erro: true });
+            return res.json({ msg: "Instituição não encontrada", erro: true });
         
         res.status(201).json({ ...instituicao, quantiaEventos: instituicao.eventos.length });
     }

@@ -37,8 +37,8 @@ export default class Email {
         const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao: token.expiracao });
 
         return this.enviarEmailGenerico(destinatario, {
-            assunto: "Crie",
-            texto: `Cadastro concluído com sucesso, por favor clique no link a seguir para confirmar seu e-mail: ${url}`,
+            assunto: "Cadastro realizado com sucesso",
+            texto: `Cadastro realizado com sucesso, por favor clique no link a seguir para confirmar seu e-mail: ${url}`,
             html: template
         });
     }

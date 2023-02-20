@@ -5,6 +5,7 @@ import participanteRouter from "./participante";
 import instituicaoRouter from "./instituicao";
 import categoriaRouter from "./categoria";
 import authRouter from "./auth";
+import emailRouter from "./email";
 
 const router = express.Router();
 router.use("/evento", eventoRouter);
@@ -13,5 +14,6 @@ router.use("/participante", participanteRouter);
 router.use("/instituicao", instituicaoRouter);
 router.use("/categoria", categoriaRouter);
 router.use("/auth", authRouter);
+router.use("/email", emailRouter);
 
 export default router;

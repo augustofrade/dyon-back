@@ -9,11 +9,11 @@ router
     .route("/cadastro")
     .post(authValidarRefreshToken, InstituicaoController.cadastro);
 
-router.use(authAcessToken);
-
 router
     .route("/perfil/:username")
     .get(InstituicaoController.obterDadosPerfil);
+
+router.use(authAcessToken);
 
 router
     .route("/atualizar/dados")

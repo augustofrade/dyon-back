@@ -37,7 +37,7 @@ class Usuario {
     public senha!: string;
 
     @prop({ default: false })
-    public emailConfirmado!: string;
+    public emailConfirmado!: boolean;
 
     @prop()
     public emailToken?: TokenGenerico;
