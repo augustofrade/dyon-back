@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 
-import { IEmail, TokenGenerico } from "../types/interface";
+import { IEmail, ITokenGenerico } from "../types/interface";
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import fs from "fs";
@@ -29,10 +29,10 @@ export default class Email {
             }
         });
 
-        this.templatesEmCache.cadastro = fs.readFileSync(path.join(__dirname, "./templates/cadastro.html"), "utf-8");
+        this.templatesEmCache.cadastro = fs.readFileSync(path.join(__dirname, "./templates/cadastro.ejs"), "utf-8");
     }
 
-    public async enviarEmailDeCadastro(destinatario: string, nomeUsuario: string, token: TokenGenerico) {
+    public async enviarEmailDeCadastro(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
         const url = `https://localhost:3000/email/${token.hash}`;
         const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao: token.expiracao });
 

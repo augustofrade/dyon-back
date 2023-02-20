@@ -8,6 +8,7 @@ import { Evento } from "./evento.model";
 import { Inscricao } from "./inscricao.model";
 import gerarUsername from "../util/gerarUsername";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
+import { Types } from "mongoose";
 
 
 const configsPadrao = () => ({
@@ -46,8 +47,8 @@ class Participante extends Usuario {
     @prop({ required: true })
     public endereco!: Endereco;
 
-    @prop({ default: [], ref: () => Categoria })
-    public categoriasFavoritas!: Ref<Categoria>[];
+    @prop({ default: [], type: [Categoria] })
+    public categoriasFavoritas!: Types.Array<Categoria>;
 
     @prop({ default: [], ref: () => Instituicao })
     public seguindo!: Ref<Instituicao>[];

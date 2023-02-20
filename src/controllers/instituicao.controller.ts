@@ -1,6 +1,8 @@
+import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
 import { InstituicaoModel, ParticipanteModel } from "./../model/models";
-import {  Request, Response } from "express";
+import { Request, Response } from "express";
 import validarSenha from "../util/validarSenha";
+import Email from "../email/Email";
 
 export default class InstituicaoController {
 
@@ -9,8 +11,14 @@ export default class InstituicaoController {
             nomeRepresentante, cnpj, categoriasRamo, endereco } = req.body;
 
         try {
-            const instituicaoCriada = new InstituicaoModel({ email, senha, nomeFantasia, telefone, nomeRepresentante, cnpj, categoriasRamo, endereco });
-            instituicaoCriada.save();
+            const emailToken = gerarTokenGenerico();
+            const instituicaoCriada = new InstituicaoModel({
+                email, senha, nomeFantasia, telefone,
+                nomeRepresentante, cnpj, categoriasRamo, endereco,
+                emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
+            });
+            await instituicaoCriada.save();
+            Email.Instance.enviarEmailDeCadastro(email, instituicaoCriada.nomeFantasia, emailToken);
             res.status(200).json({ msg: "Cadastro realizado com sucesso" });
         } catch(erro) {
             res.status(400).json({ msg: "Falha ao realizar cadastro", erro });

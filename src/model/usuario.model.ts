@@ -1,3 +1,5 @@
+import { usuariosEnum } from "./../types/enums";
+import { TokenGenerico } from "../schema/tokenGenerico.schema";
 import { Types } from "mongoose";
 import { pre, prop, modelOptions, getModelForClass, DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
@@ -38,14 +40,18 @@ class Usuario {
     public emailConfirmado!: string;
 
     @prop()
-    public emailToken?: string;
+    public emailToken?: TokenGenerico;
 
-    @prop({ default: [], type: String })
+    @prop({ default: [], type: [String] })
     public refreshToken!: Types.Array<string>;
 
+    // Definição explícita para ser usado no código
+    @prop({ enum: usuariosEnum })
+    public tipo!: string;
 
-    async verificarSenha(this: DocumentType<Usuario>, password: string) {
-        const senhasConferem = bcrypt.compare(password, this.senha);
+
+    async verificarSenha(this: DocumentType<Usuario>, senha: string) {
+        const senhasConferem = bcrypt.compare(senha, this.senha);
         return senhasConferem;
     }
 }

@@ -32,7 +32,7 @@ export interface IEmail {
     html: string;
 }
 
-export interface TokenGenerico {
+export interface ITokenGenerico {
     hash: string;
     expiracao: Date;
 }

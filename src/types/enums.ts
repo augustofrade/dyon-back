@@ -5,3 +5,9 @@ export enum generoEnum {
     Feminino = "Feminino",
     NaoInformado = "Prefiro não informar",
 }
+
+export enum usuariosEnum {
+    Participante = "Participante",
+    Instituicao = "Instituicao",
+    Operador = "Operador",
+}

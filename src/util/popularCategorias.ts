@@ -10,7 +10,7 @@ import path from "path";
  * não houver categorias registradas na collection.
  */
 export default class popularCategorias {
-    static categorias: { slug: string, titulo: string, imagem: Buffer }[] = [];
+    static categorias: { _id: string, titulo: string, imagem: Buffer }[] = [];
 
     static categoriasTexto: Record<string, string> = {
         animais: "Animais",
@@ -64,7 +64,7 @@ export default class popularCategorias {
     private static gerarCategoria(slug: string, bytesImagem: Buffer) {
         const titulo = this.categoriasTexto[slug];
         this.categorias.push({
-            slug,
+            _id: slug,
             titulo,
             imagem: bytesImagem
         });

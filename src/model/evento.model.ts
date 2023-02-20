@@ -50,8 +50,8 @@ class Evento {
     @prop({ required: true })
     public banner!: Buffer;
 
-    @prop({ required: true, ref: () => Categoria })
-    public categorias!: Ref<Categoria>[];
+    @prop({ required: true, type: [Categoria] })
+    public categorias!: Types.Array<Categoria>;
 
     @prop({ default: [], type: [Avaliacao] })
     public avaliacoes!: Types.Array<Avaliacao>;
