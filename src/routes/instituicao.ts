@@ -20,10 +20,6 @@ router
     .put(InstituicaoController.atualizarDados);
 
 router
-    .route("/atualizar/senha")
-    .put(InstituicaoController.atualizarSenha);
-
-router
     .route("/atualizar/privacidade")
     .put(InstituicaoController.atualizarPrivacidade);
 

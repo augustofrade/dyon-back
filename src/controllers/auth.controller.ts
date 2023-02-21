@@ -6,6 +6,7 @@ import { UsuarioModel } from "../model/usuario.model";
 
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
+import validarSenha from "../util/validarSenha";
 
 
 /**
@@ -34,11 +35,11 @@ class AuthController {
 
         const usuario = await UsuarioModel.findOne({ email });
         if(!usuario)
-            return res.status(204).json({ msg: "Usuário não encontrado" });
+            return res.status(404).json({ msg: "Usuário não encontrado" });
         
         const senhaCorreta = await usuario.verificarSenha(senha);
         if(!senhaCorreta)
-            return res.status(403).json({ msg: "Senha incorreta" });
+            return res.status(400).json({ msg: "Senha incorreta" });
         
         const refreshToken = gerarRefreshToken({ id: usuario._id, email: usuario.email });
 
@@ -47,7 +48,10 @@ class AuthController {
         usuario.refreshToken.push(refreshToken);
         usuario.save();
 
-        res.cookie("token", refreshToken, { maxAge: 5 * 60 * 1000 });
+        const dataAtual = new Date();
+        const dataExpiracao = new Date(dataAtual.setDate(dataAtual.getDate() + 30));
+
+        res.cookie("token", refreshToken, { expires: dataExpiracao });
         return res.json({ token: accessToken });
     }
 
@@ -59,12 +63,12 @@ class AuthController {
      */
     public static async logout(req: Request, res: Response) {
         if(!req.cookies?.token)
-            return res.status(204).json({ msg: "Usuário não está autenticado" });
+            return res.status(404).json({ msg: "Usuário não está autenticado" });
         
         const refreshToken: string = req.cookies.token;
         const usuarioComToken = await UsuarioModel.findOne({ refreshToken });
         if(!usuarioComToken)
-            return res.status(204).json({ msg: "Token inválido" });
+            return res.status(404).json({ msg: "Token inválido" });
 
         // TODO: colocar essa lógica no model
         // Remover token da lista de Refresh Tokens do usuário
@@ -95,7 +99,7 @@ class AuthController {
             process.env.REFRESH_TOKEN_SECRET as string,
             (err: any, payload: any) => {
                 if(err || !(<JwtPayload>payload).userId) {
-                    return res.status(403).json({ msg: "Token inválido" });
+                    return res.status(200).json({ msg: "Token inválido" });
                 }
                 else {
                     const novoAccessToken = gerarAccesToken({ id: usuarioComToken._id, email: usuarioComToken.email });
@@ -103,6 +107,23 @@ class AuthController {
                 }
             }
         );
+    }
+
+    static async atualizarSenha(req: Request, res: Response) {
+        const { senhaAtual, novaSenha } = req.body;
+        const usuario = await UsuarioModel.findById(res.locals.userId);
+        if(!usuario)
+            return res.status(404).json({ msg: "Erro interno", erro: true });
+
+        if(!await usuario.verificarSenha(senhaAtual))
+           return res.status(400).json({ msg: "A senha informada está incorreta", erro: true });
+
+        if(!validarSenha(novaSenha))
+            return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
+        
+        usuario.senha = novaSenha;
+        usuario.save();
+        res.status(200).json({ msg: "Senha atualizada com sucesso" });
     }
 }
 

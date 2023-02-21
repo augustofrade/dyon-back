@@ -1,7 +1,6 @@
 import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
 import { InstituicaoModel, ParticipanteModel } from "./../model/models";
 import { Request, Response } from "express";
-import validarSenha from "../util/validarSenha";
 import Email from "../email/Email";
 
 export default class InstituicaoController {
@@ -47,23 +46,6 @@ export default class InstituicaoController {
             res.status(400).json({ msg: "Não foi possível atualizar seus dados", erro: true });
     }
 
-    static async atualizarSenha(req: Request, res: Response) {
-        const { senhaAtual, novaSenha } = req.body;
-        const instituicao = await InstituicaoModel.findById(res.locals.userId);
-        if(!instituicao)
-            return res.status(404).json({ msg: "Erro interno", erro: true });
-
-        if(await instituicao.verificarSenha(senhaAtual))
-           return res.status(400).json({ msg: "A senha informada está incorreta", erro: true });
-
-        if(!validarSenha(novaSenha))
-            return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
-        
-        instituicao.senha = novaSenha;
-        instituicao.save();
-        res.status(200).json({ msg: "Senha atualizada com sucesso" });
-    }
-
     static async atualizarPrivacidade(req: Request, res: Response) {
         const instituicao = await InstituicaoModel.findById(res.locals.userId);
         if(!instituicao)
@@ -71,7 +53,7 @@ export default class InstituicaoController {
         
         try {
 
-            instituicao.configuracoes.exibirEndereco = req.body.exibirEndereco;
+            instituicao.configuracoes.exibirEndereco = req.body.exibirEndereco ?? true;
             instituicao.save();
             res.status(200).json({ msg: "Configurações de privacidade salvas com sucesso" });
         } catch(err) {
@@ -101,13 +83,18 @@ export default class InstituicaoController {
         } catch(err) {
             res.status(400).json({ msg: `Ocorreu um erro ao tentar seguir ${instituicao.nomeFantasia}`, erro: true });
         }
-
-        
     }
 
     static async obterEndereco(req: Request, res: Response) {
-        const endereco = await InstituicaoModel.obterEndereco(res.locals.userId).endereco;
-        res.json(endereco);
+        try {
+            const instituicao = await InstituicaoModel.obterEndereco(res.locals.userId);
+            if(!instituicao)
+                throw new Error();
+            
+            res.json(instituicao.endereco);
+        } catch (err) {
+            res.json({ msg: "Não foi possível buscar os dados do endereço", erro: true });
+        }
     }
     
 }

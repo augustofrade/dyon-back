@@ -10,14 +10,14 @@ import jwt from "jsonwebtoken";
 const authAcessToken  = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const authHeader: string | undefined = req.headers["authorization"];
     if(!authHeader) {
-        res.sendStatus(401);
+        res.status(401).json({ msg: "Token inválido" });
     } else {
         const accessToken: string = authHeader.split(" ")[1];
 
         const secret = process.env.ACCESS_TOKEN_SECRET as string;
         jwt.verify(accessToken, secret, (err, payload) => {
             if(err) // Access Token invalido
-                res.sendStatus(403);
+                res.status(401).json({ msg: "Token inválido" });
             else {  // Token valido
                 res.locals.userId = (<jwt.JwtPayload>payload).userId;
                 next();

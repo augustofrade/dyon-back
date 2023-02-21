@@ -1,5 +1,5 @@
 import { generoEnum } from "./../types/enums";
-import { prop, Ref, pre } from "@typegoose/typegoose";
+import { prop, Ref, pre, ReturnModelType } from "@typegoose/typegoose";
 import { Endereco } from "../schema/endereco.schema";
 import { Usuario } from "./usuario.model";
 import { Categoria } from "./categoria.model";
@@ -32,6 +32,9 @@ class Participante extends Usuario {
     @prop()
     public nomeSocial?: string;
 
+    @prop()
+    public fotoPerfil?: Buffer;
+
     @prop({ required: true, enum: generoEnum })
     public genero!: string;
 
@@ -58,6 +61,14 @@ class Participante extends Usuario {
 
     @prop({ default: [], ref: () => Inscricao })
     public inscricoes!: Ref<Inscricao>[];
+
+    static obterDadosPerfil(this: ReturnModelType<typeof Participante>, username: string) {
+        // TODO: excluir infos do perfil de acordo com as configurações
+
+        return this.findOne({ username })
+        .select("-senha -username -cpf -dataNascimento -configuracoes -telefone -updateDate")
+        .populate("inscricoes");
+    }
 }
 
 export { Participante };

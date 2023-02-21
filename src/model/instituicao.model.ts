@@ -3,12 +3,12 @@ import { pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 
 import { Endereco } from "../schema/endereco.schema";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
-import gerarUsername from "../util/gerarUsername";
 import { Categoria } from "./categoria.model";
 import { Evento } from "./evento.model";
 import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
 import { Types } from "mongoose";
+import gerarSlug from "../util/gerarSlug";
 
 
 const configsPadrao = (): IInstituicaoConfig => ({ exibirEndereco: true });
@@ -16,7 +16,7 @@ const configsPadrao = (): IInstituicaoConfig => ({ exibirEndereco: true });
 
 @pre<Instituicao>("save", function() {
     if(this.isModified("nomeFantasia")) {
-        this.username = gerarUsername(this.nomeFantasia);
+        this.username = gerarSlug(this.nomeFantasia);
     }
 })
 class Instituicao extends Usuario {
@@ -25,6 +25,9 @@ class Instituicao extends Usuario {
 
     @prop({ required: true, maxLength: 80 })
     public nomeRepresentante!: string;
+
+    @prop()
+    public fotoPerfil?: Buffer;
 
     @prop({ required: true,  })
     public cnpj!: string;
@@ -54,7 +57,7 @@ class Instituicao extends Usuario {
     }
 
     static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {
-        return this.findById(id).select("endereco");
+        return this.findById(id).select("endereco -tipo -_id");
     }
 }
 
