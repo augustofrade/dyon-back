@@ -5,8 +5,8 @@ const router = express.Router();
 
 // Cadastrar participante
 router
-    .route("/register")
-    .post(ParticipanteController.register);
+    .route("/cadastro")
+    .post(ParticipanteController.cadastro);
 
 
 router

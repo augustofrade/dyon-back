@@ -1,10 +1,14 @@
-import { prop, pre, Ref, modelOptions } from "@typegoose/typegoose";
+import { prop, Ref, modelOptions, post, DocumentType } from "@typegoose/typegoose";
 import { Periodo } from "../schema/periodo.schema";
 import { Participante } from "./participante.model";
 import { Operador } from "./operador.model";
+import QRCode from "qrcode";
 
-@pre<Inscricao>("save", function() {
-    // TODO: Adicionar geração de QR Code
+@post<Inscricao>("save", async function() {
+    if(!this.confirmada && !this.qrCode) {
+        this.qrCode = await QRCode.toDataURL(this._id);
+        this.save();
+    }
 })
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Inscricao {
@@ -12,7 +16,7 @@ class Inscricao {
     public periodo!: Ref<Periodo>;
 
     @prop()
-    public qrCode!: string;
+    public qrCode?: string;
 
     @prop({ required: true, ref: () => Participante })
     public participante!: Ref<Participante>;
@@ -22,6 +26,14 @@ class Inscricao {
 
     @prop({ required: true, ref: () => Operador })
     public confirmadaPor!: Ref<Operador>;
+
+
+    public async confirmarParticipacao(this: DocumentType<Inscricao>, idOperador: string) {
+        this.confirmadaPor._id = idOperador;
+        this.qrCode = undefined;
+        this.confirmada = true;
+        this.save();
+    }
 }
 
 export { Inscricao };

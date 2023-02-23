@@ -2,13 +2,12 @@ import { Request, Response } from "express";
 import Email from "../email/Email";
 import { Inscricao } from "../model/inscricao.model";
 import { ParticipanteModel } from "../model/models";
-import { Participante } from "../model/participante.model";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 
 
 class ParticipanteController {
 
-    static async register(req: Request, res: Response) {            
+    static async cadastro(req: Request, res: Response) {            
         const { email, senha, nomeCompleto, cpf, telefone, endereco, dataNascimento, categoriasFavoritas } = req.body;
         try {
             const emailToken = gerarTokenGenerico();
