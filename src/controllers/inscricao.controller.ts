@@ -1,4 +1,4 @@
-import { Eventomodel, InstituicaoModel } from "../model/models";
+import { EventoModel, InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
 import { InscricaoModel } from "../model/models";
 
@@ -11,7 +11,7 @@ export default abstract class InscricaoController {
         if(!instituicao)
             return res.json({ msg: "Não autorizado" });
         
-        const evento = Eventomodel.findOne({ "inscricoes._id": idInscricao });
+        const evento = EventoModel.findOne({ "inscricoes._id": idInscricao });
         const inscricao = await InscricaoModel.findById(idInscricao);
         if(!evento || !inscricao)
             return res.json({ msg: "Inscricão inválida, contate seu gestor" });

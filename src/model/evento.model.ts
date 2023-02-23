@@ -1,4 +1,4 @@
-import { pre, prop, Ref } from "@typegoose/typegoose";
+import { pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 import { Types } from "mongoose";
 
 import { Avaliacao } from "../schema/avaliacao.schema";
@@ -17,7 +17,7 @@ class Evento {
     @prop({ default: () => gerarIdAleatorio() })
     public _publicId!: string;
 
-    @prop({ required: true })
+    @prop()
     public slug!: string;
 
     @prop({ required: true, ref: () => Instituicao })
@@ -30,7 +30,7 @@ class Evento {
     public descricao!: string;
 
     @prop({ required: true })
-    public localidade!: Endereco;
+    public endereco!: Endereco;
 
     @prop({ min: 1 })
     public inscricoesMaximo?: number;
@@ -47,8 +47,11 @@ class Evento {
     @prop({ required: true, type: [Periodo] })
     public periodosOcorrencia!: Types.Array<Periodo>;
 
-    @prop({ required: true })
+    @prop()
     public banner!: Buffer;
+
+    @prop({ default: true })
+    public visivel!: boolean;
 
     @prop({ required: true, type: [Categoria] })
     public categorias!: Types.Array<Categoria>;
@@ -58,6 +61,11 @@ class Evento {
 
     @prop({ default: [], type: [Inscricao] })
     public inscricoes!: Types.Array<Inscricao>;
+
+
+    static async dadosResumidos(this: ReturnModelType<typeof Evento>, id: string) {
+        return this.findById(id).select("titulo endereco");
+    }
 }
 
 export { Evento };

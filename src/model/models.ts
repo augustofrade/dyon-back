@@ -11,7 +11,7 @@ import { UsuarioModel } from "./usuario.model";
 // Resolve problemas de dependência circular recorrentes no Typegoose
 
 export const InscricaoModel = getModelForClass(Inscricao);
-export const Eventomodel = getModelForClass(Evento);
+export const EventoModel = getModelForClass(Evento);
 export const ParticipanteModel = getDiscriminatorModelForClass(UsuarioModel, Participante);
 export const OperadorModel = getDiscriminatorModelForClass(UsuarioModel, Operador);
 export const InstituicaoModel = getDiscriminatorModelForClass(UsuarioModel, Instituicao);
