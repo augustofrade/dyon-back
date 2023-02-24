@@ -22,7 +22,7 @@
         "quotes": ["error", "double"],
         "object-curly-spacing": ["warn", "always"],
         "eqeqeq": ["error", "always"],
-        "max-lines-per-function": ["warn", { "skipBlankLines": true, "max": 25 }],
+        "max-lines-per-function": ["warn", { "skipBlankLines": true, "max": 40 }],
         "no-empty-function": "error",
         "no-unused-vars": "warn",
         "no-var": "error",

@@ -6,7 +6,6 @@ import routes from "./routes/router";
 import * as dotenv from "dotenv";
 import dbConnect from "./db";
 import cookieParser from "cookie-parser";
-import popularCategorias from "./util/popularCategorias";
 
 // Receber valor do arquivo .ENV
 dotenv.config();
@@ -26,5 +25,4 @@ app.use("/api", routes);
 
 app.listen(PORT, () => {
     console.log(`Listening ${process.env.PORT}`);
-    // popularCategorias.popular();
 });

@@ -62,9 +62,20 @@ class Evento {
     @prop({ default: [], type: [Inscricao] })
     public inscricoes!: Types.Array<Inscricao>;
 
+    public static async todosDadosPorId(this: ReturnModelType<typeof Evento>, id: string) {
+        return this.findById(id)
+            .populate("criador", "nomeFantasia username")
+            .populate("avaliacoes", "nota");
+    }
 
-    static async dadosResumidos(this: ReturnModelType<typeof Evento>, id: string) {
-        return this.findById(id).select("titulo endereco");
+    public static async avaliacoesPorId(this: ReturnModelType<typeof Evento>, id: string) {
+        return this.findById(id).select("avaliacoes").populate({
+            path: "avaliacoes",
+            populate: {
+                path: "autor",
+                select: "username nomeCompleto nomeSocial fotoPerfil"
+            }
+        });
     }
 }
 

@@ -11,11 +11,15 @@ router
     .post(EventoController.novoEvento);
 
 router
+    .route("/editar")
+    .patch(EventoController.editarEvento);
+
+router
     .route("/todos")
     .get(EventoController.getAll);
 
 router
     .route("/:id")
-    .get(EventoController.dados);
+    .get(EventoController.dadosEvento);
 
 export default router;

@@ -23,7 +23,6 @@ export interface IParticipanteConfig {
 export interface ICategoriaVM {
     slug: string;
     titulo: string;
-    imagem: string;
 }
 
 export interface IEmail {
