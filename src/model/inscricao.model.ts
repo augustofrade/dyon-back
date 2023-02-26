@@ -3,6 +3,7 @@ import { Periodo } from "../schema/periodo.schema";
 import { Participante } from "./participante.model";
 import { Operador } from "./operador.model";
 import QRCode from "qrcode";
+import { Types } from "mongoose";
 
 @post<Inscricao>("save", async function() {
     if(!this.confirmada && !this.qrCode) {
@@ -12,8 +13,8 @@ import QRCode from "qrcode";
 })
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Inscricao {
-    @prop({ required: true, ref: () => Periodo })
-    public periodo!: Ref<Periodo>;
+    @prop({ required: true, type: [Periodo] })
+    public periodo!: Types.Array<Periodo>;
 
     @prop()
     public qrCode?: string;

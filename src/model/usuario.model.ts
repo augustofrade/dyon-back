@@ -54,6 +54,11 @@ class Usuario {
         const senhasConferem = bcrypt.compare(senha, this.senha);
         return senhasConferem;
     }
+
+    async salvarRefreshToken(this: DocumentType<Usuario>, refreshToken: string) {
+        this.refreshToken.pull(refreshToken);
+        this.save();
+    }
 }
 
 

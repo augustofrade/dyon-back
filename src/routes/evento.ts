@@ -4,6 +4,14 @@ import authAcessToken from "../middlewares/authAcessToken.middleware";
 
 const router = express.Router();
 
+router
+    .route("/pesquisa")
+    .get(EventoController.pesquisa);
+
+router
+    .route("/todos")
+    .get(EventoController.getAll);
+
 router.use(authAcessToken);
 
 router
@@ -13,10 +21,6 @@ router
 router
     .route("/editar")
     .patch(EventoController.editarEvento);
-
-router
-    .route("/todos")
-    .get(EventoController.getAll);
 
 router
     .route("/:id")

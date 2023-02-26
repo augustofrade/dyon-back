@@ -17,6 +17,11 @@ export interface IParticipanteConfig {
     exibirHistorico: boolean;
 }
 
+export interface IPeriodo {
+    inicio: Date;
+    termino: Date;
+}
+
 /**
  * Estrutura dos objetos de categorias que serão enviados ao front-end
  */

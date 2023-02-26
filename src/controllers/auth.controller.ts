@@ -70,10 +70,7 @@ class AuthController {
         if(!usuarioComToken)
             return res.status(404).json({ msg: "Token inválido" });
 
-        // TODO: colocar essa lógica no model
-        // Remover token da lista de Refresh Tokens do usuário
-        usuarioComToken.refreshToken.pull(refreshToken);
-        usuarioComToken.save();
+        usuarioComToken.salvarRefreshToken(refreshToken);
 
         // Remover refresh token dos cookies
         res.clearCookie("token");

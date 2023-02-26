@@ -1,13 +1,20 @@
 import express from "express";
-import AuthController from "../controllers/auth.controller";
+import InscricaoController from "../controllers/inscricao.controller";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
 
 const router = express.Router();
 
+router
+    .route("/novo")
+    .post(authAcessToken, InscricaoController.novaInscricao);
+
+router
+    .route("/cancelar")
+    .post(authAcessToken, InscricaoController.cancelarInscricao);
 
 router
     .route("/confirmar/:id")
-    .post(authAcessToken, AuthController.login);
+    .post(authAcessToken, InscricaoController.confirmarInscricao);
     
 
 export default router;

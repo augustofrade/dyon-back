@@ -84,6 +84,10 @@ class EventoController {
         res.send(resposta);
     }
 
+    public static async pesquisa(req: Request, res: Response) {
+        
+    }
+
     public static async getAll(req: Request, res: Response) {
         // TODO: desenvolver sistema de recomendação
         const todosEventos = await EventoModel.find();
