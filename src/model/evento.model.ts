@@ -59,8 +59,8 @@ class Evento {
     @prop({ default: [], type: [Avaliacao] })
     public avaliacoes!: Types.Array<Avaliacao>;
 
-    @prop({ default: [], type: [Inscricao] })
-    public inscricoes!: Types.Array<Inscricao>;
+    @prop({ default: [], ref:() => Inscricao })
+    public inscricoes!: Ref<Inscricao>[];
 
     public static async todosDadosPorId(this: ReturnModelType<typeof Evento>, id: string) {
         return this.findById(id)
@@ -75,6 +75,17 @@ class Evento {
                 path: "autor",
                 select: "username nomeCompleto nomeSocial fotoPerfil"
             }
+        });
+    }
+
+    public static async pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: string, categoria?: string, estado?: string) {
+        return this.find({
+            $or: [
+                { "titulo": new RegExp(pesquisa, "i") },
+                { "endereco.cidade" : new RegExp(pesquisa, "i") },
+            ],
+            categorias: categoria ? categoria : {},
+            estado: estado ? estado : {}
         });
     }
 }

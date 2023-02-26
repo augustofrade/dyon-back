@@ -1,9 +1,11 @@
-import { prop, Ref, modelOptions, post, DocumentType } from "@typegoose/typegoose";
-import { Periodo } from "../schema/periodo.schema";
-import { Participante } from "./participante.model";
-import { Operador } from "./operador.model";
-import QRCode from "qrcode";
+import { DocumentType, modelOptions, post, prop, Ref } from "@typegoose/typegoose";
 import { Types } from "mongoose";
+import QRCode from "qrcode";
+
+import { Periodo } from "../schema/periodo.schema";
+import { Evento } from "./evento.model";
+import { Operador } from "./operador.model";
+import { Participante } from "./participante.model";
 
 @post<Inscricao>("save", async function() {
     if(!this.confirmada && !this.qrCode) {
@@ -27,6 +29,9 @@ class Inscricao {
 
     @prop({ required: true, ref: () => Operador })
     public confirmadaPor!: Ref<Operador>;
+
+    @prop({ required: true, ref: () => Evento })
+    public evento!: Ref<Evento>;
 
 
     public async confirmarParticipacao(this: DocumentType<Inscricao>, idOperador: string) {

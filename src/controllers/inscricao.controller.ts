@@ -16,8 +16,12 @@ export default abstract class InscricaoController {
         const periodo: IPeriodo = req.body.periodo;
 
         try {
-            const inscricao = new InscricaoModel({ participante: res.locals.userId, periodo });
-            inscricao.save();
+            const inscricao = new InscricaoModel({ participante: res.locals.userId, periodo, evento: evento._id });
+            await inscricao.save();
+            participante.inscricoes.push(inscricao._id);
+            await participante.save();
+            evento.inscricoes.push(inscricao._id);
+            await evento.save();
             res.status(200).json({ msg: "Inscrição realizada com sucesso" });
         } catch (err) {
             res.json({ msg: "Não foi possível realizar sua inscrição neste evento, tente novamente.", erro: true, detalhes: err });
@@ -25,7 +29,22 @@ export default abstract class InscricaoController {
     }
 
     static async cancelarInscricao(req: Request, res: Response) {
-        
+        const idInscricao = req.body.idInscricao;
+        const participante = await ParticipanteModel.findById(res.locals.userId);
+        const inscricao = await InscricaoModel.findById(idInscricao);
+        if(!participante || !inscricao || inscricao.participante._id !== participante._id)
+            return res.json({ msg: "Não autorizado", erro: true });
+        else if(inscricao.confirmada)
+            return res.json({ msg: "Não é possível cancelar uma inscrição após ela já estar confirmada", erro: true });
+
+        try {
+            await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $pull: { inscricoes: idInscricao } });
+            await EventoModel.findByIdAndUpdate(inscricao.evento._id, { $pull: { inscricoes: idInscricao } });
+            await InscricaoModel.findByIdAndDelete(inscricao._id);
+            res.status(200).json({ msg: "Inscrição cancelada com sucesso" });
+        } catch (err) {
+            res.json({ msg: "Não foi possível cancelar sua inscrição neste evento", erro: true, detalhes: err });
+        }
     }
 
     static async confirmarInscricao(req: Request, res: Response) {

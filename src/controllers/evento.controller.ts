@@ -85,7 +85,13 @@ class EventoController {
     }
 
     public static async pesquisa(req: Request, res: Response) {
-        
+        const { pesquisa, categoria, estado } = req.body;
+        try {
+            const resPesquisa = await EventoModel.pesquisar(pesquisa, categoria, estado);
+            res.json(resPesquisa);
+        } catch(err) {
+            res.json({ msg: "Ocorreu um erro ao tentar pesquisar os eventos, tente novamente", erro: true, detalhes: err });
+        }
     }
 
     public static async getAll(req: Request, res: Response) {
