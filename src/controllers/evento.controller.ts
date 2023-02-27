@@ -1,6 +1,6 @@
+import { buscarCategorias } from "./../util/buscarCategorias";
 import { EventoModel, InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
-import { ICategoriaVM } from "../types/interface";
 import { Avaliacao } from "../schema/avaliacao.schema";
 import { Instituicao } from "../model/instituicao.model";
 
@@ -27,10 +27,10 @@ class EventoController {
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
                 periodosOcorrencia: dados.periodos,
-                categorias: (dados.categorias as Array<ICategoriaVM>).map(c => ({ _id: c.slug, titulo: c.titulo }))
+                categorias: await buscarCategorias(dados.categorias)
             });
             novoEvento.save();
-            res.json({ msg: "Evento criado com sucesso" });
+            res.json({ msg: "Evento criado com sucesso", redirect: `/evento/${novoEvento._id}` });
         } catch (err) {
             res.json({ msg: "Não foi possível criar o evento", erro: true, detalhes: err });
         }
@@ -46,6 +46,7 @@ class EventoController {
         if(dados.inscricoesInicio > dados.inscricoesTermino)
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a data final", erro: true });
         
+    
         try {
             const editado = EventoModel.findByIdAndUpdate(dados.idEvento, {
                 criador: res.locals.userId,
@@ -57,7 +58,7 @@ class EventoController {
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
                 periodosOcorrencia: dados.periodos,
-                categorias: (dados.categorias as Array<ICategoriaVM>).map(c => ({ _id: c.slug, titulo: c.titulo }))
+                categorias: await buscarCategorias(dados.categorias)
             }, { new: true });
             
             if(!editado) throw new Error();

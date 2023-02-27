@@ -1,6 +1,3 @@
-/* eslint-disable no-unused-vars */
-
-
 export interface IUsuario {
     id: string;
     email: string;
@@ -25,7 +22,7 @@ export interface IPeriodo {
 /**
  * Estrutura dos objetos de categorias que serão enviados ao front-end
  */
-export interface ICategoriaVM {
+export interface ICategoria {
     slug: string;
     titulo: string;
 }

@@ -27,5 +27,6 @@
         "no-unused-vars": "warn",
         "no-var": "error",
         "camelcase": "warn"
-    }
+    },
+    "ignorePatterns": ["src/types/**/*.ts", "src/util/popularCategorias.ts"]
 }

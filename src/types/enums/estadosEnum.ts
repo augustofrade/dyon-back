@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 enum estadosEnum {
     AC = "Acre",
     AL = "Alagoas",
