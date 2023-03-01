@@ -7,7 +7,6 @@ import bcrypt from "bcrypt";
 @pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
 
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const usuario = this;
     const saltFactor = 10;
 

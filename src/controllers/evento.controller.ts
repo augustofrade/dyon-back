@@ -3,6 +3,8 @@ import { EventoModel, InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
 import { Avaliacao } from "../schema/avaliacao.schema";
 import { Instituicao } from "../model/instituicao.model";
+import { DateTime } from "luxon";
+import { Periodo } from "../schema/periodo.schema";
 
 class EventoController {
 
@@ -13,7 +15,7 @@ class EventoController {
         
         const dados = req.body;
         
-        if(dados.inscricoesInicio > dados.inscricoesTermino)
+        if(DateTime.fromJSDate(dados.inscricoesInicio) > DateTime.fromJSDate(dados.inscricoesTermino))
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a final", erro: true });
         
         try {
@@ -26,12 +28,15 @@ class EventoController {
                 inscricoesMaximo: dados.inscricoesMaximo,
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
-                periodosOcorrencia: dados.periodos,
+                periodosOcorrencia: (<Array<Periodo>>dados.periodos).sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()),
                 categorias: await buscarCategorias(dados.categorias)
             });
-            novoEvento.save();
-            res.json({ msg: "Evento criado com sucesso", redirect: `/evento/${novoEvento._id}` });
+            await novoEvento.save();
+            instituicao.eventos.push(novoEvento._id);
+            await instituicao.save();
+            res.json({ msg: "Evento criado com sucesso", redirect: `/evento/${novoEvento._publicId}/${novoEvento.slug}` });
         } catch (err) {
+            console.log(err);
             res.json({ msg: "Não foi possível criar o evento", erro: true, detalhes: err });
         }
     }
@@ -48,7 +53,7 @@ class EventoController {
         
     
         try {
-            const editado = EventoModel.findByIdAndUpdate(dados.idEvento, {
+            const editado = await EventoModel.findByIdAndUpdate(dados.idEvento, {
                 criador: res.locals.userId,
                 titulo: dados.titulo,
                 descricao: dados.descricao,
@@ -67,6 +72,29 @@ class EventoController {
         } catch (err) {
             res.json({ msg: "Não foi possível alterar os dados do evento", erro: true, detalhes: err });
         }
+    }
+
+    public static async excluirEvento(req: Request, res: Response) {
+        const instituicao = await InstituicaoModel.findById(res.locals.userId);
+        if(!instituicao || !instituicao.eventos.includes(req.body.idEvento))
+            return res.json({ msg: "Não autorizado", erro: true });
+
+        const evento = await EventoModel.findById(req.body.idEvento);
+        if(!evento)
+            return res.json({ msg: "Evento não encontrado", erro: true });
+        
+        if(evento.permiteAlteracoes()) {
+            try {
+                const sucesso = await evento.delete() && await instituicao.removerEvento(req.body.idEvento);
+                if(!sucesso)
+                    throw new Error();
+
+                res.json({ msg: "Evento excluído com sucesso" });
+            } catch (err) {
+                res.json({ msg: "Não foi possível excluir o evento", erro: true, detalhes: err });
+            }
+        }
+        
     }
 
     public static async dadosEvento(req: Request, res: Response) {

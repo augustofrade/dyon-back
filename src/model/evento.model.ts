@@ -1,5 +1,6 @@
-import { pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
+import { DocumentType, pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 import { Types } from "mongoose";
+import { DateTime } from "luxon";
 
 import { Avaliacao } from "../schema/avaliacao.schema";
 import { Endereco } from "../schema/endereco.schema";
@@ -87,6 +88,10 @@ class Evento {
             categorias: categoria ? categoria : {},
             estado: estado ? estado : {}
         });
+    }
+
+    public permiteAlteracoes(this: DocumentType<Evento>) {
+        return DateTime.now().plus({ hours: 24 }) > DateTime.fromJSDate(this.periodosOcorrencia[0].inicio);
     }
 }
 

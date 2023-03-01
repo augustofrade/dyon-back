@@ -12,18 +12,20 @@ router
     .route("/todos")
     .get(EventoController.getAll);
 
-router.use(authAcessToken);
-
 router
     .route("/novo")
-    .post(EventoController.novoEvento);
+    .post(authAcessToken, EventoController.novoEvento);
 
 router
     .route("/editar")
-    .patch(EventoController.editarEvento);
+    .patch(authAcessToken, EventoController.editarEvento);
 
 router
-    .route("/:id")
+    .route("/excluir")
+    .delete(authAcessToken, EventoController.excluirEvento);
+
+router
+    .route("/dados/:id")
     .get(EventoController.dadosEvento);
 
 export default router;

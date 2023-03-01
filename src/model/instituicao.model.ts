@@ -1,5 +1,5 @@
 import { IInstituicaoConfig } from "../types/interface";
-import { pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
+import { DocumentType, pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 
 import { Endereco } from "../schema/endereco.schema";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
@@ -50,14 +50,19 @@ class Instituicao extends Usuario {
     @prop({ default: [], ref: () => Evento })
     public eventos!: Ref<Evento>[];
 
-    static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
+    public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         // TODO: excluir infos do perfil de acordo com as configurações
 
         return this.findOne({ username }).select("-senha -username -cnpj -configuracoes -telefone -updateDate");
     }
 
-    static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {
+    public static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {
         return this.findById(id).select("endereco -tipo -_id");
+    }
+
+    public async removerEvento(this: DocumentType<Instituicao>, idEvento: string) {
+        this.eventos = this.eventos.filter(e => e._id != idEvento);
+        return this.save();
     }
 }
 
