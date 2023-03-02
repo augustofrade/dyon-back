@@ -1,12 +1,14 @@
-import { prop, modelOptions } from "@typegoose/typegoose";
+import { prop } from "@typegoose/typegoose";
 
-@modelOptions({ schemaOptions: { _id: false } })
 class Periodo {
     @prop({ required: true })
     public inicio!: Date;
     
     @prop({ required: true })
     public termino!: Date;
+
+    @prop({ min: 1 })
+    public inscricoesMaximo?: number;
 }
 
 export { Periodo };

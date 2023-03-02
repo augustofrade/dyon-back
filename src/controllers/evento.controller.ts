@@ -25,7 +25,6 @@ class EventoController {
                 descricao: dados.descricao,
                 banner: dados.banner,
                 endereco: dados.endereco,
-                inscricoesMaximo: dados.inscricoesMaximo,
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
                 periodosOcorrencia: (<Array<Periodo>>dados.periodos).sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()),
@@ -59,7 +58,6 @@ class EventoController {
                 descricao: dados.descricao,
                 banner: dados.banner,
                 endereco: dados.endereco,
-                inscricoesMaximo: dados.inscricoesMaximo,
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
                 periodosOcorrencia: dados.periodos,
@@ -76,12 +74,13 @@ class EventoController {
 
     public static async excluirEvento(req: Request, res: Response) {
         const instituicao = await InstituicaoModel.findById(res.locals.userId);
-        if(!instituicao || !instituicao.eventos.includes(req.body.idEvento))
-            return res.json({ msg: "Não autorizado", erro: true });
-
         const evento = await EventoModel.findById(req.body.idEvento);
+
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
+
+        if(!instituicao || !instituicao.eventos.includes(req.body.idEvento))
+            return res.json({ msg: "Não autorizado", erro: true });
         
         if(evento.permiteAlteracoes()) {
             try {
@@ -101,16 +100,18 @@ class EventoController {
         const evento = await EventoModel.todosDadosPorId(req.params.id);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
-
+        
         const avaliacao = evento.avaliacoes.reduce((soma: number, avaliacao: Avaliacao) => { return soma + avaliacao.nota; }, 0);
-        const resposta = { ...evento, avaliacoes: undefined, criador: undefined, avaliacao, instituicao: {
+        
+        const camposDeletar = { avaliacoes: undefined, criador: undefined };
+        const resposta = { ...evento.toObject(), ...camposDeletar, avaliacao, inscricoes: evento.inscricoes.length, instituicao: {
             nomeFantasia: (<Instituicao>evento.criador).nomeFantasia,
             username: (<Instituicao>evento.criador).username
         } };
         delete resposta.avaliacoes;
         delete resposta.criador;
-        
-        res.send(resposta);
+
+        res.json(resposta);
     }
 
     public static async pesquisa(req: Request, res: Response) {

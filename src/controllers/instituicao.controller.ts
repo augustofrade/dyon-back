@@ -33,7 +33,7 @@ export default class InstituicaoController {
         if(!instituicao)
             return res.json({ msg: "Instituição não encontrada", erro: true });
         
-        res.status(201).json({ ...instituicao, quantiaEventos: instituicao.eventos.length });
+        res.status(201).json({ ...instituicao.toObject(), quantiaEventos: instituicao.eventos.length });
     }
 
     static async atualizarDados(req: Request, res: Response) {

@@ -33,9 +33,6 @@ class Evento {
     @prop({ required: true })
     public endereco!: Endereco;
 
-    @prop({ min: 1 })
-    public inscricoesMaximo?: number;
-
     @prop({ required: true })
     public inscricoesInicio!: Date;
 
@@ -65,6 +62,7 @@ class Evento {
 
     public static async todosDadosPorId(this: ReturnModelType<typeof Evento>, id: string) {
         return this.findById(id)
+            .select("-__v")
             .populate("criador", "nomeFantasia username")
             .populate("avaliacoes", "nota");
     }
@@ -74,7 +72,7 @@ class Evento {
             path: "avaliacoes",
             populate: {
                 path: "autor",
-                select: "username nomeCompleto nomeSocial fotoPerfil"
+                select: "username nomeCompleto nomeSocial fotoPerfil",
             }
         });
     }

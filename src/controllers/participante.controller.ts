@@ -33,7 +33,7 @@ class ParticipanteController {
         if(!participante)
             return res.json({ msg: "Participante não encontrado", erro: true });
         
-        res.status(201).json({ ...participante, quantiaEventos: participante.inscricoes.filter(i => (<Inscricao>i).confirmada).length });
+        res.status(201).json({ ...participante.toObject(), quantiaEventos: participante.inscricoes.filter(i => (<Inscricao>i).confirmada).length });
     }
 
     static async atualizarPerfil(req: Request, res: Response) {

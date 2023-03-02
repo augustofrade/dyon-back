@@ -54,7 +54,7 @@ class Usuario {
         return senhasConferem;
     }
 
-    async salvarRefreshToken(this: DocumentType<Usuario>, refreshToken: string) {
+    async removerRefreshToken(this: DocumentType<Usuario>, refreshToken: string) {
         this.refreshToken.pull(refreshToken);
         this.save();
     }

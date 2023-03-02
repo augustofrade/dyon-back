@@ -15,6 +15,10 @@ router
 router
     .route("/confirmar/:id")
     .post(authAcessToken, InscricaoController.confirmarInscricao);
+
+router
+    .route("/status/:idEvento")
+    .post(authAcessToken, InscricaoController.statusInscricao);
     
 
 export default router;

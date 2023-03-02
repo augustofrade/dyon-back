@@ -48,10 +48,11 @@ export default abstract class InscricaoController {
     }
 
     static async confirmarInscricao(req: Request, res: Response) {
+        // Operador
         const idInscricao = req.params.id;
-        const instituicao = InstituicaoModel.findOne({ "operadores._id": res.locals.userId });
+        const instituicaoOperador = InstituicaoModel.findOne({ "operadores._id": res.locals.userId });
         
-        if(!instituicao)
+        if(!instituicaoOperador)
             return res.json({ msg: "Não autorizado", erro: true });
         
         const evento = EventoModel.findOne({ "inscricoes._id": idInscricao });
@@ -64,6 +65,15 @@ export default abstract class InscricaoController {
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
             res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente. ", erro: true, detalhes: err });
+        }
+    }
+
+    static async statusInscricao(req: Request, res: Response) {
+        try {
+            const estaInscrito = !!await ParticipanteModel.findOne({ _id: res.locals.userId, inscricoes: { evento: req.params.idEvento } });
+            res.json({ inscrito: estaInscrito });
+        } catch (err) {
+            res.json({ inscrito: false, erro: true });
         }
     }
 }
