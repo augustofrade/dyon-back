@@ -104,12 +104,16 @@ class EventoController {
         const avaliacaoMedia = evento.avaliacoes.reduce((soma: number, avaliacao: Avaliacao) => { return soma + avaliacao.nota; }, 0);
         
         const camposDeletar = { avaliacoes: undefined, criador: undefined };
-        const resposta = { ...evento.toObject(), ...camposDeletar, avaliacaoMedia, inscricoes: evento.inscricoes.length, instituicao: {
-            nomeFantasia: (<Instituicao>evento.criador).nomeFantasia,
-            username: (<Instituicao>evento.criador).username
-        } };
-        delete resposta.avaliacoes;
-        delete resposta.criador;
+        const resposta = {
+            ...evento.toObject(),
+            ...camposDeletar,
+            avaliacaoMedia,
+            inscricoes: evento.inscricoes.length,
+            instituicao: {
+                nomeFantasia: (<Instituicao>evento.criador).nomeFantasia,
+                username: (<Instituicao>evento.criador).username
+            }
+        };
 
         res.json(resposta);
     }

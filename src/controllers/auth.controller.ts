@@ -9,18 +9,9 @@ import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import validarSenha from "../util/validarSenha";
 
 
-/**
- * Controller direcionado às ações de autenticação que um usuário pode tomar:
- * 
- * - Login
- * - Logout
- * - Accesar rota protegida
- */
 class AuthController {
 
     /**
-     * ROTA DE LOGIN
-     * 
      * Verifica se há algum usuário que possua ao e-mail passado
      * e se as credenciais enviadas em **req.body** estão corretas
      * 
@@ -41,23 +32,17 @@ class AuthController {
         if(!senhaCorreta)
             return res.status(400).json({ msg: "Senha incorreta" });
         
-        const refreshToken = gerarRefreshToken({ id: usuario._id, email: usuario.email });
-
+        const { token: refreshToken, dataExpiracao } = gerarRefreshToken({ id: usuario._id, email: usuario.email });
         const accessToken = gerarAccesToken({ id: usuario._id, email: usuario.email });
 
         usuario.refreshToken.push(refreshToken);
         usuario.save();
-
-        const dataAtual = new Date();
-        const dataExpiracao = new Date(dataAtual.setDate(dataAtual.getDate() + 30));
 
         res.cookie("token", refreshToken, { expires: dataExpiracao });
         return res.json({ token: accessToken });
     }
 
     /**
-     * ROTA DE LOGOUT
-     * 
      * Realiza o logout do usuário removendo seu Refresh Token atual de seus cookies
      * e de seu documento no banco de dados, tornando-o inutilizável.
      */
@@ -105,7 +90,7 @@ class AuthController {
             }
         );
     }
-
+    
     static async atualizarSenha(req: Request, res: Response) {
         const { senhaAtual, novaSenha } = req.body;
         const usuario = await UsuarioModel.findById(res.locals.userId);

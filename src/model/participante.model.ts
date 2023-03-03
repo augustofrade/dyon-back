@@ -20,8 +20,8 @@ const configsPadrao = () => ({
 
 
 @pre<Participante>("save", function() {
-    if(this.isModified("nomeSocial" || this.isModified("nomeCompleto"))) {
-        this.username = gerarUsername( this.nomeSocial ?? this.nomeCompleto);
+    if(this.isModified("nomeSocial") || this.isModified("nomeCompleto")) {
+        this.username = gerarUsername(this.nomeSocial ?? this.nomeCompleto);
     }
 })
 class Participante extends Usuario {
@@ -66,8 +66,37 @@ class Participante extends Usuario {
         // TODO: excluir infos do perfil de acordo com as configurações
 
         return this.findOne({ username })
-        .select("-senha -username -cpf -dataNascimento -configuracoes -telefone -updateDate")
-        .populate("inscricoes");
+        .select("-_id -tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando")
+        .populate({
+            path: "inscricoes",
+            select: "periodo evento",
+            populate: {
+                path: "evento",
+                select: "-_id titulo endereco _publicId slug"
+            }
+        })
+        .populate("acompanhando", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
+    }
+
+    static atualizarPerfil(this: ReturnModelType<typeof Participante>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
+        const nome: string | undefined = dados.nomeSocial ?? dados.nomeCompleto;
+        const username: string | undefined = nome ? gerarUsername(nome) : undefined;
+
+        let configuracoesValidadas: Record<string, boolean> | undefined = undefined;
+        if(dados.configuracoes) {
+
+            const configuracoes: Record<string, boolean> = JSON.parse(dados.configuracoes);
+            configuracoesValidadas = {
+                exibirInscricoes: configuracoes.exibirInscricoes ?? true,
+                exibirCategorias: configuracoes.exibirCategorias ?? true,
+                exibirSeguindo: configuracoes.exibirSeguindo ?? true,
+                exibirHistorico: configuracoes.exibirHistorico ?? true
+            };
+        }
+
+        return this.findByIdAndUpdate(idUsuario, {
+            $set: { ...dados, username, fotoPerfil, configuracoes: configuracoesValidadas }
+        }, { new: true }).select("-senha -_id -__v -emailToken -refreshToken -acompanhando -inscricoes -updatedAt");
     }
 }
 

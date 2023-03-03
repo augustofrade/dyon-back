@@ -28,16 +28,8 @@ router
 router.use(authAcessToken);
 
 router
-    .route("/atualizar/perfil")
-    .put(uploadFotoPerfil, ParticipanteController.atualizarPerfil);
-
-router
-    .route("/atualizar/dados")
-    .put(ParticipanteController.atualizarDados);
-
-router
-    .route("/atualizar/privacidade")
-    .put(ParticipanteController.atualizarPrivacidade);
+    .route("/atualizar")
+    .patch(uploadFotoPerfil, ParticipanteController.atualizarDados);
 
 
 export default router;
