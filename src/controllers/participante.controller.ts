@@ -68,33 +68,15 @@ class ParticipanteController {
 
             // TODO: verificar melhor maneira de enviar a foto do perfil para o front em todas as rotas
             const fotoPerfil = participante.fotoPerfil ? participante.fotoPerfil?.toString("base64") : undefined;
-            const dados = { ...participante.toObject(), fotoPerfil };
-            res.json({ msg: "", dados });
+            const dados = { ...participante.toObject(), fotoPerfil,
+                categoriasFavoritas: participante.categoriasFavoritas.map(c => ({ slug: c._id, titulo: c.titulo }))
+            };
+            res.json({ msg: "Dados atualizados com sucesso", dados });
         } catch (err) {
             res.json({ msg: "Não foi possível atualizar os dados, tente novamente.", erro: true });
         }
     }
-
-    static async atualizarPrivacidade(req: Request, res: Response) {
-        const participante = await ParticipanteModel.findById(res.locals.userId);
-        if(!participante)
-            return res.status(404).json({ msg: "Erro interno", erro: true });
-        
-        try {
-            participante.configuracoes = {
-                exibirInscricoes: req.body.exibirInscricoes ?? true,
-                exibirCategorias: req.body.exibirCategorias ?? true,
-                exibirSeguindo: req.body.exibirSeguindo ?? true,
-                exibirHistorico: req.body.exibirHistorico ?? true
-            };
-            participante.save();
-            res.status(200).json({ msg: "Configurações de privacidade salvas com sucesso" });
-        } catch(err) {
-            res.status(400).json({ msg: "Não foi possível salvar as configurações de privacidade. Tente novamente.", erro: true });
-        }
-        
-    }
-
+    
     static async getAll(req: Request, res: Response) {
         const allUsers = await ParticipanteModel.find();
         res.json(allUsers);

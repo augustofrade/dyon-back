@@ -8,7 +8,7 @@ import { Evento } from "./evento.model";
 import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
 import { Types } from "mongoose";
-import gerarSlug from "../util/gerarSlug";
+import gerarUsername from "../util/gerarUsername";
 
 
 const configsPadrao = (): IInstituicaoConfig => ({ exibirEndereco: true });
@@ -16,7 +16,7 @@ const configsPadrao = (): IInstituicaoConfig => ({ exibirEndereco: true });
 
 @pre<Instituicao>("save", function() {
     if(this.isModified("nomeFantasia")) {
-        this.username = gerarSlug(this.nomeFantasia);
+        this.username = gerarUsername(this.nomeFantasia);
     }
 })
 class Instituicao extends Usuario {
@@ -56,6 +56,23 @@ class Instituicao extends Usuario {
         return this.findOne({ username })
             .select("-_id -senha -email -emailConfirmado -emailToken -refreshToken -tipo -nomeRepresentante -operadores -cnpj -configuracoes -telefone -updatedAt -__v")
             .populate("eventos", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
+    }
+
+    static atualizarPerfil(this: ReturnModelType<typeof Instituicao>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
+        const username: string | undefined = dados.nomeFantasia ? gerarUsername(dados.nomeFantasia) : undefined;
+
+        let configuracoesValidadas: Record<string, boolean> | undefined = undefined;
+        if(dados.configuracoes) {
+
+            const configuracoes: Record<string, boolean> = JSON.parse(dados.configuracoes);
+            configuracoesValidadas = {
+                exibirEndereco: configuracoes.exibirInscricoes ?? true
+            };
+        }
+
+        return this.findByIdAndUpdate(idUsuario, {
+            $set: { ...dados, username, fotoPerfil, configuracoes: configuracoesValidadas }
+        }, { new: true }).select("-senha -_id -__v -emailToken -refreshToken -operadores -eventos -updatedAt");
     }
 
     public static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {

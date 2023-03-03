@@ -58,34 +58,22 @@ export default class InstituicaoController {
         res.status(201).json(retorno);
     }
 
-    static async atualizarPerfil(req: Request, res: Response) {
-        // TODO: método de atualização de perfil
-    }
-
     static async atualizarDados(req: Request, res: Response) {
-        const { nomeRepresentante, telefone, nomeFantasia, endereco } = req.body;
-        
-        const atualizado = await InstituicaoModel.findByIdAndUpdate(res.locals.userId, { nomeRepresentante, telefone, nomeFantasia, endereco }, { new: true });
-        if(atualizado)
-            res.status(200).json({ msg: "Seus dados foram atualizados com sucesso." });
-        else
-            res.status(400).json({ msg: "Não foi possível atualizar seus dados", erro: true });
-    }
-
-    static async atualizarPrivacidade(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(res.locals.userId);
-        if(!instituicao)
-            return res.status(404).json({ msg: "Erro interno", erro: true });
-        
         try {
+            const novaFoto = req.file ? req.file.buffer : undefined;
+            const instituicao = await InstituicaoModel.atualizarPerfil(res.locals.userId, req.body, novaFoto);
+            if(!instituicao)
+                throw new Error();
 
-            instituicao.configuracoes.exibirEndereco = req.body.exibirEndereco ?? true;
-            instituicao.save();
-            res.status(200).json({ msg: "Configurações de privacidade salvas com sucesso" });
-        } catch(err) {
-            res.status(400).json({ msg: "Não foi possível salvar as configurações de privacidade. Tente novamente.", erro: true });
+            // TODO: verificar melhor maneira de enviar a foto do perfil para o front em todas as rotas
+            const fotoPerfil = instituicao.fotoPerfil ? instituicao.fotoPerfil?.toString("base64") : undefined;
+            const dados = { ...instituicao.toObject(), fotoPerfil,
+                categoriasRamo: instituicao.categoriasRamo.map(c => ({ slug: c._id, titulo: c.titulo }))
+            };
+            res.json({ msg: "Dados atualizados com sucesso", dados });
+        } catch (err) {
+            res.json({ msg: "Não foi possível atualizar os dados, tente novamente.", erro: true });
         }
-        
     }
 
     static async seguirInstituicao(req: Request, res: Response) {
@@ -95,7 +83,7 @@ export default class InstituicaoController {
         
         const instituicao = await InstituicaoModel.findOne({ username: req.params.username });
         if(!instituicao)
-            return res.status(404).json({ msg: "Perfil de instituição não encontrado", erro: true });
+            return res.status(404).json({ msg: "Instituição não encontrada", erro: true });
         
         try {
             if(usuario.seguindo.includes(instituicao._id)) {

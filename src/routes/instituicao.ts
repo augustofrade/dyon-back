@@ -25,15 +25,7 @@ router.use(authAcessToken);
 
 router
     .route("/atualizar/dados")
-    .put(InstituicaoController.atualizarDados);
-
-router
-    .route("/atualizar/perfil")
-    .put(uploadFotoPerfil, InstituicaoController.atualizarPerfil);
-
-router
-    .route("/atualizar/privacidade")
-    .put(InstituicaoController.atualizarPrivacidade);
+    .patch(InstituicaoController.atualizarDados);
 
 router
     .route("/seguir/:username")
