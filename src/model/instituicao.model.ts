@@ -53,7 +53,9 @@ class Instituicao extends Usuario {
     public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         // TODO: excluir infos do perfil de acordo com as configurações
 
-        return this.findOne({ username }).select("-senha -username -cnpj -configuracoes -telefone -updateDate");
+        return this.findOne({ username })
+            .select("-_id -senha -email -emailConfirmado -emailToken -refreshToken -tipo -nomeRepresentante -operadores -cnpj -configuracoes -telefone -updatedAt -__v")
+            .populate("eventos", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
     }
 
     public static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {

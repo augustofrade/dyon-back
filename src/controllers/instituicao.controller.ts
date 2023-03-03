@@ -2,6 +2,8 @@ import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
 import { InstituicaoModel, ParticipanteModel } from "./../model/models";
 import { Request, Response } from "express";
 import Email from "../email/Email";
+import { ICategoria } from "../types/interface";
+import { Evento } from "../model/evento.model";
 
 export default class InstituicaoController {
 
@@ -13,7 +15,8 @@ export default class InstituicaoController {
             const emailToken = gerarTokenGenerico();
             const instituicaoCriada = new InstituicaoModel({
                 email, senha, nomeFantasia, telefone,
-                nomeRepresentante, cnpj, categoriasRamo, endereco,
+                nomeRepresentante, cnpj, categoriasRamo,
+                endereco: endereco,
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });
             await instituicaoCriada.save();
@@ -33,7 +36,21 @@ export default class InstituicaoController {
         if(!instituicao)
             return res.json({ msg: "Instituição não encontrada", erro: true });
         
-        res.status(201).json({ ...instituicao.toObject(), quantiaEventos: instituicao.eventos.length });
+        const categoriasRamo: ICategoria[] = instituicao.categoriasRamo.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
+        const eventos = instituicao._id === res.locals.userId ? instituicao.eventos : instituicao.eventos.map((e => (<Evento>e).visivel));
+        
+        const retorno = {
+            ...instituicao.toObject(),
+            quantiaEventos: instituicao.eventos.length,
+            categoriasRamo,
+            eventos
+        };
+        
+        res.status(201).json(retorno);
+    }
+
+    static async atualizarPerfil(req: Request, res: Response) {
+        // TODO: método de atualização de perfil
     }
 
     static async atualizarDados(req: Request, res: Response) {

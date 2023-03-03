@@ -7,13 +7,14 @@ import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 
 class ParticipanteController {
 
-    static async cadastro(req: Request, res: Response) {            
-        const { email, senha, nomeCompleto, cpf, telefone, endereco, dataNascimento, categoriasFavoritas } = req.body;
+    static async cadastro(req: Request, res: Response) {
+        const { email, senha, nomeCompleto, cpf, telefone, endereco, dataNascimento, genero, categoriasFavoritas } = req.body;
         try {
             const emailToken = gerarTokenGenerico();
             const novoParticipante = new ParticipanteModel({
-                email, senha, nomeCompleto, telefone,
-                cpf, categoriasFavoritas, endereco, dataNascimento,
+                email, senha, nomeCompleto, telefone, genero,
+                cpf, categoriasFavoritas, dataNascimento,
+                endereco,
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });
             await novoParticipante.save();
@@ -37,13 +38,21 @@ class ParticipanteController {
     }
 
     static async atualizarPerfil(req: Request, res: Response) {
-        const { nomeCompleto, nomeSocial, categoriasFavoritas, fotoPerfil } = req.body;
+        const { nomeCompleto, nomeSocial, categoriasFavoritas } = req.body;
         
-        const atualizado = await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { nomeCompleto, nomeSocial, fotoPerfil, categoriasFavoritas }, { new: true });
-        if(atualizado)
+        try {
+            const atualizado = await ParticipanteModel.findByIdAndUpdate(res.locals.userId, {
+                nomeCompleto, nomeSocial,
+                categoriasFavoritas: JSON.parse(categoriasFavoritas),
+                fotoPerfil: req.file ? req.file.buffer : undefined,
+            }, { new: true });
+            if(atualizado)
             res.status(200).json({ msg: "Os dados do seu perfil foram atualizado com sucesso." });
-        else
+            else
+                throw new Error();
+        } catch (err) {
             res.status(400).json({ msg: "Não foi possível atualizar seus dados de perfil", erro: true });
+        }
     }
 
     static async atualizarDados(req: Request, res: Response) {

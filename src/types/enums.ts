@@ -9,3 +9,8 @@ export enum usuariosEnum {
     Instituicao = "Instituicao",
     Operador = "Operador",
 }
+
+export enum formatosImagemValidos {
+    "image/png",
+    "image/jpeg"
+}

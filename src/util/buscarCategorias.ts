@@ -1,5 +1,5 @@
 import { CategoriaModel } from "../model/categoria.model";
 
 export const buscarCategorias = (slugs: string[]) => {
-    return CategoriaModel.find({ _id: slugs });
+    return CategoriaModel.find({ _id: slugs }).select("-__id");
 };
