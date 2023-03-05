@@ -17,7 +17,7 @@ router
     .post(authAcessToken, InscricaoController.confirmarInscricao);
 
 router
-    .route("/status/:idEvento")
+    .route("/status/:idInscricao")
     .post(authAcessToken, InscricaoController.statusInscricao);
     
 

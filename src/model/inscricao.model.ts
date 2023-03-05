@@ -15,8 +15,8 @@ import { Participante } from "./participante.model";
 })
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Inscricao {
-    @prop({ required: true, type: [Periodo] })
-    public periodo!: Types.Array<Periodo>;
+    @prop({ required: true, type: Periodo })
+    public periodo!: Periodo;
 
     @prop()
     public qrCode?: string;
@@ -27,15 +27,15 @@ class Inscricao {
     @prop({ default: false })
     public confirmada!: boolean;
 
-    @prop({ required: true, ref: () => Operador })
-    public confirmadaPor!: Ref<Operador>;
+    @prop({ ref: () => Operador })
+    public confirmadaPor?: Ref<Operador>;
 
     @prop({ required: true, ref: () => Evento })
     public evento!: Ref<Evento>;
 
 
     public async confirmarParticipacao(this: DocumentType<Inscricao>, idOperador: string) {
-        this.confirmadaPor._id = idOperador;
+        this.confirmadaPor!._id = idOperador;
         this.qrCode = undefined;
         this.confirmada = true;
         this.save();

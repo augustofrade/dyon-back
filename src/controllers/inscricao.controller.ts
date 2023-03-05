@@ -70,8 +70,8 @@ export default abstract class InscricaoController {
 
     static async statusInscricao(req: Request, res: Response) {
         try {
-            const estaInscrito = !!await ParticipanteModel.findOne({ _id: res.locals.userId, inscricoes: { evento: req.params.idEvento } });
-            res.json({ inscrito: estaInscrito });
+            const inscricao = await InscricaoModel.findById(req.params.idInscricao);
+            res.json({ inscrito: inscricao && inscricao.confirmada });
         } catch (err) {
             res.json({ inscrito: false, erro: true });
         }

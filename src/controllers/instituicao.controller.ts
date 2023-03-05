@@ -84,13 +84,14 @@ export default class InstituicaoController {
         const instituicao = await InstituicaoModel.findOne({ username: req.params.username });
         if(!instituicao)
             return res.status(404).json({ msg: "Instituição não encontrada", erro: true });
-        
+
         try {
+            console.log(usuario.seguindo.includes(instituicao._id));
             if(usuario.seguindo.includes(instituicao._id)) {
-                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $pull: { seguindo: { _id: instituicao._id } } });
+                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $pull: { seguindo: instituicao._id } });
                 res.status(200).json({ msg: `Deixou de seguir ${instituicao.nomeFantasia}` });
             } else {
-                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $push: { seguindo: { _id: instituicao._id } } });
+                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $push: { seguindo: instituicao._id } });
                 res.status(200).json({ msg: `Começou a seguir ${instituicao.nomeFantasia}` });
             }
 

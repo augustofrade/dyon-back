@@ -15,6 +15,7 @@ export interface IParticipanteConfig {
 }
 
 export interface IPeriodo {
+    _id: string;
     inicio: Date;
     termino: Date;
 }
