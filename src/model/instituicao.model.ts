@@ -9,6 +9,7 @@ import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
 import { Types } from "mongoose";
 import gerarUsername from "../util/gerarUsername";
+import { Avaliacao } from "./avaliacao.model";
 
 
 const configsPadrao = (): IInstituicaoConfig => ({ exibirEndereco: true });
@@ -50,13 +51,17 @@ class Instituicao extends Usuario {
     @prop({ default: [], ref: () => Evento })
     public eventos!: Ref<Evento>[];
 
+    @prop({ default: [], ref: () => Avaliacao })
+    public avaliacoes!: Ref<Avaliacao>[];
+
     public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         return this.findOne({ username })
             .select("-_id -senha -email -emailConfirmado -emailToken -refreshToken -tipo -nomeRepresentante -operadores -cnpj -configuracoes -telefone -updatedAt -__v")
-            .populate("eventos", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
+            .populate("eventos", "-_id titulo endereco publicId slug visivel periodosOcorrencia")
+            .populate("avaliacoes");
     }
 
-    static atualizarPerfil(this: ReturnModelType<typeof Instituicao>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
+    public static atualizarPerfil(this: ReturnModelType<typeof Instituicao>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
         const username: string | undefined = dados.nomeFantasia ? gerarUsername(dados.nomeFantasia) : undefined;
 
         let configuracoesValidadas: Record<string, boolean> | undefined = undefined;
@@ -71,6 +76,11 @@ class Instituicao extends Usuario {
         return this.findByIdAndUpdate(idUsuario, {
             $set: { ...dados, username, fotoPerfil, configuracoes: configuracoesValidadas }
         }, { new: true }).select("-senha -_id -__v -emailToken -refreshToken -operadores -eventos -updatedAt");
+    }
+
+    public avaliacaoMedia(this: DocumentType<Instituicao>) {
+        let media = 0;
+        return media;
     }
 
     public static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {

@@ -1,7 +1,6 @@
 import { buscarCategorias } from "./../util/buscarCategorias";
 import { EventoModel, InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
-import { Avaliacao } from "../schema/avaliacao.schema";
 import { Instituicao } from "../model/instituicao.model";
 import { DateTime } from "luxon";
 import { Periodo } from "../schema/periodo.schema";
@@ -101,13 +100,12 @@ class EventoController {
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
         
-        const avaliacaoMedia = evento.avaliacoes.reduce((soma: number, avaliacao: Avaliacao) => { return soma + avaliacao.nota; }, 0);
         
-        const camposDeletar = { avaliacoes: undefined, criador: undefined };
+        
+        const camposDeletar = { criador: undefined };
         const resposta = {
             ...evento.toObject(),
             ...camposDeletar,
-            avaliacaoMedia,
             inscricoes: evento.inscricoes.length,
             instituicao: {
                 nomeFantasia: (<Instituicao>evento.criador).nomeFantasia,

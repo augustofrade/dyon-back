@@ -2,7 +2,6 @@ import { DocumentType, pre, prop, Ref, ReturnModelType } from "@typegoose/typego
 import { Types } from "mongoose";
 import { DateTime } from "luxon";
 
-import { Avaliacao } from "../schema/avaliacao.schema";
 import { Endereco } from "../schema/endereco.schema";
 import { Periodo } from "../schema/periodo.schema";
 import gerarIdAleatorio from "../util/gerarIDAleatorio";
@@ -55,9 +54,6 @@ class Evento {
     @prop({ required: true, type: [Categoria] })
     public categorias!: Types.Array<Categoria>;
 
-    @prop({ default: [], type: [Avaliacao] })
-    public avaliacoes!: Types.Array<Avaliacao>;
-
     @prop({ default: [], ref:() => Inscricao })
     public inscricoes!: Ref<Inscricao>[];
 
@@ -65,17 +61,6 @@ class Evento {
         return this.findById(id)
             .select("-__v")
             .populate("criador", "nomeFantasia username")
-            .populate("avaliacoes", "nota");
-    }
-
-    public static async avaliacoesPorId(this: ReturnModelType<typeof Evento>, id: string) {
-        return this.findById(id).select("avaliacoes").populate({
-            path: "avaliacoes",
-            populate: {
-                path: "autor",
-                select: "username nomeCompleto nomeSocial fotoPerfil",
-            }
-        });
     }
 
     public static async pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: string, categoria?: string, estado?: string) {

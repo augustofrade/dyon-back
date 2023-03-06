@@ -1,5 +1,5 @@
 import { modelOptions, Ref, prop } from "@typegoose/typegoose";
-import { Participante } from "../model/participante.model";
+import { Participante } from "./participante.model";
 
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Avaliacao {
@@ -11,6 +11,12 @@ class Avaliacao {
 
     @prop()
     public comentario?: string;
+
+    @prop()
+    public nomeEvento!: string;
+
+    @prop()
+    public dataEvento!: Date;
 }
 
 export { Avaliacao };
