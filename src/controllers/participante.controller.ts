@@ -26,7 +26,7 @@ class ParticipanteController {
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });
             await novoParticipante.save();
-            Email.Instance.enviarEmailDeCadastro({ email, tipo: "Participante" }, novoParticipante.nomeCompleto.split(" ")[0], emailToken);
+            Email.Instance.enviarEmailCadastro({ email, tipo: "Participante" }, novoParticipante.nomeCompleto.split(" ")[0], emailToken);
 
             const { token: refreshToken, dataExpiracao } = gerarRefreshToken({ id: novoParticipante._id, email: novoParticipante.email });
             const accessToken = gerarAccesToken({ id: novoParticipante._id, email: novoParticipante.email });

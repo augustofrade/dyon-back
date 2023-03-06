@@ -7,6 +7,7 @@ import SMTPTransport from "nodemailer/lib/smtp-transport";
 import fs from "fs";
 import path from "path";
 import ejs from "ejs";
+import { DateTime } from "luxon";
 
 export default class Email {
     private static _instance: Email;
@@ -34,9 +35,24 @@ export default class Email {
         this.templatesEmCache.operador = fs.readFileSync(path.join(__dirname, "./template/cadastroOperador.ejs"), "utf-8");
     }
 
-    public async enviarEmailDeCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
+    
+
+    public async enviarEmailCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
         const url = `https://localhost:3000/email/${token.hash}`;
-        const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao: token.expiracao, tipo: destinatario.tipo });
+        const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
+        const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao, tipo: destinatario.tipo });
+
+        return this.enviarEmailGenerico(destinatario.email, {
+            assunto: "Cadastro realizado com sucesso",
+            texto: `Cadastro realizado com sucesso, por favor clique no link a seguir para confirmar seu e-mail: ${url}`,
+            html: template
+        });
+    }
+
+    public async enviarEmailEventoCriacao(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
+        const url = `https://localhost:3000/email/${token.hash}`;
+        const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
+        const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao, tipo: destinatario.tipo });
 
         return this.enviarEmailGenerico(destinatario.email, {
             assunto: "Cadastro realizado com sucesso",

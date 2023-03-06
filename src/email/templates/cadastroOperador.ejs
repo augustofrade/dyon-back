@@ -12,6 +12,13 @@
             color: #2d3436;
             font-weight: 500;
         }
+        span.text {
+            font-size: 1.3em;
+        }
+
+        .title {
+            font-size: 2em;
+        }
     </style>
 </head>
 <body style="font-family: Helvetica, sans-serif;">
@@ -19,12 +26,12 @@
         <%- include("header"); -%>
         <tr>
             <td>
-                <h2 class="text" style="margin-block-end: 0;"><%= nomeUsuario %>, bem-vindo!</h2>
+                <h2 class="text" style="margin-block-end: 0; margin-bottom: 0;"><%= nomeUsuario %>, bem-vindo!</h2>
             </td>
         </tr>
         <tr>
             <td>
-                <h2 class="text"><%= nomeInstituicao %> criou sua conta</h2>
+                <h2 class="text">Você foi cadastrado por <%= nomeInstituicao %> no Dyon</h2>
             </td>
         </tr>
         <tr>

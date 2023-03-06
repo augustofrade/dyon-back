@@ -1,9 +1,9 @@
+import { DateTime } from "luxon";
 import { ITokenGenerico } from "./../types/interface";
 import crypto from "crypto";
 
 export const gerarTokenGenerico = (): ITokenGenerico => {
-    const dataAtual = new Date();
-    const dataExpiracao = new Date(dataAtual.getTime() + 5 * 60000);
+    const dataExpiracao = DateTime.now().plus({ minutes: 15 }).toJSDate();
     return {
         hash: crypto.randomBytes(32).toString("hex"),
         expiracao: dataExpiracao
