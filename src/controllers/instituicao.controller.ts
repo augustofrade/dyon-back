@@ -24,7 +24,7 @@ export default class InstituicaoController {
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });
             await novaInstituicao.save();
-            Email.Instance.enviarEmailDeCadastro(email, novaInstituicao.nomeFantasia, emailToken);
+            Email.Instance.enviarEmailDeCadastro({ email, tipo: "Instituição" }, novaInstituicao.nomeFantasia, emailToken);
             
             const { token: refreshToken, dataExpiracao } = gerarRefreshToken({ id: novaInstituicao._id, email: novaInstituicao.email });
             const accessToken = gerarAccesToken({ id: novaInstituicao._id, email: novaInstituicao.email });

@@ -20,18 +20,23 @@ export interface IPeriodo {
     termino: Date;
 }
 
+export interface IEmail {
+    assunto: string;
+    texto?: string;
+    html: string;
+}
+
+export interface IEmailCadastro {
+    email: string;
+    tipo: "Participante" | "Instituição";
+}
+
 /**
  * Estrutura dos objetos de categorias que serão enviados ao front-end
  */
 export interface ICategoria {
     slug: string;
     titulo: string;
-}
-
-export interface IEmail {
-    assunto: string;
-    texto?: string;
-    html: string;
 }
 
 export interface ITokenGenerico {

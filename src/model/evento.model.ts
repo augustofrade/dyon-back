@@ -42,7 +42,7 @@ class Evento {
     @prop({ default: true })
     public inscricoesAbertas!: boolean;
 
-    // Avaliar se deve ser subdocs ou refs devido à edição dos períodos e inscrições dos usuários neles
+    // TODO: Avaliar se deve ser subdocs ou refs devido à edição dos períodos e inscrições dos usuários neles
     @prop({ required: true, type: [Periodo] })
     public periodosOcorrencia!: Types.Array<Periodo>;
 

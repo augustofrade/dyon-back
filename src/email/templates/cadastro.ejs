@@ -16,11 +16,7 @@
 </head>
 <body style="font-family: Helvetica, sans-serif;">
     <table style="margin: 0 auto" width="600">
-        <tr>
-            <td>
-                <img src="cid:unique@logo" width="315" height="99" alt="Logo Dyon">
-            </td>
-        </tr>
+        <%- include("header"); -%>
         <tr>
             <td>
                 <h2 class="text" style="margin-block-end: 0;"><%= nomeUsuario %>, bem-vindo!</h2>
@@ -36,8 +32,14 @@
         </tr>
         <tr>
             <td>
-                <span class="text">Sua conta foi cadastrada com sucesso em nossa plataforma!<br/>
-                    Por favor, clique no link abaixo para confirmar seu e-mail e ter acesso total ao Dyon.</span>
+                <% if (tipo === "Instituição") { %>
+                    <span class="text">A conta de sua instituição foi cadastrada com sucesso em nossa plataforma!<br/>
+                        Por favor, clique no link abaixo para confirmar o e-mail da conta e ter acesso total ao Dyon.</span>
+                <% } else { %>
+                    <span class="text">Sua conta foi cadastrada com sucesso em nossa plataforma!<br/>
+                        Por favor, clique no link abaixo para confirmar seu e-mail e ter acesso total ao Dyon.</span>
+                <% } %>
+                
             </td>
         </tr>
         <tr style="height: 100px;">

@@ -25,7 +25,7 @@ export default abstract class OperadorController {
             await novoOperador.save();
             await InstituicaoModel.findByIdAndUpdate(res.locals.userId, { $push: { operadores: novoOperador._id } });
             // TODO: criar template próprio para o operador
-            Email.Instance.enviarEmailDeCadastro(email, novoOperador.nomeCompleto.split(" ")[0], emailToken);
+            Email.Instance.enviarEmailOperador(email, novoOperador.nomeCompleto.split(" ")[0], instituicao.nomeFantasia);
             res.status(200).json({ msg: "Cadastro realizado com sucesso" });
         } catch(erro) {
             res.status(400).json({ msg: "Falha ao realizar cadastro", erro });

@@ -1,3 +1,4 @@
+import { IEmailCadastro } from "./../types/interface";
 /* eslint-disable no-unused-vars */
 
 import { IEmail, ITokenGenerico } from "../types/interface";
@@ -29,16 +30,27 @@ export default class Email {
             }
         });
 
-        this.templatesEmCache.cadastro = fs.readFileSync(path.join(__dirname, "./templates/cadastro.ejs"), "utf-8");
+        this.templatesEmCache.cadastro = fs.readFileSync(path.join(__dirname, "./template/cadastro.ejs"), "utf-8");
+        this.templatesEmCache.operador = fs.readFileSync(path.join(__dirname, "./template/cadastroOperador.ejs"), "utf-8");
     }
 
-    public async enviarEmailDeCadastro(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
+    public async enviarEmailDeCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
         const url = `https://localhost:3000/email/${token.hash}`;
-        const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao: token.expiracao });
+        const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao: token.expiracao, tipo: destinatario.tipo });
 
-        return this.enviarEmailGenerico(destinatario, {
+        return this.enviarEmailGenerico(destinatario.email, {
             assunto: "Cadastro realizado com sucesso",
             texto: `Cadastro realizado com sucesso, por favor clique no link a seguir para confirmar seu e-mail: ${url}`,
+            html: template
+        });
+    }
+
+    public async enviarEmailOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string) {
+        const template = ejs.render(this.templatesEmCache.operador, { nomeUsuario, nomeInstituicao });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: `Novo cadastro no Dyon por ${nomeInstituicao}`,
+            texto: `Agora você pode começar a confirmar inscrições de participantes nos eventos de ${nomeInstituicao}!`,
             html: template
         });
     }
