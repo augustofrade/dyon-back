@@ -8,6 +8,7 @@ import fs from "fs";
 import path from "path";
 import ejs from "ejs";
 import { DateTime } from "luxon";
+import { Evento } from "../model/evento.model";
 
 export default class Email {
     private static _instance: Email;
@@ -33,9 +34,8 @@ export default class Email {
 
         this.templatesEmCache.cadastro = fs.readFileSync(path.join(__dirname, "./template/cadastro.ejs"), "utf-8");
         this.templatesEmCache.operador = fs.readFileSync(path.join(__dirname, "./template/cadastroOperador.ejs"), "utf-8");
+        this.templatesEmCache.confirmacaoEmail = fs.readFileSync(path.join(__dirname, "./template/confirmacaoEmail.ejs"), "utf-8");
     }
-
-    
 
     public async enviarEmailCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
         const url = `https://localhost:3000/email/${token.hash}`;
@@ -49,17 +49,6 @@ export default class Email {
         });
     }
 
-    public async enviarEmailEventoCriacao(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
-        const url = `https://localhost:3000/email/${token.hash}`;
-        const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
-        const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao, tipo: destinatario.tipo });
-
-        return this.enviarEmailGenerico(destinatario.email, {
-            assunto: "Cadastro realizado com sucesso",
-            texto: `Cadastro realizado com sucesso, por favor clique no link a seguir para confirmar seu e-mail: ${url}`,
-            html: template
-        });
-    }
 
     public async enviarEmailOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string) {
         const template = ejs.render(this.templatesEmCache.operador, { nomeUsuario, nomeInstituicao });
@@ -67,6 +56,34 @@ export default class Email {
         return this.enviarEmailGenerico(destinatario, {
             assunto: `Novo cadastro no Dyon por ${nomeInstituicao}`,
             texto: `Agora você pode começar a confirmar inscrições de participantes nos eventos de ${nomeInstituicao}!`,
+            html: template
+        });
+    }
+    
+    public async enviarEmailEventoCriacao(destinatario: string, evento: Evento) {
+        const url = `https://localhost:3000/email/${evento._publicId}/${evento.slug}`;
+        const template = ejs.render(this.templatesEmCache.eventoCriacao, { });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: `Evento ${evento.titulo} criado com sucesso no Dyon`,
+            texto: `Seu novo evento "${evento.titulo}" foi criado no Dyon em: ${url}`,
+            html: template,
+            anexos: [{
+                filename: "Banner do Evento",
+                cid: "unique@banner",
+                content: evento.banner
+            }]
+        });
+    }
+
+    public async enviarEmailConfirmacao(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
+        const url = `https://localhost:3000/email/${token.hash}`;
+        const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
+        const template = ejs.render(this.templatesEmCache.confirmacaoEmail, { url, nomeUsuario, dataExpiracao });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: "Confirme o e-mail de sua conta Dyon",
+            texto: `Confirme seu e-mail em: ${url}`,
             html: template
         });
     }
@@ -80,11 +97,14 @@ export default class Email {
             subject: email.assunto,
             text: email.texto,
             html: email.html,
-            attachments: [{
-                filename: "Logo.png",
-                path: path.join(__dirname, "../../public/img/logo/logo_default.png"),
-                cid: "unique@logo"
-            }]
+            attachments: [
+                {
+                    filename: "Logo.png",
+                    path: path.join(__dirname, "../../public/img/logo/logo_default.png"),
+                    cid: "unique@logo",
+                },
+                ...email.anexos ?? []
+            ]
         });
     }
 

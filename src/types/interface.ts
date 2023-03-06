@@ -24,6 +24,12 @@ export interface IEmail {
     assunto: string;
     texto?: string;
     html: string;
+    anexos?: Array<{
+        filename: string;
+        path?: string;
+        content?: string | Buffer;
+        cid?: string;
+    }>;
 }
 
 export interface IEmailCadastro {
