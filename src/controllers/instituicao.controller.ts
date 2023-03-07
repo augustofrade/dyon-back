@@ -48,7 +48,6 @@ export default class InstituicaoController {
         
         const categoriasRamo: ICategoria[] = instituicao.categoriasRamo.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
         const eventos = instituicao._id === res.locals.userId ? instituicao.eventos : instituicao.eventos.map((e => (<Evento>e).visivel));
-        // TODO: calcular media de avaliacoes na instituicao
         const avaliacaoMedia = instituicao.avaliacaoMedia();
         
         const retorno = {

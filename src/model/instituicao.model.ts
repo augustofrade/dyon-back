@@ -78,9 +78,13 @@ class Instituicao extends Usuario {
         }, { new: true }).select("-senha -_id -__v -emailToken -refreshToken -operadores -eventos -updatedAt");
     }
 
-    public avaliacaoMedia(this: DocumentType<Instituicao>) {
+    public avaliacaoMedia(this: DocumentType<Instituicao>) : string {
         let media = 0;
-        return media;
+        if(this.populated("avaliacoes")) {
+            media = (<Avaliacao[]>this.avaliacoes).reduce((valor: number, avaliacao: Avaliacao) => valor + avaliacao.nota, 0);
+            media = media / this.avaliacoes.length;
+        }
+        return media.toFixed(2);
     }
 
     public static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {

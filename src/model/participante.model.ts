@@ -63,8 +63,6 @@ class Participante extends Usuario {
     public inscricoes!: Ref<Inscricao>[];
 
     static obterDadosPerfil(this: ReturnModelType<typeof Participante>, username: string) {
-        // TODO: excluir infos do perfil de acordo com as configurações
-
         return this.findOne({ username })
         .select("-_id -tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando")
         .populate({
