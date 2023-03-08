@@ -1,9 +1,10 @@
+import { PeriodoModel } from "../model/models";
 import { buscarCategorias } from "./../util/buscarCategorias";
 import { EventoModel, InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
 import { Instituicao } from "../model/instituicao.model";
 import { DateTime } from "luxon";
-import { Periodo } from "../schema/periodo.schema";
+import { Periodo } from "../model/periodo.model";
 
 class EventoController {
 
@@ -49,7 +50,7 @@ class EventoController {
         if(dados.inscricoesInicio > dados.inscricoesTermino)
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a data final", erro: true });
         
-    
+        // Adicionar exceção para cancelamento de ocorrência em um período
         try {
             const editado = await EventoModel.findByIdAndUpdate(dados.idEvento, {
                 criador: res.locals.userId,
@@ -93,6 +94,22 @@ class EventoController {
             }
         }
         
+    }
+
+    public static async cancelarEvento(req: Request, res: Response) {
+        const instituicao = InstituicaoModel.findById(res.locals.userId);
+        if(!instituicao)
+            return res.json({ msg: "Não autorizado", erro: true });
+
+        const evento = await EventoModel.findById(req.body.idEvento);
+        if(!evento)
+            return res.json({ msg: "Evento não encontrado", erro: true });
+        
+        const sucesso = evento.cancelarEventoSync();
+        if(sucesso)
+            res.json({ msg: `${evento.titulo} cancelado com sucesso` });
+        else
+            res.json({ msg: "Não foi possível cancelar este evento", erro: true });
     }
 
     public static async dadosEvento(req: Request, res: Response) {

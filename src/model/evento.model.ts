@@ -3,12 +3,13 @@ import { Types } from "mongoose";
 import { DateTime } from "luxon";
 
 import { Endereco } from "../schema/endereco.schema";
-import { Periodo } from "../schema/periodo.schema";
+import { Periodo } from "./periodo.model";
 import gerarIdAleatorio from "../util/gerarIDAleatorio";
 import gerarSlug from "../util/gerarSlug";
 import { Categoria } from "./categoria.model";
 import { Inscricao } from "./inscricao.model";
 import { Instituicao } from "./instituicao.model";
+import { PeriodoModel } from "./models";
 
 @pre<Evento>("save", function() {
     this.slug = gerarSlug(this.titulo);
@@ -42,8 +43,11 @@ class Evento {
     public inscricoesAbertas!: boolean;
 
     // TODO: Avaliar se deve ser subdocs ou refs devido à edição dos períodos e inscrições dos usuários neles
-    @prop({ required: true, type: [Periodo] })
-    public periodosOcorrencia!: Types.Array<Periodo>;
+    @prop({ required: true, ref: () => Periodo })
+    public periodosOcorrencia!: Ref<Periodo>[];
+
+    @prop({ default: false })
+    public cancelado!: boolean;
 
     @prop()
     public banner!: Buffer;
@@ -57,13 +61,13 @@ class Evento {
     @prop({ default: [], ref:() => Inscricao })
     public inscricoes!: Ref<Inscricao>[];
 
-    public static async todosDadosPorId(this: ReturnModelType<typeof Evento>, id: string) {
+    public static todosDadosPorId(this: ReturnModelType<typeof Evento>, id: string) {
         return this.findById(id)
             .select("-__v")
             .populate("criador", "nomeFantasia username")
     }
 
-    public static async pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: string, categoria?: string, estado?: string) {
+    public static pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: string, categoria?: string, estado?: string) {
         return this.find({
             $or: [
                 { "titulo": new RegExp(pesquisa, "i") },
@@ -74,8 +78,23 @@ class Evento {
         });
     }
 
+    public async cancelarEventoSync(this: DocumentType<Evento>) {
+        this.cancelado = true;
+        const eventoCancelado = await this.save();
+        if(eventoCancelado) {   
+            const periodosCancelados = await PeriodoModel.updateMany({
+                _id: { $in: this.periodosOcorrencia }
+            });
+            return periodosCancelados;
+        }
+        return eventoCancelado;
+    }
+
     public permiteAlteracoes(this: DocumentType<Evento>) {
-        return DateTime.now().plus({ hours: 24 }) > DateTime.fromJSDate(this.periodosOcorrencia[0].inicio);
+        if(!this.populated("periodosOcorrencia"))
+            return false;
+        const dataInicial = (<Array<Periodo>>this.periodosOcorrencia)[0].inicio
+        return DateTime.now().plus({ hours: 24 }) > DateTime.fromJSDate(dataInicial);
     }
 }
 

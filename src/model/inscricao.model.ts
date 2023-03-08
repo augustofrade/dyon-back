@@ -2,7 +2,7 @@ import { DocumentType, modelOptions, post, prop, Ref } from "@typegoose/typegoos
 import { Types } from "mongoose";
 import QRCode from "qrcode";
 
-import { Periodo } from "../schema/periodo.schema";
+import { Periodo } from "./periodo.model";
 import { Evento } from "./evento.model";
 import { Operador } from "./operador.model";
 import { Participante } from "./participante.model";
@@ -15,8 +15,8 @@ import { Participante } from "./participante.model";
 })
 @modelOptions({ schemaOptions: { timestamps: true } })
 class Inscricao {
-    @prop({ required: true, type: Periodo })
-    public periodo!: Periodo;
+    @prop({ required: true, ref: () => Periodo })
+    public periodo!: Ref<Periodo>;
 
     @prop()
     public qrCode?: string;

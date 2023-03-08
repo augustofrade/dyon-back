@@ -1,4 +1,4 @@
-import { prop } from "@typegoose/typegoose";
+import { prop, ReturnModelType } from "@typegoose/typegoose";
 
 class Periodo {
     @prop({ required: true })
@@ -9,6 +9,9 @@ class Periodo {
 
     @prop({ min: 1 })
     public inscricoesMaximo?: number;
+
+    @prop({ default: false })
+    public cancelado!: boolean;
 }
 
 export { Periodo };
