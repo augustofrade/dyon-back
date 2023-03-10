@@ -4,7 +4,7 @@ import { EventoModel, InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
 import { Instituicao } from "../model/instituicao.model";
 import { DateTime } from "luxon";
-import { Periodo } from "../model/periodo.model";
+import { IPeriodo } from "../types/interface";
 
 class EventoController {
 
@@ -19,6 +19,13 @@ class EventoController {
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a final", erro: true });
         
         try {
+            const periodosRaw = dados.periodos as Array<IPeriodo>;
+            const periodos = await PeriodoModel.create(periodosRaw.map((p: IPeriodo) => ({
+                inicio: p.inicio,
+                termino: p.termino,
+                isnscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
+            })));
+        
             const novoEvento = new EventoModel({
                 criador: res.locals.userId,
                 titulo: dados.titulo,
@@ -27,7 +34,7 @@ class EventoController {
                 endereco: dados.endereco,
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
-                periodosOcorrencia: (<Array<Periodo>>dados.periodos).sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()),
+                periodosOcorrencia: periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()).map(p => p._id),
                 categorias: await buscarCategorias(dados.categorias)
             });
             await novoEvento.save();
@@ -52,6 +59,8 @@ class EventoController {
         
         // Adicionar exceção para cancelamento de ocorrência em um período
         try {
+            const periodos = await PeriodoModel.atualizar(dados.periodos);
+
             const editado = await EventoModel.findByIdAndUpdate(dados.idEvento, {
                 criador: res.locals.userId,
                 titulo: dados.titulo,
@@ -60,7 +69,7 @@ class EventoController {
                 endereco: dados.endereco,
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
-                periodosOcorrencia: dados.periodos,
+                periodosOcorrencia: periodos,
                 categorias: await buscarCategorias(dados.categorias)
             }, { new: true });
             
@@ -105,7 +114,7 @@ class EventoController {
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
         
-        const sucesso = evento.cancelarEventoSync();
+        const sucesso = await evento.cancelarEvento();
         if(sucesso)
             res.json({ msg: `${evento.titulo} cancelado com sucesso` });
         else
@@ -116,8 +125,6 @@ class EventoController {
         const evento = await EventoModel.todosDadosPorId(req.params.id);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
-        
-        
         
         const camposDeletar = { criador: undefined };
         const resposta = {

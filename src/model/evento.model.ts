@@ -74,11 +74,12 @@ class Evento {
                 { "endereco.cidade" : new RegExp(pesquisa, "i") },
             ],
             categorias: categoria ? categoria : {},
-            estado: estado ? estado : {}
+            estado: estado ? estado : {},
+            cancelado: false
         });
     }
 
-    public async cancelarEventoSync(this: DocumentType<Evento>) {
+    public async cancelarEvento(this: DocumentType<Evento>) {
         this.cancelado = true;
         const eventoCancelado = await this.save();
         if(eventoCancelado) {   

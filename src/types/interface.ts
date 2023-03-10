@@ -18,6 +18,7 @@ export interface IPeriodo {
     _id: string;
     inicio: Date;
     termino: Date;
+    inscricoesMaximo?: number;
 }
 
 export interface IEmail {
