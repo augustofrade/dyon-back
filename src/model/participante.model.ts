@@ -94,7 +94,7 @@ class Participante extends Usuario {
 
         return this.findByIdAndUpdate(idUsuario, {
             $set: { ...dados, username, fotoPerfil, configuracoes: configuracoesValidadas }
-        }, { new: true }).select("-senha -_id -__v -emailToken -refreshToken -acompanhando -inscricoes -updatedAt");
+        }, { new: true }).select("-senha -_id -__v -emailToken -senhaToken -refreshToken -acompanhando -inscricoes -updatedAt");
     }
 }
 

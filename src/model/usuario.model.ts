@@ -35,6 +35,9 @@ class Usuario {
     @prop({ required: true, minlength: 6 })
     public senha!: string;
 
+    @prop()
+    public senhaToken?: TokenGenerico;
+
     @prop({ default: false })
     public emailConfirmado!: boolean;
 

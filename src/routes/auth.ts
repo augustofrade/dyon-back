@@ -1,6 +1,5 @@
 import express from "express";
 import AuthController from "../controllers/auth.controller";
-import authAcessToken from "../middlewares/authAcessToken.middleware";
 import authValidarRefreshToken from "../middlewares/authValidarRefreshToken";
 
 const router = express.Router();
@@ -19,10 +18,5 @@ router
 router
     .route("/token")
     .get(AuthController.gerarNovoAccessToken);
-
-// Alterar Senha - Altera a senha de qualquer tipo de usuário caso atenda os requisitos de senha
-router
-    .route("/alterar-senha")
-    .put(authAcessToken, AuthController.atualizarSenha);
 
 export default router;

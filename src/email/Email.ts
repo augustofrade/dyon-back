@@ -35,6 +35,7 @@ export default class Email {
         this.templatesEmCache.cadastro = fs.readFileSync(path.join(__dirname, "./template/cadastro.ejs"), "utf-8");
         this.templatesEmCache.operador = fs.readFileSync(path.join(__dirname, "./template/cadastroOperador.ejs"), "utf-8");
         this.templatesEmCache.confirmacaoEmail = fs.readFileSync(path.join(__dirname, "./template/confirmacaoEmail.ejs"), "utf-8");
+        this.templatesEmCache.recuperacaoSenha = fs.readFileSync(path.join(__dirname, "./template/recuperacaoSenha.ejs"), "utf-8");
     }
 
     public async enviarEmailCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
@@ -84,6 +85,19 @@ export default class Email {
         return this.enviarEmailGenerico(destinatario, {
             assunto: "Confirme o e-mail de sua conta Dyon",
             texto: `Confirme seu e-mail em: ${url}`,
+            html: template
+        });
+    }
+
+    public async enviarEmailRecuperacaoSenha(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
+        const url = `https://localhost:3000/email/${token.hash}`;
+        const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
+        const template = ejs.render(this.templatesEmCache.recuperacaoSenha, { url, nomeUsuario, dataExpiracao });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: "Recuperação de Senha",
+            texto: `Foi solicitado um e-mail de recuperçaão de senha para sua conta no Dyon.
+                Caso não tenha sido você que solicitou a recuperação de senha, ignore este e-mail. Para trocar de senha, acesse: ${url}`,
             html: template
         });
     }

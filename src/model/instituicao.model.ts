@@ -56,7 +56,7 @@ class Instituicao extends Usuario {
 
     public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         return this.findOne({ username })
-            .select("-_id -senha -email -emailConfirmado -emailToken -refreshToken -tipo -nomeRepresentante -operadores -cnpj -configuracoes -telefone -updatedAt -__v")
+            .select("-_id -senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -nomeRepresentante -operadores -cnpj -configuracoes -telefone -updatedAt -__v")
             .populate("eventos", "-_id titulo endereco publicId slug visivel periodosOcorrencia")
             .populate("avaliacoes");
     }
@@ -75,7 +75,7 @@ class Instituicao extends Usuario {
 
         return this.findByIdAndUpdate(idUsuario, {
             $set: { ...dados, username, fotoPerfil, configuracoes: configuracoesValidadas }
-        }, { new: true }).select("-senha -_id -__v -emailToken -refreshToken -operadores -eventos -updatedAt");
+        }, { new: true }).select("-senha -_id -__v -emailToken -senhaToken -refreshToken -operadores -eventos -updatedAt");
     }
 
     public avaliacaoMedia(this: DocumentType<Instituicao>) : string {

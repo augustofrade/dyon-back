@@ -9,6 +9,7 @@ import emailRouter from "./email";
 import operadorRouter from "./operador";
 import inscricaoRouter from "./inscricao";
 import avaliacaoRouter from "./avaliacao";
+import senhaRouter from "./senha";
 
 const router = express.Router();
 router.use("/evento", eventoRouter);
@@ -21,5 +22,6 @@ router.use("/email", emailRouter);
 router.use("/operador", operadorRouter);
 router.use("/inscricao", inscricaoRouter);
 router.use("/avaliacao", avaliacaoRouter);
+router.use("/senha", senhaRouter);
 
 export default router;

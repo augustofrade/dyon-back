@@ -6,7 +6,6 @@ import { UsuarioModel } from "../model/usuario.model";
 
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
-import validarSenha from "../util/validarSenha";
 
 
 class AuthController {
@@ -89,23 +88,6 @@ class AuthController {
                 }
             }
         );
-    }
-    
-    static async atualizarSenha(req: Request, res: Response) {
-        const { senhaAtual, novaSenha } = req.body;
-        const usuario = await UsuarioModel.findById(res.locals.userId);
-        if(!usuario)
-            return res.status(404).json({ msg: "Erro interno", erro: true });
-
-        if(!await usuario.verificarSenha(senhaAtual))
-           return res.status(400).json({ msg: "A senha informada está incorreta", erro: true });
-
-        if(!validarSenha(novaSenha))
-            return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
-        
-        usuario.senha = novaSenha;
-        usuario.save();
-        res.status(200).json({ msg: "Senha atualizada com sucesso" });
     }
 }
 
