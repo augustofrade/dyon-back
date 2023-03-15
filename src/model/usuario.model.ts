@@ -3,6 +3,8 @@ import { TokenGenerico } from "../schema/tokenGenerico.schema";
 import { Types } from "mongoose";
 import { pre, prop, modelOptions, getModelForClass, DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
+import { Instituicao } from "./instituicao.model";
+import { Participante } from "./participante.model";
 
 @pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
@@ -52,14 +54,21 @@ class Usuario {
     public tipo!: string;
 
 
-    async verificarSenha(this: DocumentType<Usuario>, senha: string) {
+    public async verificarSenha(this: DocumentType<Usuario>, senha: string) {
         const senhasConferem = bcrypt.compare(senha, this.senha);
         return senhasConferem;
     }
 
-    async removerRefreshToken(this: DocumentType<Usuario>, refreshToken: string) {
+    public async removerRefreshToken(this: DocumentType<Usuario>, refreshToken: string) {
         this.refreshToken.pull(refreshToken);
         this.save();
+    }
+
+    public nomeUsuario(this: DocumentType<Usuario>) {
+        if(this.tipo === usuariosEnum.Instituicao)
+            return (<Instituicao>(<unknown>this)).nomeFantasia;
+        else
+            return (<Participante>(<unknown>this)).nomeCompleto;
     }
 }
 

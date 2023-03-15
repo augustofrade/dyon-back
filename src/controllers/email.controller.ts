@@ -1,7 +1,11 @@
-import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Request, Response } from "express";
+
+import Email from "../email/Email";
 import { UsuarioModel } from "../model/usuario.model";
+import { usuariosEnum } from "../types/enums";
+import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
+
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 
 export default abstract class EmailController {
 
@@ -22,9 +26,10 @@ export default abstract class EmailController {
 
     static async novoToken(req: Request, res: Response) {
         const usuario = await UsuarioModel.findById(res.locals.userId);
-        if(!usuario)
-            return res.status(404).json({ msg: "Usuário não autenticado" });
-            
+        if(!usuario )
+            return res.status(404).json({ msg: "Você não está autenticado" });
+        if(usuario.tipo !== <string>usuariosEnum.Instituicao || usuario.tipo !== <string>usuariosEnum.Participante)
+            return res.status(404).json({ msg: "Você não está autorizado", erro: true });
         if(usuario.emailConfirmado)
             return res.status(404).json({ msg: "Seu e-mail já foi confirmado" });
         
@@ -34,7 +39,7 @@ export default abstract class EmailController {
             expiracao: novoToken.expiracao
         };
         usuario.save();
-        // TODO: enviar e-mail de geração de token
+        Email.Instance.enviarEmailConfirmacao(usuario.email, usuario.nomeUsuario(), novoToken);
         res.json({ msg: "Um novo token para confirmar seu e-mail foi gerado, verifique seu e-mail" });
     }
 }

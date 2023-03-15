@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { OperadorModel } from "./../model/models";
 import { IPeriodo } from "./../types/interface";
 import { Request, Response } from "express";
 import { InscricaoModel, ParticipanteModel, EventoModel, InstituicaoModel } from "../model/models";
@@ -51,6 +53,7 @@ export default abstract class InscricaoController {
         // Operador
         const idInscricao = req.params.id;
         const instituicaoOperador = InstituicaoModel.findOne({ "operadores._id": res.locals.userId });
+        const operador = await OperadorModel.findById(res.locals.userId);
         
         if(!instituicaoOperador)
             return res.json({ msg: "Não autorizado", erro: true });
@@ -61,7 +64,7 @@ export default abstract class InscricaoController {
             return res.json({ msg: "Inscricão inválida, contate seu gestor", erro: true });
         
         try {
-            await inscricao.confirmarParticipacao(res.locals.userId);
+            await inscricao.confirmarParticipacao(operador!.nomeCompleto);
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
             res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente. ", erro: true, detalhes: err });

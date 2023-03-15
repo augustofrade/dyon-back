@@ -1,7 +1,9 @@
-import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
 import { Request, Response } from "express";
+
+import Email from "../email/Email";
 import { UsuarioModel } from "../model/usuario.model";
 import validarSenha from "../util/validarSenha";
+import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
 
 
 export default abstract class SenhaController {
@@ -19,13 +21,18 @@ export default abstract class SenhaController {
             return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         
         usuario.senha = novaSenha;
-        usuario.save();
+        try {
+            await usuario.save();
+            Email.Instance.enviarEmailAlteracaoSenha(usuario.email, usuario.nomeUsuario());
+        } catch (err) {
+            Email.Instance.enviarEmailFalhaSenha(usuario.email, usuario.nomeUsuario());
+        }
         res.status(200).json({ msg: "Senha atualizada com sucesso" });
     }
 
     static async gerarTokenSenha(req: Request, res: Response) {
         const token = gerarTokenGenerico();
-        const usuario = UsuarioModel.findOne({ email: req.body.email });
+        const usuario = await UsuarioModel.findOne({ email: req.body.email });
         if(!usuario)
             return res.json({ msg: "Não foi encontrado um usuário com este e-mail" });
         
@@ -34,6 +41,7 @@ export default abstract class SenhaController {
             expiracao: token.expiracao
         };
         usuario.save();
+        Email.Instance.enviarEmailRecuperacaoSenha(usuario.email, usuario.nomeUsuario(), token);
     }
 
     static async recuperarSenha(req: Request, res: Response) {
@@ -48,7 +56,12 @@ export default abstract class SenhaController {
         
         usuario.senhaToken = undefined;
         usuario.senha = req.body.senha;
-        usuario.save();
+        try {
+            await usuario.save();
+            Email.Instance.enviarEmailAlteracaoSenha(usuario.email, usuario.nomeUsuario());
+        } catch (err) {
+            Email.Instance.enviarEmailFalhaSenha(usuario.email, usuario.nomeUsuario());
+        }
         res.status(201).json({ msg: "Senha alterada com sucesso" });
     }
 }

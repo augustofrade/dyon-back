@@ -36,6 +36,8 @@ export default class Email {
         this.templatesEmCache.operador = fs.readFileSync(path.join(__dirname, "./template/cadastroOperador.ejs"), "utf-8");
         this.templatesEmCache.confirmacaoEmail = fs.readFileSync(path.join(__dirname, "./template/confirmacaoEmail.ejs"), "utf-8");
         this.templatesEmCache.recuperacaoSenha = fs.readFileSync(path.join(__dirname, "./template/recuperacaoSenha.ejs"), "utf-8");
+        this.templatesEmCache.alteracaoSenha = fs.readFileSync(path.join(__dirname, "./template/alteracaoSenha.ejs"), "utf-8");
+        this.templatesEmCache.falhaSenha = fs.readFileSync(path.join(__dirname, "./template/falhaSenha.ejs"), "utf-8");
     }
 
     public async enviarEmailCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
@@ -98,6 +100,31 @@ export default class Email {
             assunto: "Recuperação de Senha",
             texto: `Foi solicitado um e-mail de recuperçaão de senha para sua conta no Dyon.
                 Caso não tenha sido você que solicitou a recuperação de senha, ignore este e-mail. Para trocar de senha, acesse: ${url}`,
+            html: template
+        });
+    }
+
+    public async enviarEmailAlteracaoSenha(destinatario: string, nomeUsuario: string) {
+        const url = "https://localhost:3000/senha/esqueci-minha-senha";
+        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy às HH:mm:ss");
+        const template = ejs.render(this.templatesEmCache.alteracaoSenha, { url, nomeUsuario, dataAlteracao });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: "Aviso de Alteração de senha",
+            texto: `A senha da sua conta Dyon foi alterada em ${dataAlteracao}
+            Caso não tenha sido você que alterou sua senha, acesse: ${url}`,
+            html: template
+        });
+    }
+
+    public async enviarEmailFalhaSenha(destinatario: string, nomeUsuario: string) {
+        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy às HH:mm:ss");
+        const template = ejs.render(this.templatesEmCache.falhaSenha, { nomeUsuario, dataAlteracao });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: "Aviso de Tentativa de Alteração de Senha",
+            texto: `Houve uma tentativa de alteração de senha em sua conta em ${dataAlteracao},
+                considere atualizá-la nas configurações de seu perfil`,
             html: template
         });
     }

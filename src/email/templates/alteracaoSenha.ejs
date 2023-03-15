@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aviso de Troca de Senha</title>
+    <meta description="Aviso de Troca de Senha">
+
+    <style>
+        .text {
+            color: #2d3436;
+            font-weight: 500;
+        }
+        span.text {
+            font-size: 1.3em;
+        }
+
+        .title {
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body style="font-family: Helvetica, sans-serif;">
+    <table style="margin: 0 auto" width="600">
+        <%- include("header"); -%>
+        <tr>
+            <td>
+                <h2 class="text title" style="margin-block-end: 0; margin-bottom: 0;">Olá, <%= nomeUsuario %></h2>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span class="text">A senha da sua conta Dyon foi alterada em <%= dataAlteracao %><br/>
+                    Caso não tenha sido você que alterou sua senha, mude-a clicando <a href="<%= url %>">aqui</a>.</span>                
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div class="text">Acesse também pelo link abaixo:</div>
+                <a href="<%= url %>"><%= url %></a>
+            </td>
+        </tr>
+    </table>    
+</body>
+</html>

@@ -27,15 +27,15 @@ class Inscricao {
     @prop({ default: false })
     public confirmada!: boolean;
 
-    @prop({ ref: () => Operador })
-    public confirmadaPor?: Ref<Operador>;
+    @prop()
+    public confirmadaPor?: string; 
 
     @prop({ required: true, ref: () => Evento })
     public evento!: Ref<Evento>;
 
 
-    public async confirmarParticipacao(this: DocumentType<Inscricao>, idOperador: string) {
-        this.confirmadaPor!._id = idOperador;
+    public async confirmarParticipacao(this: DocumentType<Inscricao>, nomeOperador: string) {
+        this.confirmadaPor = nomeOperador;
         this.qrCode = undefined;
         this.confirmada = true;
         this.save();
