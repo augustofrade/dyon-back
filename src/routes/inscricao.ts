@@ -17,8 +17,8 @@ router
     .post(authAcessToken, InscricaoController.confirmarInscricao);
 
 router
-    .route("/status/:idInscricao")
-    .post(authAcessToken, InscricaoController.statusInscricao);
+    .route("/por-periodo/:idPeriodo")
+    .post(authAcessToken, InscricaoController.listarPorPeriodoEvento);
     
 
 export default router;

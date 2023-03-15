@@ -50,3 +50,8 @@ export interface ITokenGenerico {
     hash: string;
     expiracao: Date;
 }
+
+export interface IResumoInscricao {
+    nomeUsuario: string;
+    confirmada: boolean;
+}

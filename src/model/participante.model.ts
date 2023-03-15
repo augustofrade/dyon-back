@@ -62,7 +62,7 @@ class Participante extends Usuario {
     @prop({ default: [], ref: () => Inscricao })
     public inscricoes!: Ref<Inscricao>[];
 
-    static obterDadosPerfil(this: ReturnModelType<typeof Participante>, username: string) {
+    public static obterDadosPerfil(this: ReturnModelType<typeof Participante>, username: string) {
         return this.findOne({ username })
         .select("-_id -tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando")
         .populate({
@@ -76,7 +76,7 @@ class Participante extends Usuario {
         .populate("acompanhando", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
     }
 
-    static atualizarPerfil(this: ReturnModelType<typeof Participante>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
+    public static atualizarPerfil(this: ReturnModelType<typeof Participante>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
         const nome: string | undefined = dados.nomeSocial ?? dados.nomeCompleto;
         const username: string | undefined = nome ? gerarUsername(nome) : undefined;
 

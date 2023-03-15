@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { OperadorModel } from "./../model/models";
-import { IPeriodo } from "./../types/interface";
+import { IPeriodo, IResumoInscricao } from "./../types/interface";
 import { Request, Response } from "express";
 import { InscricaoModel, ParticipanteModel, EventoModel, InstituicaoModel } from "../model/models";
+import { Inscricao } from "../model/inscricao.model";
+import { Participante } from "../model/participante.model";
 
 export default abstract class InscricaoController {
 
@@ -53,11 +55,11 @@ export default abstract class InscricaoController {
         // Operador
         const idInscricao = req.params.id;
         const instituicaoOperador = InstituicaoModel.findOne({ "operadores._id": res.locals.userId });
-        const operador = await OperadorModel.findById(res.locals.userId);
         
         if(!instituicaoOperador)
             return res.json({ msg: "Não autorizado", erro: true });
         
+        const operador = await OperadorModel.findById(res.locals.userId);
         const evento = EventoModel.findOne({ "inscricoes._id": idInscricao });
         const inscricao = await InscricaoModel.findById(idInscricao);
         if(!evento || !inscricao)
@@ -71,12 +73,17 @@ export default abstract class InscricaoController {
         }
     }
 
-    static async statusInscricao(req: Request, res: Response) {
+    static async listarPorPeriodoEvento(req: Request, res: Response) {
         try {
-            const inscricao = await InscricaoModel.findById(req.params.idInscricao);
-            res.json({ inscrito: inscricao && inscricao.confirmada });
+            const inscricoesRaw = await InscricaoModel.listarPorPeriodoEvento(req.params.idPeriodo);
+            if(!inscricoesRaw)
+                throw new Error();
+            const inscricoes: Array<IResumoInscricao> = inscricoesRaw.map((i: Inscricao) =>
+                ({ confirmada: i.confirmada, nomeUsuario: (<Participante>i.participante).nomeCompleto })
+            );
+            return res.json(inscricoes);
         } catch (err) {
-            res.json({ inscrito: false, erro: true });
+            return res.json({ msg: "Não foi possível buscar as inscrições para esta ocorrência deste evento, tente novamente", erro: true });
         }
     }
 }

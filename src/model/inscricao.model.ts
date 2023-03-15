@@ -1,10 +1,8 @@
-import { DocumentType, modelOptions, post, prop, Ref } from "@typegoose/typegoose";
-import { Types } from "mongoose";
+import { DocumentType, modelOptions, post, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 import QRCode from "qrcode";
 
 import { Periodo } from "./periodo.model";
 import { Evento } from "./evento.model";
-import { Operador } from "./operador.model";
 import { Participante } from "./participante.model";
 
 @post<Inscricao>("save", async function() {
@@ -39,6 +37,10 @@ class Inscricao {
         this.qrCode = undefined;
         this.confirmada = true;
         this.save();
+    }
+
+    public static listarPorPeriodoEvento(this: ReturnModelType<typeof Inscricao>, idEvento: string) {
+        return this.find({ evento: idEvento }).select("participante confirmada -__v -_id").populate("participante", "nomeCompleto");
     }
 }
 

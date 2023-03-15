@@ -42,7 +42,6 @@ class Evento {
     @prop({ default: true })
     public inscricoesAbertas!: boolean;
 
-    // TODO: Avaliar se deve ser subdocs ou refs devido à edição dos períodos e inscrições dos usuários neles
     @prop({ required: true, ref: () => Periodo })
     public periodosOcorrencia!: Ref<Periodo>[];
 
