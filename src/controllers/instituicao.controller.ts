@@ -29,11 +29,16 @@ export default class InstituicaoController {
             
             const { token: refreshToken, dataExpiracao } = gerarRefreshToken({ id: novaInstituicao._id, email: novaInstituicao.email });
             const accessToken = gerarAccesToken({ id: novaInstituicao._id, email: novaInstituicao.email });
+            novaInstituicao.adicionarRefreshToken(refreshToken);
 
             res.cookie("token", refreshToken, { expires: dataExpiracao });
             res.status(200).json({ msg: "Cadastro realizado com sucesso", token: accessToken });
-        } catch(erro) {
-            res.status(400).json({ msg: "Falha ao realizar cadastro", erro });
+        } catch(err) {
+            const erro = err as Record<string, Record<string, unknown>>; 
+            if(erro.keyValue.email)
+                res.status(400).json({ msg: "Falha ao realizar cadastro, este e-mail já está em uso", erro: true });
+            else
+                res.status(400).json({ msg: "Falha ao realizar cadastro", erro: true });
         }
     }
 

@@ -64,6 +64,11 @@ class Usuario {
         this.save();
     }
 
+    public async adicionarRefreshToken(this: DocumentType<Usuario>, refreshToken: string) {
+        this.refreshToken.push(refreshToken);
+        this.save();
+    }
+
     public nomeUsuario(this: DocumentType<Usuario>) {
         if(this.tipo === usuariosEnum.Instituicao)
             return (<Instituicao>(<unknown>this)).nomeFantasia;

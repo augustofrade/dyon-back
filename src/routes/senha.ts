@@ -11,12 +11,12 @@ router
 
 // Enviar email de alteração de senha
 router
-    .route("/token")
+    .route("/enviar-email")
     .get(SenhaController.gerarTokenSenha);
 
 // Alterar senha na página de recuperação de senha
 router
     .route("/recuperar")
-    .get(SenhaController.recuperarSenha);
+    .patch(SenhaController.recuperarSenha);
 
 export default router;

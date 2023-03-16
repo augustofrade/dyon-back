@@ -89,7 +89,7 @@ export default class Email {
 
     public async enviarEmailRecuperacaoSenha(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
         const nomeTemplate = TemplateGerenciador.Instance.template("recuperacaoSenha");
-        const url = `https://localhost:3000/email/${token.hash}`;
+        const url = `https://localhost:3000/recuperar-senha/${token.hash}`;
         const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataExpiracao });
 
@@ -104,7 +104,7 @@ export default class Email {
     public async enviarEmailAlteracaoSenha(destinatario: string, nomeUsuario: string) {
         const nomeTemplate = TemplateGerenciador.Instance.template("alteracaoSenha");
         const url = "https://localhost:3000/senha/esqueci-minha-senha";
-        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy às HH:mm:ss");
+        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy à\\s HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {
@@ -117,7 +117,7 @@ export default class Email {
 
     public async enviarEmailFalhaSenha(destinatario: string, nomeUsuario: string) {
         const nomeTemplate = TemplateGerenciador.Instance.template("falhaSenha");
-        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy às HH:mm:ss");
+        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy à\\s HH:mm:ss");
         const template = ejs.render(nomeTemplate, { nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {

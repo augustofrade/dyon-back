@@ -30,6 +30,7 @@ class ParticipanteController {
 
             const { token: refreshToken, dataExpiracao } = gerarRefreshToken({ id: novoParticipante._id, email: novoParticipante.email });
             const accessToken = gerarAccesToken({ id: novoParticipante._id, email: novoParticipante.email });
+            novoParticipante.adicionarRefreshToken(refreshToken);
             
             res.cookie("token", refreshToken, { expires: dataExpiracao });
             res.status(200).json({ msg: "Cadastro realizado com sucesso", token: accessToken });

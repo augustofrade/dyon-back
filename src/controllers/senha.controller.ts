@@ -42,26 +42,33 @@ export default abstract class SenhaController {
         };
         usuario.save();
         Email.Instance.enviarEmailRecuperacaoSenha(usuario.email, usuario.nomeUsuario(), token);
+        res.json({ msg: "Foi enviado um e-mail de recuperação de senha" });
     }
 
     static async recuperarSenha(req: Request, res: Response) {
         const usuario = await UsuarioModel.findOne({ "senhaToken._id": req.body.token });
-        
+
         if(!usuario)
             return res.status(404).json({ msg: "Token de Recuperação de senha inválido", erro: true });
-        if(!usuario.senhaToken)
-            return res.status(404).json({ msg: "Você não solicitou um token de recuperação de senha" });
+        else if(!usuario.senhaToken)
+            return res.status(404).json({ msg: "Você não solicitou um token de recuperação de senha", erro: true });
         else if(new Date() > usuario.senhaToken.expiracao)
             return res.status(400).json({ msg: "O token de recuperação de senha já expirou", erro: true });
+        else if(req.body.senha !== req.body.confirmarSenha)
+            return res.status(400).json({ msg: "As senhas não conferem", erro: true });
+        else if(!validarSenha(req.body.senha))
+            return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         
         usuario.senhaToken = undefined;
         usuario.senha = req.body.senha;
+
         try {
             await usuario.save();
             Email.Instance.enviarEmailAlteracaoSenha(usuario.email, usuario.nomeUsuario());
+            res.status(201).json({ msg: "Senha alterada com sucesso" });
         } catch (err) {
             Email.Instance.enviarEmailFalhaSenha(usuario.email, usuario.nomeUsuario());
+            res.status(400).json({ msg: "Não foi possível alterar sua senha" });
         }
-        res.status(201).json({ msg: "Senha alterada com sucesso" });
     }
 }
