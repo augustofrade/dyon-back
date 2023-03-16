@@ -33,8 +33,12 @@ class ParticipanteController {
             
             res.cookie("token", refreshToken, { expires: dataExpiracao });
             res.status(200).json({ msg: "Cadastro realizado com sucesso", token: accessToken });
-        } catch(erro) {
-            res.status(400).json({ msg: "Falha ao realizar cadastro", erro });
+        } catch(err: unknown) {
+            const erro = err as Record<string, Record<string, unknown>>; 
+            if(erro.keyValue.email)
+                res.status(400).json({ msg: "Falha ao realizar cadastro, este e-mail já está em uso", erro: true });
+            else
+                res.status(400).json({ msg: "Falha ao realizar cadastro", erro: true });
         }
     }
 

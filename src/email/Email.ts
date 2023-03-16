@@ -1,20 +1,18 @@
 import { IEmailCadastro } from "./../types/interface";
-/* eslint-disable no-unused-vars */
 
 import { IEmail, ITokenGenerico } from "../types/interface";
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
-import fs from "fs";
 import path from "path";
 import ejs from "ejs";
 import { DateTime } from "luxon";
 import { Evento } from "../model/evento.model";
+import TemplateGerenciador from "./TemplateGerenciador";
 
 export default class Email {
     private static _instance: Email;
     public readonly REMETENTE;
     private transporter: nodemailer.Transporter<SMTPTransport.SentMessageInfo>;
-    private readonly templatesEmCache: Record<string, string> = {};
 
 
     private constructor() {
@@ -32,18 +30,13 @@ export default class Email {
             }
         });
 
-        this.templatesEmCache.cadastro = fs.readFileSync(path.join(__dirname, "./template/cadastro.ejs"), "utf-8");
-        this.templatesEmCache.operador = fs.readFileSync(path.join(__dirname, "./template/cadastroOperador.ejs"), "utf-8");
-        this.templatesEmCache.confirmacaoEmail = fs.readFileSync(path.join(__dirname, "./template/confirmacaoEmail.ejs"), "utf-8");
-        this.templatesEmCache.recuperacaoSenha = fs.readFileSync(path.join(__dirname, "./template/recuperacaoSenha.ejs"), "utf-8");
-        this.templatesEmCache.alteracaoSenha = fs.readFileSync(path.join(__dirname, "./template/alteracaoSenha.ejs"), "utf-8");
-        this.templatesEmCache.falhaSenha = fs.readFileSync(path.join(__dirname, "./template/falhaSenha.ejs"), "utf-8");
     }
 
     public async enviarEmailCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
+        const nomeTemplate = TemplateGerenciador.Instance.template("cadastro");
         const url = `https://localhost:3000/email/${token.hash}`;
         const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
-        const template = ejs.render(this.templatesEmCache.cadastro, { url, nomeUsuario, dataExpiracao, tipo: destinatario.tipo });
+        const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataExpiracao, tipo: destinatario.tipo });
 
         return this.enviarEmailGenerico(destinatario.email, {
             assunto: "Cadastro realizado com sucesso",
@@ -54,7 +47,8 @@ export default class Email {
 
 
     public async enviarEmailOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string) {
-        const template = ejs.render(this.templatesEmCache.operador, { nomeUsuario, nomeInstituicao });
+        const nomeTemplate = TemplateGerenciador.Instance.template("operador");
+        const template = ejs.render(nomeTemplate, { nomeUsuario, nomeInstituicao });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: `Novo cadastro no Dyon por ${nomeInstituicao}`,
@@ -64,8 +58,9 @@ export default class Email {
     }
     
     public async enviarEmailEventoCriacao(destinatario: string, evento: Evento) {
+        const nomeTemplate = TemplateGerenciador.Instance.template("eventoCriacao");
         const url = `https://localhost:3000/email/${evento._publicId}/${evento.slug}`;
-        const template = ejs.render(this.templatesEmCache.eventoCriacao, { });
+        const template = ejs.render(nomeTemplate, { });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: `Evento ${evento.titulo} criado com sucesso no Dyon`,
@@ -80,9 +75,10 @@ export default class Email {
     }
 
     public async enviarEmailConfirmacao(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
+        const nomeTemplate = TemplateGerenciador.Instance.template("confirmacaoEmail");
         const url = `https://localhost:3000/email/${token.hash}`;
         const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
-        const template = ejs.render(this.templatesEmCache.confirmacaoEmail, { url, nomeUsuario, dataExpiracao });
+        const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataExpiracao });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: "Confirme o e-mail de sua conta Dyon",
@@ -92,9 +88,10 @@ export default class Email {
     }
 
     public async enviarEmailRecuperacaoSenha(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
+        const nomeTemplate = TemplateGerenciador.Instance.template("recuperacaoSenha");
         const url = `https://localhost:3000/email/${token.hash}`;
         const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
-        const template = ejs.render(this.templatesEmCache.recuperacaoSenha, { url, nomeUsuario, dataExpiracao });
+        const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataExpiracao });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: "Recuperação de Senha",
@@ -105,9 +102,10 @@ export default class Email {
     }
 
     public async enviarEmailAlteracaoSenha(destinatario: string, nomeUsuario: string) {
+        const nomeTemplate = TemplateGerenciador.Instance.template("alteracaoSenha");
         const url = "https://localhost:3000/senha/esqueci-minha-senha";
         const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy às HH:mm:ss");
-        const template = ejs.render(this.templatesEmCache.alteracaoSenha, { url, nomeUsuario, dataAlteracao });
+        const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: "Aviso de Alteração de senha",
@@ -118,8 +116,9 @@ export default class Email {
     }
 
     public async enviarEmailFalhaSenha(destinatario: string, nomeUsuario: string) {
+        const nomeTemplate = TemplateGerenciador.Instance.template("falhaSenha");
         const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy às HH:mm:ss");
-        const template = ejs.render(this.templatesEmCache.falhaSenha, { nomeUsuario, dataAlteracao });
+        const template = ejs.render(nomeTemplate, { nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: "Aviso de Tentativa de Alteração de Senha",

@@ -38,6 +38,11 @@ export interface IEmailCadastro {
     tipo: "Participante" | "Instituição";
 }
 
+export interface IEmailTemplate {
+    diretorio: string;
+    template?: string;
+}
+
 /**
  * Estrutura dos objetos de categorias que serão enviados ao front-end
  */
