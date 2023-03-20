@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd ./src/index.ts"
+    "dev": "tsnd --files ./src/index.ts"
   },
   "keywords": [],
   "author": "",

@@ -10,7 +10,7 @@ export default abstract class SenhaController {
 
     static async atualizarSenha(req: Request, res: Response) {
         const { senhaAtual, novaSenha } = req.body;
-        const usuario = await UsuarioModel.findById(res.locals.userId);
+        const usuario = await UsuarioModel.findById(req.userId);
         if(!usuario)
             return res.status(404).json({ msg: "Erro interno", erro: true });
 

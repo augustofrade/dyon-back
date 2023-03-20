@@ -9,7 +9,7 @@ import { Participante } from "../model/participante.model";
 export default abstract class InscricaoController {
 
     static async novaInscricao(req: Request, res: Response) {
-        const participante = await ParticipanteModel.findById(res.locals.userId);
+        const participante = await ParticipanteModel.findById(req.userId);
         if(!participante)
             return res.json({ msg: "Não autorizado", erro: true });
         
@@ -20,7 +20,7 @@ export default abstract class InscricaoController {
         const periodo: IPeriodo = req.body.periodo;
 
         try {
-            const inscricao = new InscricaoModel({ participante: res.locals.userId, periodo, evento: evento._id });
+            const inscricao = new InscricaoModel({ participante: req.userId, periodo, evento: evento._id });
             await inscricao.save();
             participante.inscricoes.push(inscricao._id);
             await participante.save();
@@ -34,7 +34,7 @@ export default abstract class InscricaoController {
 
     static async cancelarInscricao(req: Request, res: Response) {
         const idInscricao = req.body.idInscricao;
-        const participante = await ParticipanteModel.findById(res.locals.userId);
+        const participante = await ParticipanteModel.findById(req.userId);
         const inscricao = await InscricaoModel.findById(idInscricao);
         if(!participante || !inscricao || inscricao.participante._id !== participante._id)
             return res.json({ msg: "Não autorizado", erro: true });
@@ -42,7 +42,7 @@ export default abstract class InscricaoController {
             return res.json({ msg: "Não é possível cancelar uma inscrição após ela já estar confirmada", erro: true });
 
         try {
-            await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $pull: { inscricoes: idInscricao } });
+            await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { inscricoes: idInscricao } });
             await EventoModel.findByIdAndUpdate(inscricao.evento._id, { $pull: { inscricoes: idInscricao } });
             await InscricaoModel.findByIdAndDelete(inscricao._id);
             res.status(200).json({ msg: "Inscrição cancelada com sucesso" });
@@ -54,12 +54,12 @@ export default abstract class InscricaoController {
     static async confirmarInscricao(req: Request, res: Response) {
         // Operador
         const idInscricao = req.params.id;
-        const instituicaoOperador = InstituicaoModel.findOne({ "operadores._id": res.locals.userId });
+        const instituicaoOperador = InstituicaoModel.findOne({ "operadores._id": req.userId });
         
         if(!instituicaoOperador)
             return res.json({ msg: "Não autorizado", erro: true });
         
-        const operador = await OperadorModel.findById(res.locals.userId);
+        const operador = await OperadorModel.findById(req.userId);
         const evento = EventoModel.findOne({ "inscricoes._id": idInscricao });
         const inscricao = await InscricaoModel.findById(idInscricao);
         if(!evento || !inscricao)

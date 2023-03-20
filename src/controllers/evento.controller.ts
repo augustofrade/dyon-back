@@ -9,7 +9,7 @@ import { IPeriodo } from "../types/interface";
 class EventoController {
 
     public static async novoEvento(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(res.locals.userId);
+        const instituicao = await InstituicaoModel.findById(req.userId);
         if(!instituicao)
             return res.json({ msg: "Não autorizado", erro: true });
         
@@ -27,7 +27,7 @@ class EventoController {
             })));
         
             const novoEvento = new EventoModel({
-                criador: res.locals.userId,
+                criador: req.userId,
                 titulo: dados.titulo,
                 descricao: dados.descricao,
                 banner: dados.banner,
@@ -48,7 +48,7 @@ class EventoController {
     }
 
     public static async editarEvento(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(res.locals.userId);
+        const instituicao = await InstituicaoModel.findById(req.userId);
         const dados = req.body;
 
         if(!instituicao || !instituicao.eventos.includes(dados.idEvento))
@@ -62,7 +62,7 @@ class EventoController {
             const periodos = await PeriodoModel.atualizar(dados.periodos);
 
             const editado = await EventoModel.findByIdAndUpdate(dados.idEvento, {
-                criador: res.locals.userId,
+                criador: req.userId,
                 titulo: dados.titulo,
                 descricao: dados.descricao,
                 banner: dados.banner,
@@ -82,7 +82,7 @@ class EventoController {
     }
 
     public static async excluirEvento(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(res.locals.userId);
+        const instituicao = await InstituicaoModel.findById(req.userId);
         const evento = await EventoModel.findById(req.body.idEvento);
 
         if(!evento)
@@ -106,7 +106,7 @@ class EventoController {
     }
 
     public static async cancelarEvento(req: Request, res: Response) {
-        const instituicao = InstituicaoModel.findById(res.locals.userId);
+        const instituicao = InstituicaoModel.findById(req.userId);
         if(!instituicao)
             return res.json({ msg: "Não autorizado", erro: true });
 

@@ -67,7 +67,7 @@ class ParticipanteController {
     static async atualizarDados(req: Request, res: Response) {
         try {
             const novaFoto = req.file ? req.file.buffer : undefined;
-            const participante = await ParticipanteModel.atualizarPerfil(res.locals.userId, req.body, novaFoto);
+            const participante = await ParticipanteModel.atualizarPerfil(req.userId as string, req.body, novaFoto);
             if(!participante)
                 throw new Error();
 

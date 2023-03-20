@@ -14,10 +14,10 @@ const authOpcional  = async (req: Request, res: Response, next: NextFunction): P
         const secret = process.env.ACCESS_TOKEN_SECRET as string;
         jwt.verify(accessToken, secret, (err, payload) => {
             if(err) { // Access Token invalido
-                res.locals.userId = null;
+                req.userId = null;
                 next();
             } else {  // Token valido
-                res.locals.userId = (<jwt.JwtPayload>payload).userId;
+                req.userId = (<jwt.JwtPayload>payload).userId;
                 next();
             }
         });

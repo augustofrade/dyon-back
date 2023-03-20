@@ -31,7 +31,7 @@ export default abstract class EmailController {
     }
 
     static async novoToken(req: Request, res: Response) {
-        const usuario = await UsuarioModel.findById(res.locals.userId);
+        const usuario = await UsuarioModel.findById(req.userId);
         if(!usuario)
             return res.status(404).json({ msg: "Você não está autenticado", erro: true });
         if(usuario.tipo !== <string>usuariosEnum.Instituicao && usuario.tipo !== <string>usuariosEnum.Participante)

@@ -52,7 +52,7 @@ export default class InstituicaoController {
             return res.json({ msg: "Instituição não encontrada", erro: true });
         
         const categoriasRamo: ICategoria[] = instituicao.categoriasRamo.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
-        const eventos = instituicao._id === res.locals.userId ? instituicao.eventos : instituicao.eventos.map((e => (<Evento>e).visivel));
+        const eventos = instituicao._id === req.userId ? instituicao.eventos : instituicao.eventos.map((e => (<Evento>e).visivel));
         const avaliacaoMedia = instituicao.avaliacaoMedia();
         
         const retorno = {
@@ -69,7 +69,7 @@ export default class InstituicaoController {
     static async atualizarDados(req: Request, res: Response) {
         try {
             const novaFoto = req.file ? req.file.buffer : undefined;
-            const instituicao = await InstituicaoModel.atualizarPerfil(res.locals.userId, req.body, novaFoto);
+            const instituicao = await InstituicaoModel.atualizarPerfil(req.userId as string, req.body, novaFoto);
             if(!instituicao)
                 throw new Error();
 
@@ -85,7 +85,7 @@ export default class InstituicaoController {
     }
 
     static async seguirInstituicao(req: Request, res: Response) {
-        const usuario = await ParticipanteModel.findById(res.locals.userId);
+        const usuario = await ParticipanteModel.findById(req.userId);
         if(!usuario)
             return res.status(404).json({ msg: "Erro interno", erro: true });
         
@@ -96,10 +96,10 @@ export default class InstituicaoController {
         try {
             console.log(usuario.seguindo.includes(instituicao._id));
             if(usuario.seguindo.includes(instituicao._id)) {
-                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $pull: { seguindo: instituicao._id } });
+                await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { seguindo: instituicao._id } });
                 res.status(200).json({ msg: `Deixou de seguir ${instituicao.nomeFantasia}` });
             } else {
-                await ParticipanteModel.findByIdAndUpdate(res.locals.userId, { $push: { seguindo: instituicao._id } });
+                await ParticipanteModel.findByIdAndUpdate(req.userId, { $push: { seguindo: instituicao._id } });
                 res.status(200).json({ msg: `Começou a seguir ${instituicao.nomeFantasia}` });
             }
 
@@ -110,7 +110,7 @@ export default class InstituicaoController {
 
     static async obterEndereco(req: Request, res: Response) {
         try {
-            const instituicao = await InstituicaoModel.obterEndereco(res.locals.userId);
+            const instituicao = await InstituicaoModel.obterEndereco(req.userId as string);
             if(!instituicao)
                 throw new Error();
             

@@ -7,7 +7,7 @@ import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 export default abstract class OperadorController {
 
     static async cadastro(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(res.locals.userId);
+        const instituicao = await InstituicaoModel.findById(req.userId);
         if(!instituicao)
             return res.json({ msg: "Não autorizado", erro: true });
 
@@ -23,7 +23,7 @@ export default abstract class OperadorController {
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });
             await novoOperador.save();
-            await InstituicaoModel.findByIdAndUpdate(res.locals.userId, { $push: { operadores: novoOperador._id } });
+            await InstituicaoModel.findByIdAndUpdate(req.userId, { $push: { operadores: novoOperador._id } });
             Email.Instance.enviarEmailOperador(email, novoOperador.nomeCompleto.split(" ")[0], instituicao.nomeFantasia);
             res.status(200).json({ msg: "Cadastro realizado com sucesso" });
         } catch(erro) {
@@ -33,7 +33,7 @@ export default abstract class OperadorController {
 
     static async alternarEstadoConta(req: Request, res: Response) {
         try {
-            const instituicao = await InstituicaoModel.findById(res.locals.userId);
+            const instituicao = await InstituicaoModel.findById(req.userId);
             if(!instituicao)
                 return res.json({ msg: "Não autorizado", erro: true });
 
@@ -54,7 +54,7 @@ export default abstract class OperadorController {
     
     static async excluirConta(req: Request, res: Response) {
         try {
-            const instituicao = await InstituicaoModel.findById(res.locals.userId);
+            const instituicao = await InstituicaoModel.findById(req.userId);
             if(!instituicao || instituicao.operadores.includes(req.body.operadorId))
                 return res.json({ msg: "Não autorizado", erro: true });
             const deletada = await OperadorModel.findByIdAndDelete(req.body.operadorId);
