@@ -19,16 +19,22 @@ export default abstract class EmailController {
         else if(new Date() > usuario.emailToken!.expiracao)
             return res.status(400).json({ msg: "O token de confirmação de e-mail já expirou", erro: true });
         
-        usuario.emailToken = undefined;
-        usuario.emailConfirmado = true;
-        usuario.save();
+        try {
+
+            usuario.emailToken = undefined;
+            usuario.emailConfirmado = true;
+            usuario.save();
+            res.status(200).json({ msg: "E-mail confirmado com sucesso" });
+        } catch (err) {
+            res.json({ msg: "Não foi possível confirmar seu e-mail, tente novamente.", erro: true });
+        }
     }
 
     static async novoToken(req: Request, res: Response) {
         const usuario = await UsuarioModel.findById(res.locals.userId);
-        if(!usuario )
-            return res.status(404).json({ msg: "Você não está autenticado" });
-        if(usuario.tipo !== <string>usuariosEnum.Instituicao || usuario.tipo !== <string>usuariosEnum.Participante)
+        if(!usuario)
+            return res.status(404).json({ msg: "Você não está autenticado", erro: true });
+        if(usuario.tipo !== <string>usuariosEnum.Instituicao && usuario.tipo !== <string>usuariosEnum.Participante)
             return res.status(404).json({ msg: "Você não está autorizado", erro: true });
         if(usuario.emailConfirmado)
             return res.status(404).json({ msg: "Seu e-mail já foi confirmado" });
