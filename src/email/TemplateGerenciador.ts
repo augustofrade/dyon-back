@@ -37,6 +37,13 @@ class TemplateGerenciador {
         return this.templates[template].template as string;
     }
 
+    public static limparCache() {
+        if(!this._instance)
+            throw new Error("Não foi definida uma instância dessa classes");
+        this._instance = new TemplateGerenciador();
+        return this._instance;
+    }
+
     public static get Instance() {
         return this._instance || (this._instance = new TemplateGerenciador());
     } 

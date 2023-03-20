@@ -1,11 +1,12 @@
 import express from "express";
 import UsuarioController from "../controllers/usuario.controller";
+import authAcessToken from "../middlewares/authAcessToken.middleware";
 
 const router = express.Router();
 
 router
-    .route("/all")
-    .get(UsuarioController.getAll);
+    .route("/tipo")
+    .get(authAcessToken, UsuarioController.tipoUsuario);
 
 
 
