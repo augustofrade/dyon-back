@@ -10,6 +10,7 @@ import { Categoria } from "./categoria.model";
 import { Inscricao } from "./inscricao.model";
 import { Instituicao } from "./instituicao.model";
 import { PeriodoModel } from "./models";
+import { Operador } from "./operador.model";
 
 @pre<Evento>("save", function() {
     this.slug = gerarSlug(this.titulo);
@@ -57,8 +58,11 @@ class Evento {
     @prop({ required: true, type: [Categoria] })
     public categorias!: Types.Array<Categoria>;
 
-    @prop({ default: [], ref:() => Inscricao })
+    @prop({ default: [], ref: () => Inscricao })
     public inscricoes!: Ref<Inscricao>[];
+
+    @prop({ default: [], ref: () => Operador })
+    public operadores!: Ref<Operador>[];
 
     public static todosDadosPorId(this: ReturnModelType<typeof Evento>, id: string) {
         return this.findById(id)

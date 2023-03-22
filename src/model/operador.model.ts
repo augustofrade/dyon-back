@@ -1,7 +1,8 @@
 import { prop, Ref } from "@typegoose/typegoose";
 import { Instituicao } from "./instituicao.model";
+import { Usuario } from "./usuario.model";
 
-class Operador {
+class Operador extends Usuario {
     @prop({ required: true, minlength: 10, maxLength: 50 })
     public nomeCompleto!: string;
 

@@ -1,3 +1,4 @@
+import { buscarIdOperadores } from "../util/buscarIdOperadores";
 import { ParticipanteModel } from "./../model/models";
 import { PeriodoModel } from "../model/models";
 import { buscarCategorias } from "./../util/buscarCategorias";
@@ -26,7 +27,7 @@ class EventoController {
                 termino: p.termino,
                 isnscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
             })));
-        
+
             const novoEvento = new EventoModel({
                 criador: req.userId,
                 titulo: dados.titulo,
@@ -36,7 +37,8 @@ class EventoController {
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
                 periodosOcorrencia: periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()).map(p => p._id),
-                categorias: await buscarCategorias(dados.categorias)
+                categorias: await buscarCategorias(dados.categorias),
+                operadores: await buscarIdOperadores(dados.operadores)
             });
             await novoEvento.save();
             instituicao.eventos.push(novoEvento._id);
@@ -71,7 +73,8 @@ class EventoController {
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
                 periodosOcorrencia: periodos,
-                categorias: await buscarCategorias(dados.categorias)
+                categorias: await buscarCategorias(dados.categorias),
+                operadores: await buscarIdOperadores(dados.operadores)
             }, { new: true });
             
             if(!editado) throw new Error();

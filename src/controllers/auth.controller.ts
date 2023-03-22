@@ -67,9 +67,6 @@ class AuthController {
      * para que o usuário possa acessar rotas que necessitam de autenticação.
      */
     public static async gerarNovoAccessToken(req: Request, res: Response) {
-        if(!req.cookies?.token)
-            return res.status(401).json({ msg: "Usuário não está autenticado" });
-        
         const refreshToken = req.cookies.token;
         const usuarioComToken = await UsuarioModel.findOne({ refreshToken });
         if(!usuarioComToken)
