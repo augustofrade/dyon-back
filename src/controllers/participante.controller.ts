@@ -1,13 +1,14 @@
 import { Request, Response } from "express";
+
 import Email from "../email/Email";
 import { Inscricao } from "../model/inscricao.model";
 import { ParticipanteModel } from "../model/models";
 import { ICategoria } from "../types/interface";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
+import { buscarCategorias } from "../util/buscarCategorias";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 import validarSenha from "../util/validarSenha";
-import { buscarCategorias } from "../util/buscarCategorias";
 
 
 class ParticipanteController {

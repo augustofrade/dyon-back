@@ -1,3 +1,4 @@
+import { IInfoResumida } from './../types/interface';
 import { usuariosEnum } from "./../types/enums";
 import { TokenGenerico } from "../schema/tokenGenerico.schema";
 import { Types } from "mongoose";
@@ -5,6 +6,7 @@ import { pre, prop, modelOptions, getModelForClass, DocumentType } from "@typego
 import bcrypt from "bcrypt";
 import { Instituicao } from "./instituicao.model";
 import { Participante } from "./participante.model";
+import { Operador } from './operador.model';
 
 @pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
@@ -69,11 +71,41 @@ class Usuario {
         this.save();
     }
 
-    public nomeUsuario(this: DocumentType<Usuario>) {
-        if(this.tipo === usuariosEnum.Instituicao)
-            return (<Instituicao>(<unknown>this)).nomeFantasia;
-        else
-            return (<Participante>(<unknown>this)).nomeCompleto;
+    public nomeUsuario(this: DocumentType<Usuario>): string {
+        let nome = "";
+        switch (this.tipo) {
+            case usuariosEnum.Instituicao:
+                nome = (<Instituicao>(<unknown>this)).nomeFantasia;
+                break;
+            case usuariosEnum.Participante:
+                nome = (<Participante>(<unknown>this)).nomeCompleto;
+                break;
+            case usuariosEnum.Operador:
+                nome = (<Operador>(<unknown>this)).nomeCompleto;
+                break;
+        }
+        return nome;
+    }
+
+    public async dadosCabecalho(this: DocumentType<Usuario>): Promise<IInfoResumida> {
+        const retorno: IInfoResumida = { id: this._id, username: this.username, fotoPerfil: null, nome: "" }
+        if(this.tipo === usuariosEnum.Instituicao) {
+            const u = <unknown>this as Instituicao;
+            retorno.nome = u.nomeFantasia,
+            retorno.fotoPerfil = u.fotoPerfil ? u.fotoPerfil.toString("base64") : null;
+
+        } else if(this.tipo === usuariosEnum.Participante) {
+            const u = <unknown>this as Participante;
+            retorno.nome = u.nomeSocial ?? u.nomeCompleto,
+            retorno.fotoPerfil = u.fotoPerfil ? u.fotoPerfil.toString("base64") : null;
+
+        } else if(this.tipo === usuariosEnum.Operador) {
+            const u = <unknown>this as Operador;
+            retorno.nome = u.nomeCompleto;
+            await this.populate("instituicao", "nomeFantasia")
+            retorno.instituicao = (<Instituicao>u.instituicao)?.nomeFantasia || "";
+        }
+        return retorno;
     }
 }
 

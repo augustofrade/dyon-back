@@ -1,13 +1,13 @@
-import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
-import { InstituicaoModel, ParticipanteModel } from "./../model/models";
 import { Request, Response } from "express";
+
 import Email from "../email/Email";
-import { ICategoria } from "../types/interface";
 import { Evento } from "../model/evento.model";
-import validarSenha from "../util/validarSenha";
+import { ICategoria } from "../types/interface";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
-import { Avaliacao } from "../model/avaliacao.model";
+import validarSenha from "../util/validarSenha";
+import { InstituicaoModel, ParticipanteModel } from "./../model/models";
+import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
 
 export default class InstituicaoController {
 
@@ -94,7 +94,6 @@ export default class InstituicaoController {
             return res.status(404).json({ msg: "Instituição não encontrada", erro: true });
 
         try {
-            console.log(usuario.seguindo.includes(instituicao._id));
             if(usuario.seguindo.includes(instituicao._id)) {
                 await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { seguindo: instituicao._id } });
                 res.status(200).json({ msg: `Deixou de seguir ${instituicao.nomeFantasia}` });

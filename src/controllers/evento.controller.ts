@@ -1,3 +1,4 @@
+import { ParticipanteModel } from "./../model/models";
 import { PeriodoModel } from "../model/models";
 import { buscarCategorias } from "./../util/buscarCategorias";
 import { EventoModel, InstituicaoModel } from "../model/models";
@@ -154,6 +155,28 @@ class EventoController {
         // TODO: desenvolver sistema de recomendação
         const todosEventos = await EventoModel.find();
         res.json(todosEventos);
+    }
+
+    public static async acompanharEvento(req: Request, res: Response) {
+        const evento = await EventoModel.todosDadosPorId(req.params.idEvento);
+        if(!evento)
+            return res.json({ msg: "Evento não encontrado", erro: true });
+        const participante = await ParticipanteModel.findById(req.userId);
+        if(!participante)
+            return res.json({ msg: "Não autorizado", erro: true });
+
+        try {
+            if(participante.acompanhando.includes(evento._id)) {
+                await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { acompanhando: evento._id } });
+                res.status(200).json({ msg: `Deixou de acompanhar o evento "${evento.titulo}"` });
+            } else {
+                await ParticipanteModel.findByIdAndUpdate(req.userId, { $push: { acompanhando: evento._id } });
+                res.status(200).json({ msg: `Começou a acompanhar o evento "${evento.titulo}"` });
+            }
+
+        } catch(err) {
+            res.status(400).json({ msg: `Ocorreu um erro ao tentar acompanhar o evento "${evento.titulo}"`, erro: true });
+        }
     }
 }
 

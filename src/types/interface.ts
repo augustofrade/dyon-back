@@ -60,3 +60,11 @@ export interface IResumoInscricao {
     nomeUsuario: string;
     confirmada: boolean;
 }
+
+export interface IInfoResumida {
+    nome: string;
+    username: string
+    fotoPerfil: string | null;
+    instituicao?: string;
+    id: string;
+}

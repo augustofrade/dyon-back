@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { IEmailCadastro } from "./../types/interface";
 
 import { IEmail, ITokenGenerico } from "../types/interface";
@@ -104,7 +105,7 @@ export default class Email {
     public async enviarEmailAlteracaoSenha(destinatario: string, nomeUsuario: string) {
         const nomeTemplate = TemplateGerenciador.Instance.template("alteracaoSenha");
         const url = "https://localhost:3000/senha/esqueci-minha-senha";
-        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy à\\s HH:mm:ss");
+        const dataAlteracao = DateTime.now().toFormat("dd/MM/yyyy à\s HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {
@@ -117,7 +118,7 @@ export default class Email {
 
     public async enviarEmailFalhaSenha(destinatario: string, nomeUsuario: string) {
         const nomeTemplate = TemplateGerenciador.Instance.template("falhaSenha");
-        const dataAlteracao = DateTime.now().toFormat("dd/mm/yyyy à\\s HH:mm:ss");
+        const dataAlteracao = DateTime.now().toFormat("dd/MM/yyyy à\s HH:mm:ss");
         const template = ejs.render(nomeTemplate, { nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {

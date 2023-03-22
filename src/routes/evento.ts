@@ -25,6 +25,10 @@ router
     .delete(authAcessToken, EventoController.excluirEvento);
 
 router
+    .route("/acompanhar/:idEvento")
+    .put(authAcessToken, EventoController.acompanharEvento);
+
+router
     .route("/dados/:id")
     .get(EventoController.dadosEvento);
 
