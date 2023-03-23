@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { OperadorModel } from "./../model/models";
-import { IPeriodo, IResumoInscricao } from "./../types/interface";
+import { OperadorModel, PeriodoModel } from "./../model/models";
+import { IResumoInscricao } from "./../types/interface";
 import { Request, Response } from "express";
 import { InscricaoModel, ParticipanteModel, EventoModel, InstituicaoModel } from "../model/models";
 import { Inscricao } from "../model/inscricao.model";
@@ -17,9 +17,11 @@ export default abstract class InscricaoController {
         if(!evento)
             return res.json({ msg: "ID de Evento inválido", erro: true });
 
-        const periodo: IPeriodo = req.body.periodo;
-
         try {
+            const periodo = await PeriodoModel.findById(req.body.idPeriodo);
+            if(!periodo) throw new Error();
+            if(await periodo.limiteInscricoesAtingido())
+                return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis." });
             const inscricao = new InscricaoModel({ participante: req.userId, periodo, evento: evento._id });
             await inscricao.save();
             participante.inscricoes.push(inscricao._id);
@@ -53,7 +55,7 @@ export default abstract class InscricaoController {
 
     static async confirmarInscricao(req: Request, res: Response) {
         // Operador
-        const idInscricao = req.params.id;
+        const idInscricao = req.params.idInscricao;
         const instituicaoOperador = InstituicaoModel.findOne({ "operadores._id": req.userId });
         
         if(!instituicaoOperador)

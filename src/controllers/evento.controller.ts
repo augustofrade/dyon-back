@@ -181,6 +181,10 @@ class EventoController {
             res.status(400).json({ msg: `Ocorreu um erro ao tentar acompanhar o evento "${evento.titulo}"`, erro: true });
         }
     }
+
+    public static async listarPeriodosEvento(req: Request, res: Response) {
+        // TODO: listar periodos, numero de inscrições de cada e limite se houver
+    }
 }
 
 export default EventoController;

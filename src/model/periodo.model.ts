@@ -1,5 +1,6 @@
 import { IPeriodo } from './../types/interface';
-import { prop, ReturnModelType } from "@typegoose/typegoose";
+import { DocumentType, prop, ReturnModelType } from "@typegoose/typegoose";
+import { InscricaoModel } from './models';
 
 class Periodo {
     @prop({ required: true })
@@ -35,6 +36,14 @@ class Periodo {
         });
 
         return ids;
+    }
+
+    public async limiteInscricoesAtingido(this: DocumentType<Periodo>): Promise<boolean> {
+        if(!this.inscricoesMaximo)
+            return false;
+
+        const numeroInscricoes = await InscricaoModel.find({ "periodo._id": this._id }).count();
+        return numeroInscricoes >= this.inscricoesMaximo;
     }
 }
 

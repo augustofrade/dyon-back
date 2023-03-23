@@ -10,7 +10,7 @@ const validacao = (validacoes: ValidationChain[]) => {
             return next();
 
         return res.send({
-            msg: result.array()[0].msg,
+            msg: result.array(),
             erro: true
         });
     };

@@ -1,13 +1,14 @@
 import express from "express";
 import EmailController from "../controllers/email.controller";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
+import { validacaoConfirmarEmail } from "../validation/email.validation";
+import validacao from "../validation/validacao";
 
 const router = express.Router();
 
-// Realizar login - Gerar Access Token e Refresh Token
 router
     .route("/novo-token")
-    .get(authAcessToken, EmailController.novoToken);
+    .get(authAcessToken, validacao(validacaoConfirmarEmail), EmailController.novoToken);
 
 router
     .route("/confirmar")
