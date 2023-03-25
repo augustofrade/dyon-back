@@ -1,8 +1,12 @@
 import { IPeriodo } from './../types/interface';
-import { DocumentType, prop, ReturnModelType } from "@typegoose/typegoose";
+import { DocumentType, prop, ReturnModelType, Ref } from "@typegoose/typegoose";
 import { InscricaoModel } from './models';
+import { Evento } from './evento.model';
 
 class Periodo {
+    @prop({ required: true, ref: () => Evento })
+    public evento!: Ref<Evento>;
+
     @prop({ required: true })
     public inicio!: Date;
     
@@ -15,12 +19,21 @@ class Periodo {
     @prop({ default: false })
     public cancelado!: boolean;
 
-    public static async atualizar(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[]): Promise<string[]> {
+    public static criarParaEvento(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[], idEvento: string) {
+        return this.create(periodos.map((p: IPeriodo) => ({
+            evento: idEvento,
+            inicio: p.inicio,
+            termino: p.termino,
+            isnscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
+        })));
+    }
+
+    public static async atualizar(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[], idEvento: string): Promise<string[]> {
         // TODO: refatorar
         const ids: string[] = [];
-
         periodos.forEach(async (p: IPeriodo) => {
-            const dadosPeriodo: Omit<IPeriodo, "_id"> = {
+            const dadosPeriodo: Omit<IPeriodo, "_id" | "inscricoes"> = {
+                evento: idEvento,
                 inicio: p.inicio,
                 termino: p.termino,
                 inscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined

@@ -43,7 +43,7 @@ class Evento {
     @prop({ default: true })
     public inscricoesAbertas!: boolean;
 
-    @prop({ required: true, ref: () => Periodo })
+    @prop({ default: [], ref: () => Periodo })
     public periodosOcorrencia!: Ref<Periodo>[];
 
     @prop({ default: false })
@@ -64,9 +64,9 @@ class Evento {
     @prop({ default: [], ref: () => Operador })
     public operadores!: Ref<Operador>[];
 
-    public static todosDadosPorId(this: ReturnModelType<typeof Evento>, id: string) {
-        return this.findById(id)
-            .select("-__v")
+    public static dadosPublicos(this: ReturnModelType<typeof Evento>, idPublico: string) {
+        return this.findOne({ _publicId: idPublico })
+            .select("-__v -operadores")
             .populate("criador", "nomeFantasia username")
     }
 

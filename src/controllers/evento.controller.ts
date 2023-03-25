@@ -21,13 +21,6 @@ class EventoController {
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a final", erro: true });
         
         try {
-            const periodosRaw = dados.periodos as Array<IPeriodo>;
-            const periodos = await PeriodoModel.create(periodosRaw.map((p: IPeriodo) => ({
-                inicio: p.inicio,
-                termino: p.termino,
-                isnscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
-            })));
-
             const novoEvento = new EventoModel({
                 criador: req.userId,
                 titulo: dados.titulo,
@@ -36,13 +29,15 @@ class EventoController {
                 endereco: dados.endereco,
                 inscricoesInicio: dados.inscricoesInicio,
                 inscricoesTermino: dados.inscricoesTermino,
-                periodosOcorrencia: periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()).map(p => p._id),
                 categorias: await buscarCategorias(dados.categorias),
                 operadores: await buscarIdOperadores(dados.operadores)
             });
             await novoEvento.save();
-            instituicao.eventos.push(novoEvento._id);
-            await instituicao.save();
+            await instituicao.adicionarEvento(novoEvento._id);
+            const periodos = await PeriodoModel.criarParaEvento(dados.periodos as Array<IPeriodo>, novoEvento._id);
+            novoEvento.periodosOcorrencia = periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()).map(p => p._id);
+            await novoEvento.save();
+
             res.json({ msg: "Evento criado com sucesso", redirect: `/evento/${novoEvento._publicId}/${novoEvento.slug}` });
         } catch (err) {
             console.log(err);
@@ -62,7 +57,7 @@ class EventoController {
         
         // Adicionar exceção para cancelamento de ocorrência em um período
         try {
-            const periodos = await PeriodoModel.atualizar(dados.periodos);
+            const periodos = await PeriodoModel.atualizar(dados.periodos, dados.idEvento);
 
             const editado = await EventoModel.findByIdAndUpdate(dados.idEvento, {
                 criador: req.userId,
@@ -126,7 +121,7 @@ class EventoController {
     }
 
     public static async dadosEvento(req: Request, res: Response) {
-        const evento = await EventoModel.todosDadosPorId(req.params.id);
+        const evento = await EventoModel.dadosPublicos(req.params.idPublico);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
         
@@ -161,7 +156,7 @@ class EventoController {
     }
 
     public static async acompanharEvento(req: Request, res: Response) {
-        const evento = await EventoModel.todosDadosPorId(req.params.idEvento);
+        const evento = await EventoModel.findById(req.params.idEvento);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
         const participante = await ParticipanteModel.findById(req.userId);
@@ -184,6 +179,7 @@ class EventoController {
 
     public static async listarPeriodosEvento(req: Request, res: Response) {
         // TODO: listar periodos, numero de inscrições de cada e limite se houver
+        
     }
 }
 

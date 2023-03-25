@@ -16,9 +16,11 @@ export interface IParticipanteConfig {
 
 export interface IPeriodo {
     _id: string;
+    evento: string; // id
     inicio: Date;
     termino: Date;
     inscricoesMaximo?: number;
+    inscricoes: number;
 }
 
 export interface IEmail {

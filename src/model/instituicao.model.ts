@@ -7,7 +7,7 @@ import { Categoria } from "./categoria.model";
 import { Evento } from "./evento.model";
 import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
-import { Types } from "mongoose";
+import { ObjectId, Types } from "mongoose";
 import gerarUsername from "../util/gerarUsername";
 import { Avaliacao } from "./avaliacao.model";
 
@@ -91,7 +91,12 @@ class Instituicao extends Usuario {
         return this.findById(id).select("endereco -tipo -_id");
     }
 
-    public async removerEvento(this: DocumentType<Instituicao>, idEvento: string) {
+    public adicionarEvento(this: DocumentType<Instituicao>, idEvento: string) {
+        this.eventos.push(idEvento as any);
+        return this.save();
+    }
+
+    public removerEvento(this: DocumentType<Instituicao>, idEvento: string) {
         this.eventos = this.eventos.filter(e => e._id != idEvento);
         return this.save();
     }

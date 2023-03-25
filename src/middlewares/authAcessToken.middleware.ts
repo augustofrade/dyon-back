@@ -19,7 +19,7 @@ const authAcessToken  = async (req: Request, res: Response, next: NextFunction):
             if(err) // Access Token invalido
                 res.status(401).json({ msg: "Token inválido" });
             else {  // Token valido
-                res.locals.userId = (<jwt.JwtPayload>payload).userId;
+                req.userId = (<jwt.JwtPayload>payload).userId;
                 next();
             }
         });
