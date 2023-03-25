@@ -20,7 +20,10 @@ router
 
 router
     .route("/por-periodo/:idPeriodo")
-    .post(authAcessToken, InscricaoController.listarPorPeriodoEvento);
-    
+    .get(authAcessToken, InscricaoController.listarPorPeriodoEvento);
+
+router
+    .route("/por-evento/:idEvento")
+    .get(InscricaoController.quantiaPorPeriodoEvento);
 
 export default router;

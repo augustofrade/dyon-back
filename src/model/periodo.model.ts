@@ -55,7 +55,7 @@ class Periodo {
         if(!this.inscricoesMaximo)
             return false;
 
-        const numeroInscricoes = await InscricaoModel.find({ "periodo._id": this._id }).count();
+        const numeroInscricoes = await InscricaoModel.count({ "periodo._id": this._id });
         return numeroInscricoes >= this.inscricoesMaximo;
     }
 }

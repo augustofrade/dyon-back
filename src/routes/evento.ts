@@ -29,7 +29,7 @@ router
     .put(authAcessToken, EventoController.acompanharEvento);
 
 router
-    .route("/dados/:idPublico")
+    .route("/dados/:id")
     .get(EventoController.dadosEvento);
 
 export default router;

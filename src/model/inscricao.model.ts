@@ -7,7 +7,8 @@ import { Participante } from "./participante.model";
 
 @post<Inscricao>("save", async function() {
     if(!this.confirmada && !this.qrCode) {
-        this.qrCode = await QRCode.toDataURL(this._id);
+        console.log(this._id.toString());
+        this.qrCode = await QRCode.toDataURL(this._id.toString());
         this.save();
     }
 })
@@ -24,6 +25,9 @@ class Inscricao {
 
     @prop({ default: false })
     public confirmada!: boolean;
+
+    @prop({ default: false})
+    public cancelada!: boolean;
 
     @prop()
     public confirmadaPor?: string; 

@@ -1,3 +1,4 @@
+import { IPeriodo } from "./../types/interface";
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { OperadorModel, PeriodoModel } from "./../model/models";
 import { IResumoInscricao } from "./../types/interface";
@@ -5,6 +6,7 @@ import { Request, Response } from "express";
 import { InscricaoModel, ParticipanteModel, EventoModel, InstituicaoModel } from "../model/models";
 import { Inscricao } from "../model/inscricao.model";
 import { Participante } from "../model/participante.model";
+import { Types } from "mongoose";
 
 export default abstract class InscricaoController {
 
@@ -16,13 +18,12 @@ export default abstract class InscricaoController {
         const evento = await EventoModel.findById(req.body.idEvento);
         if(!evento)
             return res.json({ msg: "ID de Evento inválido", erro: true });
-
         try {
             const periodo = await PeriodoModel.findById(req.body.idPeriodo);
             if(!periodo) throw new Error();
             if(await periodo.limiteInscricoesAtingido())
                 return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis." });
-            const inscricao = new InscricaoModel({ participante: req.userId, periodo, evento: evento._id });
+            const inscricao = new InscricaoModel({ participante: req.userId, periodo: periodo._id, evento: evento._id });
             await inscricao.save();
             participante.inscricoes.push(inscricao._id);
             await participante.save();
@@ -87,5 +88,32 @@ export default abstract class InscricaoController {
         } catch (err) {
             return res.json({ msg: "Não foi possível buscar as inscrições para esta ocorrência deste evento, tente novamente", erro: true });
         }
+    }
+
+    public static async quantiaPorPeriodoEvento(req: Request, res: Response) {
+        const idEvento = req.params.idEvento;
+        const inscricoes = await PeriodoModel.aggregate<IPeriodo>([
+            {
+                $match: { "evento": new Types.ObjectId(idEvento) }
+            },
+            {
+                $lookup: {
+                    from: InscricaoModel.collection.collectionName,
+                    localField: "_id",
+                    foreignField: "periodo",
+                    as: "inscricoesPeriodo",
+                    pipeline: [{
+                        $match: { "cancelada": false }
+                    }]
+                }
+            },
+            {
+                $addFields: { "inscricoes": { $size: "$inscricoesPeriodo" } }
+            },
+            {
+                $unset: ["inscricoesPeriodo", "__v", "evento"]
+            }
+        ]);
+        res.json(inscricoes);
     }
 }
