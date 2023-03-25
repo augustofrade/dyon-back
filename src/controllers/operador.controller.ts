@@ -37,7 +37,7 @@ export default abstract class OperadorController {
             if(!instituicao)
                 return res.json({ msg: "Não autorizado", erro: true });
 
-            const operador = await OperadorModel.findById(req.body.operadorId);
+            const operador = await OperadorModel.findById(req.body.idOperador);
 
             if(!operador)
             return res.status(404).json({ msg: "Operador não encontrado", erro: true });
@@ -55,11 +55,11 @@ export default abstract class OperadorController {
     static async excluirConta(req: Request, res: Response) {
         try {
             const instituicao = await InstituicaoModel.findById(req.userId);
-            if(!instituicao || instituicao.operadores.includes(req.body.operadorId))
+            if(!instituicao || instituicao.operadores.includes(req.body.idOperador))
                 return res.json({ msg: "Não autorizado", erro: true });
-            const deletada = await OperadorModel.findByIdAndDelete(req.body.operadorId);
+            const deletada = await OperadorModel.findByIdAndDelete(req.body.idOperador);
             if(deletada) {
-                instituicao.operadores = instituicao.operadores.filter(o => o._id !== req.body.operadorId);
+                instituicao.operadores = instituicao.operadores.filter(o => o._id !== req.body.idOperador);
                 await instituicao.save();
                 res.status(200).json({ msg: "A conta deste operador foi excluída com sucesso " });
             }

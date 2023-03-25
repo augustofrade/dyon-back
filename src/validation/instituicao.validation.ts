@@ -1,3 +1,3 @@
 import { body } from "express-validator";
 
-// TODO: validacao de rotas de evento
+// TODO: validacao de rotas de instituicao
