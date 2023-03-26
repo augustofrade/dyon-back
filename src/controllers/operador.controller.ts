@@ -45,7 +45,7 @@ export default abstract class OperadorController {
             operador.ativo = !(operador.ativo);
             await operador.save();
             const nome = operador.nomeCompleto.split(" ")[0];
-            const operacaoRealizada = operador.ativo ? "ativa" : "desativada";
+            const operacaoRealizada = operador.ativo ? "ativada" : "desativada";
             res.status(200).json({ msg: `A conta de ${nome} foi ${operacaoRealizada} com sucesso` });
         } catch (err) {
             res.status(400).json({ msg: "Ocorreu um erro ao tentar ativar/desativar a conta deste operador", erro: true });

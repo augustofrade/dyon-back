@@ -106,7 +106,7 @@ class EventoController {
     }
 
     public static async cancelarEvento(req: Request, res: Response) {
-        const instituicao = InstituicaoModel.findById(req.userId);
+        const instituicao = await InstituicaoModel.findById(req.userId);
         if(!instituicao)
             return res.json({ msg: "Não autorizado", erro: true });
 

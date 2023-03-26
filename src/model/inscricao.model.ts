@@ -7,7 +7,6 @@ import { Participante } from "./participante.model";
 
 @post<Inscricao>("save", async function() {
     if(!this.confirmada && !this.qrCode) {
-        console.log(this._id.toString());
         this.qrCode = await QRCode.toDataURL(this._id.toString());
         this.save();
     }
