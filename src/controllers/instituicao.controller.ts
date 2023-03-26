@@ -7,7 +7,7 @@ import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import validarSenha from "../util/validarSenha";
 import { InstituicaoModel, ParticipanteModel } from "./../model/models";
-import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
+import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 
 export default class InstituicaoController {
 
@@ -70,13 +70,11 @@ export default class InstituicaoController {
         try {
             const novaFoto = req.file ? req.file.buffer : undefined;
             const instituicao = await InstituicaoModel.atualizarPerfil(req.userId as string, req.body, novaFoto);
-            if(!instituicao)
-                throw new Error();
 
             // TODO: verificar melhor maneira de enviar a foto do perfil para o front em todas as rotas
-            const fotoPerfil = instituicao.fotoPerfil ? instituicao.fotoPerfil?.toString("base64") : undefined;
-            const dados = { ...instituicao.toObject(), fotoPerfil,
-                categoriasRamo: instituicao.categoriasRamo.map(c => ({ slug: c._id, titulo: c.titulo }))
+            const fotoPerfil = instituicao!.fotoPerfil ? instituicao!.fotoPerfil?.toString("base64") : undefined;
+            const dados = { ...instituicao!.toObject(), fotoPerfil,
+                categoriasRamo: instituicao!.categoriasRamo.map(c => ({ slug: c._id, titulo: c.titulo }))
             };
             res.json({ msg: "Dados atualizados com sucesso", dados });
         } catch (err) {
@@ -85,16 +83,13 @@ export default class InstituicaoController {
     }
 
     static async seguirInstituicao(req: Request, res: Response) {
-        const usuario = await ParticipanteModel.findById(req.userId);
-        if(!usuario)
-            return res.status(404).json({ msg: "Erro interno", erro: true });
         
         const instituicao = await InstituicaoModel.findOne({ username: req.params.username });
         if(!instituicao)
             return res.status(404).json({ msg: "Instituição não encontrada", erro: true });
 
         try {
-            if(usuario.seguindo.includes(instituicao._id)) {
+            if(req.participante!.seguindo.includes(instituicao._id)) {
                 await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { seguindo: instituicao._id } });
                 res.status(200).json({ msg: `Deixou de seguir ${instituicao.nomeFantasia}` });
             } else {
@@ -109,11 +104,7 @@ export default class InstituicaoController {
 
     static async obterEndereco(req: Request, res: Response) {
         try {
-            const instituicao = await InstituicaoModel.obterEndereco(req.userId as string);
-            if(!instituicao)
-                throw new Error();
-            
-            res.json(instituicao.endereco);
+            res.json(req.instituicao!.endereco);
         } catch (err) {
             res.json({ msg: "Não foi possível buscar os dados do endereço", erro: true });
         }

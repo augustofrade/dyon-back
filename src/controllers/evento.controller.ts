@@ -1,20 +1,17 @@
-import { buscarIdOperadores } from "../util/buscarIdOperadores";
-import { InscricaoModel, ParticipanteModel } from "./../model/models";
-import { PeriodoModel } from "../model/models";
-import { buscarCategorias } from "./../util/buscarCategorias";
-import { EventoModel, InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
-import { Instituicao } from "../model/instituicao.model";
 import { DateTime } from "luxon";
-import { IPeriodo } from "../types/interface";
 import { Types } from "mongoose";
+
+import { Instituicao } from "../model/instituicao.model";
+import { PeriodoModel } from "../model/models";
+import { IPeriodo } from "../types/interface";
+import { buscarIdOperadores } from "../util/buscarIdOperadores";
+import { EventoModel, InscricaoModel, ParticipanteModel } from "./../model/models";
+import { buscarCategorias } from "./../util/buscarCategorias";
 
 class EventoController {
 
     public static async novoEvento(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(req.userId);
-        if(!instituicao)
-            return res.json({ msg: "Não autorizado", erro: true });
         
         const dados = req.body;
         
@@ -34,7 +31,7 @@ class EventoController {
                 operadores: await buscarIdOperadores(dados.operadores)
             });
             await novoEvento.save();
-            await instituicao.adicionarEvento(novoEvento._id);
+            await req.instituicao!.adicionarEvento(novoEvento._id);
             const periodos = await PeriodoModel.criarParaEvento(dados.periodos as Array<IPeriodo>, novoEvento._id);
             novoEvento.periodosOcorrencia = periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()).map(p => p._id);
             await novoEvento.save();
@@ -47,11 +44,10 @@ class EventoController {
     }
 
     public static async editarEvento(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(req.userId);
         const dados = req.body;
 
-        if(!instituicao || !instituicao.eventos.includes(dados.idEvento))
-            return res.json({ msg: "Não autorizado", erro: true });
+        if(!req.instituicao!.eventos.includes(dados.idEvento))
+            return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
         
         if(dados.inscricoesInicio > dados.inscricoesTermino)
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a data final", erro: true });
@@ -82,18 +78,18 @@ class EventoController {
     }
 
     public static async excluirEvento(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(req.userId);
+        // TODO: reavaliar este método
         const evento = await EventoModel.findById(req.body.idEvento);
 
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
 
-        if(!instituicao || !instituicao.eventos.includes(req.body.idEvento))
-            return res.json({ msg: "Não autorizado", erro: true });
+        if(!req.instituicao!.eventos.includes(req.body.idEvento))
+            return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
         
         if(evento.permiteAlteracoes()) {
             try {
-                const sucesso = await evento.delete() && await instituicao.removerEvento(req.body.idEvento);
+                const sucesso = await evento.delete() && await req.instituicao!.removerEvento(req.body.idEvento);
                 if(!sucesso)
                     throw new Error();
 
@@ -106,13 +102,13 @@ class EventoController {
     }
 
     public static async cancelarEvento(req: Request, res: Response) {
-        const instituicao = await InstituicaoModel.findById(req.userId);
-        if(!instituicao)
-            return res.json({ msg: "Não autorizado", erro: true });
-
         const evento = await EventoModel.findById(req.body.idEvento);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
+
+        if(!req.instituicao!.eventos.includes(req.body.idEvento))
+            return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
+
         
         const sucesso = await evento.cancelarEvento();
         if(sucesso)
@@ -160,12 +156,9 @@ class EventoController {
         const evento = await EventoModel.findById(req.params.idEvento);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
-        const participante = await ParticipanteModel.findById(req.userId);
-        if(!participante)
-            return res.json({ msg: "Não autorizado", erro: true });
 
         try {
-            if(participante.acompanhando.includes(evento._id)) {
+            if(req.participante!.acompanhando.includes(evento._id)) {
                 await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { acompanhando: evento._id } });
                 res.status(200).json({ msg: `Deixou de acompanhar o evento "${evento.titulo}"` });
             } else {

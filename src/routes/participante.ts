@@ -2,10 +2,12 @@ import express from "express";
 import multer from "multer";
 
 import ParticipanteController from "../controllers/participante.controller";
+import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
 import authOpcional from "../middlewares/authOpcional.middleware";
 import authValidarRefreshToken from "../middlewares/authValidarRefreshToken";
-import { formatosImagemValidos } from "./../types/enums";
+import { authParticipante } from "../middlewares/autorizacao.middleware";
+import { formatosImagemValidos } from "../types/enums";
 
 const router = express.Router();
 
@@ -19,7 +21,7 @@ router
 
 router
     .route("/perfil/:username")
-    .get(ParticipanteController.obterDadosPerfil);
+    .get(authOpcional, ParticipanteController.obterDadosPerfil);
 
 router
     .route("/all")
@@ -29,7 +31,7 @@ router.use(authAcessToken);
 
 router
     .route("/atualizar")
-    .patch(uploadFotoPerfil, ParticipanteController.atualizarDados);
+    .patch(asyncWrapper(authParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
 
 
 export default router;

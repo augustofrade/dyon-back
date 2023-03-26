@@ -1,5 +1,8 @@
+import { authParticipante } from "../middlewares/autorizacao.middleware";
+import { authInstituicao } from "../middlewares/autorizacao.middleware";
 import express from "express";
 import EventoController from "../controllers/evento.controller";
+import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
 
 const router = express.Router();
@@ -14,19 +17,23 @@ router
 
 router
     .route("/novo")
-    .post(authAcessToken, EventoController.novoEvento);
+    .post(authAcessToken, asyncWrapper(authInstituicao), EventoController.novoEvento);
 
 router
     .route("/editar")
-    .patch(authAcessToken, EventoController.editarEvento);
+    .patch(authAcessToken, asyncWrapper(authInstituicao), EventoController.editarEvento);
 
 router
     .route("/excluir")
-    .delete(authAcessToken, EventoController.excluirEvento);
+    .delete(authAcessToken, asyncWrapper(authInstituicao), EventoController.excluirEvento);
+
+router
+    .route("/cancelar")
+    .delete(authAcessToken, asyncWrapper(authInstituicao), EventoController.cancelarEvento);
 
 router
     .route("/acompanhar/:idEvento")
-    .put(authAcessToken, EventoController.acompanharEvento);
+    .put(authAcessToken, asyncWrapper(authParticipante), EventoController.acompanharEvento);
 
 router
     .route("/dados/:id")

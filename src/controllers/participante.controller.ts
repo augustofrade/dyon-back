@@ -49,6 +49,7 @@ class ParticipanteController {
     }
 
     static async obterDadosPerfil(req: Request, res: Response) {
+        // TODO: excluir campos com base nas configs de privacidade se o usuário estiver autenticado
         const participante = await ParticipanteModel.obterDadosPerfil(req.params.username);
         if(!participante)
             return res.json({ msg: "Participante não encontrado", erro: true });

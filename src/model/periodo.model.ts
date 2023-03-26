@@ -24,7 +24,7 @@ class Periodo {
             evento: idEvento,
             inicio: p.inicio,
             termino: p.termino,
-            isnscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
+            inscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
         })));
     }
 

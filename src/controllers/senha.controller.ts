@@ -10,22 +10,19 @@ export default abstract class SenhaController {
 
     static async atualizarSenha(req: Request, res: Response) {
         const { senhaAtual, novaSenha } = req.body;
-        const usuario = await UsuarioModel.findById(req.userId);
-        if(!usuario)
-            return res.status(404).json({ msg: "Erro interno", erro: true });
 
-        if(!await usuario.verificarSenha(senhaAtual))
+        if(!await req.usuario!.verificarSenha(senhaAtual))
            return res.status(400).json({ msg: "A senha informada está incorreta", erro: true });
 
         if(!validarSenha(novaSenha))
             return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         
-        usuario.senha = novaSenha;
+            req.usuario!.senha = novaSenha;
         try {
-            await usuario.save();
-            Email.Instance.enviarEmailAlteracaoSenha(usuario.email, usuario.nomeUsuario());
+            await req.usuario!.save();
+            Email.Instance.enviarEmailAlteracaoSenha(req.usuario!.email, req.usuario!.nomeUsuario());
         } catch (err) {
-            Email.Instance.enviarEmailFalhaSenha(usuario.email, usuario.nomeUsuario());
+            Email.Instance.enviarEmailFalhaSenha(req.usuario!.email, req.usuario!.nomeUsuario());
         }
         res.status(200).json({ msg: "Senha atualizada com sucesso" });
     }

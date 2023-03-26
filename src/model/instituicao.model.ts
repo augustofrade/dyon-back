@@ -87,10 +87,6 @@ class Instituicao extends Usuario {
         return media.toFixed(2);
     }
 
-    public static obterEndereco(this: ReturnModelType<typeof Instituicao>, id: string) {
-        return this.findById(id).select("endereco -tipo -_id");
-    }
-
     public adicionarEvento(this: DocumentType<Instituicao>, idEvento: string) {
         this.eventos.push(idEvento as any);
         return this.save();

@@ -1,20 +1,13 @@
 import { Request, Response } from "express";
-import { PopulatedDoc } from "mongoose";
 
 import { Inscricao } from "../model/inscricao.model";
-import { EventoModel, InscricaoModel, InstituicaoModel, ParticipanteModel } from "../model/models";
+import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { Participante } from "../model/participante.model";
-import { Periodo } from "../model/periodo.model";
-import { OperadorModel, PeriodoModel } from "./../model/models";
-import { IResumoInscricao } from "./../types/interface";
+import { IResumoInscricao } from "../types/interface";
 
 export default abstract class InscricaoController {
 
     static async novaInscricao(req: Request, res: Response) {
-        const participante = await ParticipanteModel.findById(req.userId);
-        if(!participante)
-            return res.json({ msg: "Não autorizado", erro: true });
-        
         const evento = await EventoModel.findById(req.body.idEvento);
         if(!evento)
             return res.json({ msg: "ID de Evento inválido", erro: true });
@@ -25,8 +18,8 @@ export default abstract class InscricaoController {
                 return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis." });
             const inscricao = new InscricaoModel({ participante: req.userId, periodo: periodo._id, evento: evento._id });
             await inscricao.save();
-            participante.inscricoes.push(inscricao._id);
-            await participante.save();
+            req.participante!.inscricoes.push(inscricao._id);
+            await req.participante!.save();
             evento.inscricoes.push(inscricao._id);
             await evento.save();
             res.status(200).json({ msg: "Inscrição realizada com sucesso" });
@@ -37,10 +30,9 @@ export default abstract class InscricaoController {
 
     static async cancelarInscricao(req: Request, res: Response) {
         const idInscricao = req.body.idInscricao;
-        const participante = await ParticipanteModel.findById(req.userId);
         const inscricao = await InscricaoModel.findById(idInscricao);
-        if(!participante || !inscricao || inscricao.participante._id !== participante._id)
-            return res.json({ msg: "Não autorizado", erro: true });
+        if(!inscricao || inscricao.participante._id !== req.participante!._id)
+            return res.json({ msg: "Você não está inscrito neste evento", erro: true });
         else if(inscricao.confirmada)
             return res.json({ msg: "Não é possível cancelar uma inscrição após ela já estar confirmada", erro: true });
 
@@ -57,12 +49,11 @@ export default abstract class InscricaoController {
     static async confirmarInscricao(req: Request, res: Response) {
         // Operador
         const idInscricao = req.params.idInscricao;
-        const instituicaoOperador = InstituicaoModel.findOne({ "operadores._id": req.userId });
+        const operadorAtribuido = EventoModel.findOne({ "operadores._id": req.userId });
         
-        if(!instituicaoOperador)
-            return res.json({ msg: "Não autorizado", erro: true });
+        if(!operadorAtribuido)
+            return res.json({ msg: "Não autorizado: você não foi atribuído à este evento", erro: true });
         
-        const operador = await OperadorModel.findById(req.userId);
         const evento = EventoModel.findOne({ "inscricoes._id": idInscricao });
         const inscricao = await InscricaoModel.findById(idInscricao);
         if(!evento || !inscricao)
@@ -70,7 +61,7 @@ export default abstract class InscricaoController {
         // TODO: comparar data atual à do período do evento
         
         try {
-            await inscricao.confirmarParticipacao(operador!.nomeCompleto);
+            await inscricao.confirmarParticipacao(req.operador!.nomeCompleto);
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
             res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente. ", erro: true, detalhes: err });
