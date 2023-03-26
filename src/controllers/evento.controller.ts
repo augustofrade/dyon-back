@@ -1,5 +1,5 @@
 import { buscarIdOperadores } from "../util/buscarIdOperadores";
-import { ParticipanteModel } from "./../model/models";
+import { InscricaoModel, ParticipanteModel } from "./../model/models";
 import { PeriodoModel } from "../model/models";
 import { buscarCategorias } from "./../util/buscarCategorias";
 import { EventoModel, InstituicaoModel } from "../model/models";
@@ -7,6 +7,7 @@ import { Request, Response } from "express";
 import { Instituicao } from "../model/instituicao.model";
 import { DateTime } from "luxon";
 import { IPeriodo } from "../types/interface";
+import { Types } from "mongoose";
 
 class EventoController {
 
@@ -175,6 +176,33 @@ class EventoController {
         } catch(err) {
             res.status(400).json({ msg: `Ocorreu um erro ao tentar acompanhar o evento "${evento.titulo}"`, erro: true });
         }
+    }
+
+    public static async listarPeriodos(req: Request, res: Response) {
+        const idEvento = req.params.idEvento;
+        const inscricoes = await PeriodoModel.aggregate<IPeriodo>([
+            {
+                $match: { "evento": new Types.ObjectId(idEvento) }
+            },
+            {
+                $lookup: {
+                    from: InscricaoModel.collection.collectionName,
+                    localField: "_id",
+                    foreignField: "periodo",
+                    as: "inscricoesPeriodo",
+                    pipeline: [{
+                        $match: { "cancelada": false }
+                    }]
+                }
+            },
+            {
+                $addFields: { "inscricoes": { $size: "$inscricoesPeriodo" } }
+            },
+            {
+                $unset: ["inscricoesPeriodo", "__v", "evento"]
+            }
+        ]);
+        res.json(inscricoes);
     }
 }
 

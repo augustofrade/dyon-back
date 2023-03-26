@@ -22,8 +22,4 @@ router
     .route("/por-periodo/:idPeriodo")
     .get(authAcessToken, InscricaoController.listarPorPeriodoEvento);
 
-router
-    .route("/por-evento/:idEvento")
-    .get(InscricaoController.quantiaPorPeriodoEvento);
-
 export default router;

@@ -32,4 +32,8 @@ router
     .route("/dados/:id")
     .get(EventoController.dadosEvento);
 
+router
+    .route("/periodos/:idEvento")
+    .get(EventoController.listarPeriodos);
+
 export default router;

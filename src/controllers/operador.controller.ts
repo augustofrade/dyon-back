@@ -69,4 +69,6 @@ export default abstract class OperadorController {
             res.status(400).json({ msg: "Não foi possível excluir a conta deste operador, tente novamente.", erro: true });
         }
     }
+
+    // TODO: método para visualização de eventos com períodos ocorrendo em tempo real 
 }

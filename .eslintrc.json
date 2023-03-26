@@ -26,7 +26,8 @@
         "no-empty-function": "error",
         "no-unused-vars": "warn",
         "no-var": "error",
-        "camelcase": "warn"
+        "camelcase": "warn",
+        "@typescript-eslint/no-non-null-assertion": "off"
     },
     "ignorePatterns": ["src/types/**/*.ts", "src/model/*.ts", "src/util/popularCategorias.ts"]
 }
