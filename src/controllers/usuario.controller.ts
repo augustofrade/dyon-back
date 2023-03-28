@@ -18,6 +18,17 @@ class UsuarioController {
             res.json({ msg: "Não foi possível exibir seus dados", erro: true });
         }
     }
+
+    static async excluirConta(req: Request, res: Response) {
+        try {
+            await req.usuario!.remove();
+            res.clearCookie("token");
+            res.status(200).json({ msg: "Sua conta foi excluída com sucesso" });
+        } catch(err) {
+            res.status(400).json({ msg: "Ocorreu um erro ao tentar excluir sua conta, tente novamente", erro: true });
+        }
+    }
+
 }
 
 export default UsuarioController;

@@ -11,6 +11,12 @@ router
     .route("/tipo")
     .get(authAcessToken, asyncWrapper(authUsuario), UsuarioController.tipoUsuario);
 
+router
+    .route("/dados-cabecalho")
+    .get(authAcessToken, asyncWrapper(authUsuario), UsuarioController.dadosCabecalho);
 
+router
+    .route("/excluir-conta")
+    .delete(authAcessToken, asyncWrapper(authUsuario), UsuarioController.excluirConta);
 
 export default router;

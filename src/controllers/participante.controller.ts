@@ -43,10 +43,6 @@ class ParticipanteController {
         }
     }
 
-    static async excluirConta(req: Request, res: Response) {
-        // TODO: excluir conta e redirecionar para /auth/logout
-    }
-
     static async obterDadosPerfil(req: Request, res: Response) {
         const participante = await ParticipanteModel.obterDadosPerfil(req.params.username);
         if(!participante)

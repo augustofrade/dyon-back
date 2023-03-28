@@ -1,12 +1,16 @@
-import { IInfoResumida } from './../types/interface';
-import { usuariosEnum } from "./../types/enums";
+import { IInfoResumida } from "../types/interface";
+import { usuariosEnum } from "../types/enums";
 import { TokenGenerico } from "../schema/tokenGenerico.schema";
 import { Types } from "mongoose";
 import { pre, prop, modelOptions, getModelForClass, DocumentType } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
 import { Instituicao } from "./instituicao.model";
 import { Participante } from "./participante.model";
-import { Operador } from './operador.model';
+import { Operador } from "./operador.model";
+import { EventoModel, InscricaoModel, OperadorModel, PeriodoModel } from "./models";
+import { Inscricao } from "./inscricao.model";
+import { Documento } from "../types/types";
+import { Evento } from "./evento.model";
 
 @pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
@@ -28,6 +32,21 @@ import { Operador } from './operador.model';
         });
     });
 })
+@pre<Usuario>("remove", async function() {
+    if(this.tipo === usuariosEnum.Participante) {
+        const inscricoes: string[] = await InscricaoModel.find({ "participante._id": this._id }).map((i: Documento<Inscricao>) => i._id);
+        
+        InscricaoModel.deleteMany({ "participante._id": this._id });
+        EventoModel.updateMany({ "inscricao._id": { $in: inscricoes } });
+        // TODO: editar avaliacoes para "Usuario excluído" e remover ids
+    } else if(this.tipo === usuariosEnum.Instituicao) {
+        const user = this as unknown as Instituicao;
+        const eventos = user.eventos.map((e) => e._id);
+        PeriodoModel.deleteMany({ "evento._id": { $in: user.eventos } });
+        EventoModel.deleteMany({ "criador._id": this._id });
+        OperadorModel.deleteMany({ "instituicao._id": this._id });
+    }
+}, { document: true, query: false })
 @modelOptions({ schemaOptions: { discriminatorKey: "tipo", timestamps: true } })
 class Usuario {
     @prop({ unique: true, index: true })

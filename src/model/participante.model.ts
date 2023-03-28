@@ -1,4 +1,3 @@
-import { InscricaoModel } from './models';
 import { generoEnum } from "./../types/enums";
 import { prop, Ref, pre, ReturnModelType, DocumentType } from "@typegoose/typegoose";
 import { Endereco } from "../schema/endereco.schema";
@@ -25,9 +24,6 @@ const configsPadrao = () => ({
         this.username = gerarUsername(this.nomeSocial ?? this.nomeCompleto);
     }
 })
-@pre<Participante>("remove", function() {
-    InscricaoModel.deleteMany({ "participante._id": this._id });
-}, { document: true, query: false })
 class Participante extends Usuario {
 
     @prop({ required: true, minLength: 10, maxLength: 60 })

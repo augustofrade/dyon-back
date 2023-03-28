@@ -41,11 +41,7 @@ export default class InstituicaoController {
                 res.status(400).json({ msg: "Falha ao realizar cadastro", erro: true });
         }
     }
-
-    static async excluirConta(req: Request, res: Response) {
-        // TODO: excluir conta e redirecionar para /auth/logout
-    }
-
+    
     static async obterDadosPerfil(req: Request, res: Response) {
         const instituicao = await InstituicaoModel.obterDadosPerfil(req.params.username);
         if(!instituicao)

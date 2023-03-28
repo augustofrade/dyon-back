@@ -33,5 +33,4 @@ router
     .route("/atualizar")
     .patch(asyncWrapper(authParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
 
-
 export default router;
