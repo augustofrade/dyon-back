@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { Participante } from "../model/participante.model";
+import { Periodo } from "../model/periodo.model";
 import { IResumoInscricao } from "../types/interface";
 
 export default abstract class InscricaoController {
@@ -54,11 +55,15 @@ export default abstract class InscricaoController {
         if(!operadorAtribuido)
             return res.json({ msg: "Não autorizado: você não foi atribuído à este evento", erro: true });
         
-        const evento = EventoModel.findOne({ "inscricoes._id": idInscricao });
-        const inscricao = await InscricaoModel.findById(idInscricao);
+        const evento = await EventoModel.findOne({ "inscricoes._id": idInscricao });
+        const inscricao = await InscricaoModel.findById(idInscricao).populate("periodo", "inicio termino cancelado");
         if(!evento || !inscricao)
             return res.json({ msg: "Inscricão inválida, contate seu gestor", erro: true });
-        // TODO: comparar data atual à do período do evento
+        
+        const periodoInscricao: Periodo = inscricao.periodo as Periodo;
+        const dataAtual = new Date();
+        if(dataAtual >= periodoInscricao.inicio && dataAtual < periodoInscricao.termino)
+            return res.json({ msg: "Não é possível confirmar uma inscrição fora do período do evento em que está inscrito(a)", erro: true });
         
         try {
             await inscricao.confirmarParticipacao(req.operador!.nomeCompleto);

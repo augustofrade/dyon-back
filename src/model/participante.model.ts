@@ -1,5 +1,6 @@
+import { InscricaoModel } from './models';
 import { generoEnum } from "./../types/enums";
-import { prop, Ref, pre, ReturnModelType } from "@typegoose/typegoose";
+import { prop, Ref, pre, ReturnModelType, DocumentType } from "@typegoose/typegoose";
 import { Endereco } from "../schema/endereco.schema";
 import { Usuario } from "./usuario.model";
 import { Categoria } from "./categoria.model";
@@ -9,13 +10,13 @@ import { Inscricao } from "./inscricao.model";
 import gerarUsername from "../util/gerarUsername";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
 import { Types } from "mongoose";
+import { ICategoria } from "../types/interface";
 
 
 const configsPadrao = () => ({
     exibirInscricoes: true,
     exibirCategorias: true,
-    exibirSeguindo: true,
-    exibirHistorico: true
+    exibirSeguindo: true
 });
 
 
@@ -24,6 +25,9 @@ const configsPadrao = () => ({
         this.username = gerarUsername(this.nomeSocial ?? this.nomeCompleto);
     }
 })
+@pre<Participante>("remove", function() {
+    InscricaoModel.deleteMany({ "participante._id": this._id });
+}, { document: true, query: false })
 class Participante extends Usuario {
 
     @prop({ required: true, minLength: 10, maxLength: 60 })
@@ -65,15 +69,40 @@ class Participante extends Usuario {
     public static obterDadosPerfil(this: ReturnModelType<typeof Participante>, username: string) {
         return this.findOne({ username })
         .select("-_id -tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando")
-        .populate({
+    }
+
+    private async popularEventosPerfil(this: DocumentType<Participante>) {
+        await this.populate({
             path: "inscricoes",
             select: "periodo evento",
             populate: {
                 path: "evento",
                 select: "-_id titulo endereco _publicId slug"
             }
-        })
-        .populate("acompanhando", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
+        });
+        await this.populate("acompanhando", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
+
+    }
+
+    public async ocultarDadosPerfil(this: DocumentType<Participante>, idUser: string | null) {
+        const retorno: {
+            categoriasFavoritas: ICategoria[] | undefined
+            inscricoes?: unknown | undefined
+        } = {
+            categoriasFavoritas: undefined
+        }
+        await this.popularEventosPerfil();
+        retorno.categoriasFavoritas = this.categoriasFavoritas.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
+
+        if(this._id != idUser) {
+            if(this.configuracoes.exibirCategorias)
+                retorno.categoriasFavoritas = undefined;
+            
+            if(this.configuracoes.exibirInscricoes)
+                retorno.inscricoes = undefined;
+        }
+
+        return retorno;
     }
 
     public static atualizarPerfil(this: ReturnModelType<typeof Participante>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {

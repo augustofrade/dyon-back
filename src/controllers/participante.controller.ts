@@ -3,7 +3,6 @@ import { Request, Response } from "express";
 import Email from "../email/Email";
 import { Inscricao } from "../model/inscricao.model";
 import { ParticipanteModel } from "../model/models";
-import { ICategoria } from "../types/interface";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import { buscarCategorias } from "../util/buscarCategorias";
@@ -49,18 +48,16 @@ class ParticipanteController {
     }
 
     static async obterDadosPerfil(req: Request, res: Response) {
-        // TODO: excluir campos com base nas configs de privacidade se o usuário estiver autenticado
         const participante = await ParticipanteModel.obterDadosPerfil(req.params.username);
         if(!participante)
             return res.json({ msg: "Participante não encontrado", erro: true });
-        
-        const categorias: ICategoria[] = participante.categoriasFavoritas.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
+
+        const camposTrabalhados = await participante.ocultarDadosPerfil(req.userId);
 
         const retorno = {
             ...participante.toObject(),
-            categorias,
             quantiaEventos: participante.inscricoes.filter(i => (<Inscricao>i).confirmada).length,
-            categoriasFavoritas: undefined
+            ...camposTrabalhados
         };
 
         res.status(201).json(retorno);

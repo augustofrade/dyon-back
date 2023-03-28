@@ -12,9 +12,6 @@ class PerfilConfig {
     @prop()
     public exibirSeguindo?: boolean;
 
-    @prop()
-    public exibirHistorico?: boolean;
-
     // Instituicao
     @prop()
     public exibirEndereco?: boolean;

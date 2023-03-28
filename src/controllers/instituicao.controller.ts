@@ -54,13 +54,14 @@ export default class InstituicaoController {
         const categoriasRamo: ICategoria[] = instituicao.categoriasRamo.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
         const eventos = instituicao._id === req.userId ? instituicao.eventos : instituicao.eventos.map((e => (<Evento>e).visivel));
         const avaliacaoMedia = instituicao.avaliacaoMedia();
-        
+
         const retorno = {
             ...instituicao.toObject(),
             quantiaEventos: instituicao.eventos.length,
             categoriasRamo,
             eventos,
-            avaliacaoMedia
+            avaliacaoMedia,
+            endereco: instituicao.configuracoes.exibirEndereco ? instituicao.endereco: undefined
         };
         
         res.status(201).json(retorno);
