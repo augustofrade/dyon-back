@@ -2,8 +2,8 @@ import { Request, Response } from "express";
 
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
-import { Participante } from "../model/participante.model";
 import { Periodo } from "../model/periodo.model";
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { IResumoInscricao } from "../types/interface";
 
 export default abstract class InscricaoController {
@@ -17,7 +17,12 @@ export default abstract class InscricaoController {
             if(!periodo) throw new Error();
             if(await periodo.limiteInscricoesAtingido())
                 return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis." });
-            const inscricao = new InscricaoModel({ participante: req.userId, periodo: periodo._id, evento: evento._id });
+
+            const inscricao = new InscricaoModel({
+                participante: IdentificacaoUsuario.gerarIdentificacao(req.participante),
+                periodo: periodo._id,
+                evento: evento._id
+            });
             await inscricao.save();
             req.participante!.inscricoes.push(inscricao._id);
             await req.participante!.save();
@@ -32,7 +37,7 @@ export default abstract class InscricaoController {
     static async cancelarInscricao(req: Request, res: Response) {
         const idInscricao = req.body.idInscricao;
         const inscricao = await InscricaoModel.findById(idInscricao);
-        if(!inscricao || inscricao.participante._id !== req.participante!._id)
+        if(!inscricao || inscricao.participante.idUsuario !== req.participante!._id)
             return res.json({ msg: "Você não está inscrito neste evento", erro: true });
         else if(inscricao.confirmada)
             return res.json({ msg: "Não é possível cancelar uma inscrição após ela já estar confirmada", erro: true });
@@ -79,7 +84,7 @@ export default abstract class InscricaoController {
             if(!inscricoesRaw)
                 throw new Error();
             const inscricoes: Array<IResumoInscricao> = inscricoesRaw.map((i: Inscricao) =>
-                ({ confirmada: i.confirmada, nomeUsuario: (<Participante>i.participante).nomeCompleto })
+                ({ confirmada: i.confirmada, nomeUsuario: i.participante.nome })
             );
             return res.json(inscricoes);
         } catch (err) {

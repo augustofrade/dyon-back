@@ -1,9 +1,10 @@
 import { DocumentType, modelOptions, post, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 import QRCode from "qrcode";
 
-import { Periodo } from "./periodo.model";
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { Evento } from "./evento.model";
-import { Participante } from "./participante.model";
+import { Periodo } from "./periodo.model";
+
 
 @post<Inscricao>("save", async function() {
     if(!this.confirmada && !this.qrCode) {
@@ -19,8 +20,8 @@ class Inscricao {
     @prop()
     public qrCode?: string;
 
-    @prop({ required: true, ref: () => Participante })
-    public participante!: Ref<Participante>;
+    @prop({ required: true })
+    public participante!: IdentificacaoUsuario;
 
     @prop({ default: false })
     public confirmada!: boolean;

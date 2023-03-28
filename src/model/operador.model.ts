@@ -1,5 +1,6 @@
-import { prop, Ref } from "@typegoose/typegoose";
-import { Instituicao } from "./instituicao.model";
+import { prop } from "@typegoose/typegoose";
+
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { Usuario } from "./usuario.model";
 
 class Operador extends Usuario {
@@ -12,8 +13,8 @@ class Operador extends Usuario {
     @prop({ required: true, default: true })
     public ativo!: boolean;
 
-    @prop({ required: true, ref: () => Instituicao })
-    public instituicao!: Ref<Instituicao>;
+    @prop({ required: true })
+    public instituicao!: IdentificacaoUsuario;
 }
 
 export { Operador };

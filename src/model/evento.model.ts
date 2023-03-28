@@ -8,9 +8,9 @@ import gerarIdAleatorio from "../util/gerarIDAleatorio";
 import gerarSlug from "../util/gerarSlug";
 import { Categoria } from "./categoria.model";
 import { Inscricao } from "./inscricao.model";
-import { Instituicao } from "./instituicao.model";
 import { PeriodoModel } from "./models";
 import { Operador } from "./operador.model";
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 
 @pre<Evento>("save", function() {
     this.slug = gerarSlug(this.titulo);
@@ -22,8 +22,8 @@ class Evento {
     @prop()
     public slug!: string;
 
-    @prop({ required: true, ref: () => Instituicao })
-    public criador!: Ref<Instituicao>;
+    @prop({ required: true })
+    public criador!: IdentificacaoUsuario;
 
     @prop({ required: true, minlength: 10, maxLength: 50 })
     public titulo!: string;

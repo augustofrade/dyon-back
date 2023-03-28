@@ -2,12 +2,12 @@ import { Request, Response } from "express";
 import { DateTime } from "luxon";
 import { Types } from "mongoose";
 
-import { Instituicao } from "../model/instituicao.model";
 import { PeriodoModel } from "../model/models";
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { IPeriodo } from "../types/interface";
 import { buscarIdOperadores } from "../util/buscarIdOperadores";
-import { EventoModel, InscricaoModel, ParticipanteModel } from "./../model/models";
-import { buscarCategorias } from "./../util/buscarCategorias";
+import { EventoModel, InscricaoModel, ParticipanteModel } from "../model/models";
+import { buscarCategorias } from "../util/buscarCategorias";
 
 class EventoController {
 
@@ -20,7 +20,7 @@ class EventoController {
         
         try {
             const novoEvento = new EventoModel({
-                criador: req.userId,
+                criador: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 titulo: dados.titulo,
                 descricao: dados.descricao,
                 banner: dados.banner,
@@ -57,7 +57,7 @@ class EventoController {
             const periodos = await PeriodoModel.atualizar(dados.periodos, dados.idEvento);
 
             const editado = await EventoModel.findByIdAndUpdate(dados.idEvento, {
-                criador: req.userId,
+                criador: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 titulo: dados.titulo,
                 descricao: dados.descricao,
                 banner: dados.banner,
@@ -127,10 +127,7 @@ class EventoController {
             ...evento.toObject(),
             ...camposDeletar,
             inscricoes: evento.inscricoes.length,
-            instituicao: {
-                nomeFantasia: (<Instituicao>evento.criador).nomeFantasia,
-                username: (<Instituicao>evento.criador).username
-            }
+            instituicao: evento.criador
         };
 
         res.json(resposta);

@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import Email from "../email/Email";
 import { OperadorModel } from "../model/models";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 
 export default abstract class OperadorController {
 
@@ -15,7 +16,7 @@ export default abstract class OperadorController {
                 telefone,
                 email,
                 ativo: true,
-                instituicao: req.instituicao!._id,
+                instituicao: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });
             await novoOperador.save();

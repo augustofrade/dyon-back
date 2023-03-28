@@ -122,7 +122,7 @@ class Usuario {
             const u = <unknown>this as Operador;
             retorno.nome = u.nomeCompleto;
             await this.populate("instituicao", "nomeFantasia")
-            retorno.instituicao = (<Instituicao>u.instituicao)?.nomeFantasia || "";
+            retorno.instituicao = u.instituicao.nome;
         }
         return retorno;
     }
