@@ -1,9 +1,9 @@
+import { usuariosEnum } from "../types/enums";
 import { Request, Response } from "express";
 
 import Email from "../email/Email";
 import { UsuarioModel } from "../model/usuario.model";
 import validarSenha from "../util/validarSenha";
-import { gerarTokenGenerico } from "./../util/gerarTokenGenerico";
 
 
 export default abstract class SenhaController {
@@ -28,18 +28,17 @@ export default abstract class SenhaController {
     }
 
     static async gerarTokenSenha(req: Request, res: Response) {
-        const token = gerarTokenGenerico();
         const usuario = await UsuarioModel.findOne({ email: req.body.email });
         if(!usuario)
-            return res.json({ msg: "Não foi encontrado um usuário com este e-mail" });
+            return res.json({ msg: "Não foi encontrado um usuário com este e-mail", erro: true });
         
-        usuario.senhaToken = {
-            _id: token.hash,
-            expiracao: token.expiracao
-        };
-        usuario.save();
+        if(usuario.tipo === usuariosEnum.Operador)
+            return res.status(400).json({ msg: "Para alterar sua senha, contate seu gestor", erro: true });
+        
+        const token = await usuario.novaSenhaToken();
+
         Email.Instance.enviarEmailRecuperacaoSenha(usuario.email, usuario.nomeUsuario(), token);
-        res.json({ msg: "Foi enviado um e-mail de recuperação de senha" });
+        res.json({ msg: "Foi enviado um e-mail de recuperação de senha", erro: true });
     }
 
     static async recuperarSenha(req: Request, res: Response) {
@@ -65,7 +64,7 @@ export default abstract class SenhaController {
             res.status(201).json({ msg: "Senha alterada com sucesso" });
         } catch (err) {
             Email.Instance.enviarEmailFalhaSenha(usuario.email, usuario.nomeUsuario());
-            res.status(400).json({ msg: "Não foi possível alterar sua senha" });
+            res.status(400).json({ msg: "Não foi possível alterar sua senha", erro: true });
         }
     }
 }

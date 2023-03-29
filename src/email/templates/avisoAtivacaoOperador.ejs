@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novo cadastro no Dyon por <% nomeInstituicao %></title>
-    <meta description="Novo cadastron no Dyon">
+    <title>Confirme sua conta</title>
+    <meta description="Confirme sua conta">
 
     <style>
         .text {
@@ -30,12 +30,7 @@
         </tr>
         <tr>
             <td>
-                <h2 class="text" style="margin-block-end: 0; margin-bottom: 0;"><%= nomeUsuario %>, bem-vindo!</h2>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <h2 class="text">Sua conta foi cadastrada no Dyon por <%= nomeInstituicao %></h2>
+                <h2 class="text title" style="margin-block-end: 0; margin-bottom: 0;">Olá, <%= nomeUsuario %></h2>
             </td>
         </tr>
         <tr>
@@ -43,10 +38,10 @@
         </tr>
         <tr>
             <td>
-                <span class="text">
-                    Para você poder começar a confirmar inscrições de participantes nos eventos de <%= nomeInstituicao %>,<br/>
-                    Por favor, defina sua senha clicando  <a href="<%= url %>">aqui</a>
-                </span>
+                <span class="text">Foi solicitado um e-mail de recuperação de senha para sua conta de operador no Dyon.
+                    Entretanto, parece que você não ativou sua conta ainda.<br/>
+                    Para fazê-lo e definir sua senha, clique <a href="<%= url %>">aqui</a>.
+                    Com sua conta ativa, você pode confirmar inscrições dos participantes nos eventos de <%= nomeInstituicao %>!</span>
             </td>
         </tr>
         <tr>

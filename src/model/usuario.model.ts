@@ -1,16 +1,17 @@
-import { IInfoResumida } from "../types/interface";
-import { usuariosEnum } from "../types/enums";
-import { TokenGenerico } from "../schema/tokenGenerico.schema";
-import { Types } from "mongoose";
-import { pre, prop, modelOptions, getModelForClass, DocumentType } from "@typegoose/typegoose";
+import { DocumentType, getModelForClass, modelOptions, pre, prop } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
-import { Instituicao } from "./instituicao.model";
-import { Participante } from "./participante.model";
-import { Operador } from "./operador.model";
-import { EventoModel, InscricaoModel, OperadorModel, PeriodoModel } from "./models";
-import { Inscricao } from "./inscricao.model";
+import { Types } from "mongoose";
+
+import { TokenGenerico } from "../schema/tokenGenerico.schema";
+import { usuariosEnum } from "../types/enums";
+import { IInfoResumida, ITokenGenerico } from "../types/interface";
 import { Documento } from "../types/types";
-import { Evento } from "./evento.model";
+import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
+import { Inscricao } from "./inscricao.model";
+import { Instituicao } from "./instituicao.model";
+import { EventoModel, InscricaoModel, OperadorModel, PeriodoModel } from "./models";
+import { Operador } from "./operador.model";
+import { Participante } from "./participante.model";
 
 @pre<Usuario>("save", function(next) {
     // Middleware pré-salvamento de algum usuário para transformar a senha em hash.
@@ -78,6 +79,16 @@ class Usuario {
     public async verificarSenha(this: DocumentType<Usuario>, senha: string) {
         const senhasConferem = bcrypt.compare(senha, this.senha);
         return senhasConferem;
+    }
+
+    public async novaSenhaToken(this: DocumentType<Usuario>): Promise<ITokenGenerico> {
+        const token = gerarTokenGenerico();
+        this.senhaToken = {
+            _id: token.hash,
+            expiracao: token.expiracao
+        };
+        await this.save();
+        return token;
     }
 
     public async removerRefreshToken(this: DocumentType<Usuario>, refreshToken: string) {

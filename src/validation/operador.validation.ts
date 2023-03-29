@@ -12,12 +12,26 @@ export const validacaoCadastroOperador = [
     
 ];
 
+const idObrigatorio = body("idOperador")
+    .notEmpty().withMessage("ID de operador não fornecido");
+
 export const validacaoAlternarOperador = [
-    body("idOperador")
-        .notEmpty().withMessage("ID de operador não fornecido")
+    idObrigatorio  
 ];
 
 export const validacaoExcluirOperador = [
-    body("idOperador")
-        .notEmpty().withMessage("ID de operador não fornecido")
+    idObrigatorio
+];
+
+export const validacaoTrocaSenhaOperador = [
+    idObrigatorio
+];
+
+export const validacaoAtivacaoOperador = [
+    body("token")
+        .notEmpty().withMessage("Um token de ativação de conta não foi fornecido"),
+    body("senha")
+        .notEmpty().withMessage("É obrigatório informar a nova senha"),
+    body("confirmarSenha")
+        .notEmpty().withMessage("É obrigatório confirmar a nova senha")
 ];

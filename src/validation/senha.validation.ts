@@ -20,7 +20,7 @@ export const validacaoRecuperacaoSenha = [
     body("token")
         .notEmpty().withMessage("Um token de Recuperação de Senha não foi fornecido"),
     body("senha")
-        .notEmpty().withMessage("É obrigatório informar a senha atual"),
+        .notEmpty().withMessage("É obrigatório informar a nova senha"),
     body("confirmarSenha")
-        .notEmpty().withMessage("É obrigatório informar a senha atual")
+        .notEmpty().withMessage("É obrigatório confirmar a nova senha")
 ];

@@ -47,13 +47,28 @@ export default class Email {
     }
 
 
-    public async enviarEmailOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string) {
+    public async enviarEmailOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string, token: ITokenGenerico) {
+        const url = `https://localhost:3000/operador/ativacao/${token.hash}`;
         const nomeTemplate = TemplateGerenciador.Instance.template("operador");
-        const template = ejs.render(nomeTemplate, { nomeUsuario, nomeInstituicao });
+        const template = ejs.render(nomeTemplate, { nomeUsuario, nomeInstituicao, url });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: `Novo cadastro no Dyon por ${nomeInstituicao}`,
-            texto: `Agora você pode começar a confirmar inscrições de participantes nos eventos de ${nomeInstituicao}!`,
+            texto: `Para você pode começar a confirmar inscrições de participantes nos eventos de ${nomeInstituicao},
+                defina sua senha na url ${url}`,
+            html: template
+        });
+    }
+
+    public async enviarEmailAtivacaoOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string, token: ITokenGenerico) {
+        const url = `https://localhost:3000/operador/ativacao/${token.hash}`;
+        const nomeTemplate = TemplateGerenciador.Instance.template("ativacaoOperador");
+        const template = ejs.render(nomeTemplate, { nomeUsuario, nomeInstituicao, url });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: "Ative sua conta no Dyon",
+            texto: `Para você pode começar a confirmar inscrições de participantes nos eventos de ${nomeInstituicao},
+                ative sua conta definindo sua senha na url ${url}`,
             html: template
         });
     }

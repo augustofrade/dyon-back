@@ -10,6 +10,9 @@ class Operador extends Usuario {
     @prop({ required: true, minLength: 9, maxLength: 15 })
     public telefone!: string;
 
+    @prop({ default: false })
+    public confirmado!: boolean;
+
     @prop({ required: true, default: true })
     public ativo!: boolean;
 

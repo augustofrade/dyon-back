@@ -16,6 +16,9 @@ class TemplateGerenciador {
             operador: {
                 diretorio: diretorioCompleto("./templates/cadastroOperador.ejs")
             },
+            ativacaoOperador: {
+                diretorio: diretorioCompleto("./templates/avisoAtivacaoOperador.ejs")
+            },
             confirmacaoEmail: {
                 diretorio: diretorioCompleto("./templates/confirmacaoEmail.ejs")
             },
