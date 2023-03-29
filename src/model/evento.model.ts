@@ -67,7 +67,6 @@ class Evento {
     public static dadosPublicos(this: ReturnModelType<typeof Evento>, idPublico: string) {
         return this.findOne({ _publicId: idPublico })
             .select("-__v -operadores")
-            .populate("criador", "nomeFantasia username")
     }
 
     public static pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: string, categoria?: string, estado?: string) {

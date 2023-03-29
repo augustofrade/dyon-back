@@ -132,7 +132,6 @@ class Usuario {
         } else if(this.tipo === usuariosEnum.Operador) {
             const u = <unknown>this as Operador;
             retorno.nome = u.nomeCompleto;
-            await this.populate("instituicao", "nomeFantasia")
             retorno.instituicao = u.instituicao.nome;
         }
         return retorno;
