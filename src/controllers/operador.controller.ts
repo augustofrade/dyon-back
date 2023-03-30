@@ -117,5 +117,7 @@ export default abstract class OperadorController {
         }
     }
 
+    // TODO: metodo de exclusao externa de conta em caso de email utilizado sem permissão
+
     // TODO: método para visualização de eventos com períodos ocorrendo em tempo real 
 }

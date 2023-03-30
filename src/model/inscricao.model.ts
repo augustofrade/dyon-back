@@ -46,6 +46,11 @@ class Inscricao {
     public static listarPorPeriodoEvento(this: ReturnModelType<typeof Inscricao>, idEvento: string) {
         return this.find({ evento: idEvento }).select("participante confirmada -__v -_id");
     }
+
+    public static async usuarioJaInscrito(this: ReturnModelType<typeof Inscricao>, idUsuario: string, idPeriodo: string): Promise<boolean> {
+        const doc = await this.findOne({ "participante.idUsuario": idUsuario, "periodo": idPeriodo });
+        return !!doc;
+    }
 }
 
 export { Inscricao };

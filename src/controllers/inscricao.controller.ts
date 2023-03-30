@@ -9,15 +9,21 @@ import { IResumoInscricao } from "../types/interface";
 export default abstract class InscricaoController {
 
     static async novaInscricao(req: Request, res: Response) {
+        // Inscrição em um período de um evento por parte de um participante
         const evento = await EventoModel.findById(req.body.idEvento);
         if(!evento)
             return res.json({ msg: "ID de Evento inválido", erro: true });
         try {
             const periodo = await PeriodoModel.findById(req.body.idPeriodo);
-            if(!periodo) throw new Error();
-            if(await periodo.limiteInscricoesAtingido())
-                return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis." });
+            if(!periodo)
+                return res.json({ msg: "ID de Período inválido", erro: true });
+            
+            if(await InscricaoModel.usuarioJaInscrito(req.userId as string, periodo._id))
+                return res.json({ msg: "Não é possível se inscrever em um determinado período de um evento mais de uma vez", erro: true });
 
+            if(await periodo.limiteInscricoesAtingido())
+                return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis.", erro: true });
+            
             const inscricao = new InscricaoModel({
                 participante: IdentificacaoUsuario.gerarIdentificacao(req.participante),
                 periodo: periodo._id,
@@ -35,9 +41,10 @@ export default abstract class InscricaoController {
     }
 
     static async cancelarInscricao(req: Request, res: Response) {
+        // Cancelamento de inscrição por parte do participante
         const idInscricao = req.body.idInscricao;
         const inscricao = await InscricaoModel.findById(idInscricao);
-        if(!inscricao || inscricao.participante.idUsuario !== req.participante!._id)
+        if(!inscricao || inscricao.participante.idUsuario !== req.userId)
             return res.json({ msg: "Você não está inscrito neste evento", erro: true });
         else if(inscricao.confirmada)
             return res.json({ msg: "Não é possível cancelar uma inscrição após ela já estar confirmada", erro: true });
@@ -53,7 +60,7 @@ export default abstract class InscricaoController {
     }
 
     static async confirmarInscricao(req: Request, res: Response) {
-        // Operador
+        // Confirmação de inscrição por parte do operador
         const idInscricao = req.params.idInscricao;
         const operadorAtribuido = EventoModel.findOne({ "operadores._id": req.userId });
         
@@ -79,6 +86,7 @@ export default abstract class InscricaoController {
     }
 
     static async listarPorPeriodoEvento(req: Request, res: Response) {
+        // Listagem de participantes no evento que a instituição ou operador podem ver
         try {
             const inscricoesRaw = await InscricaoModel.listarPorPeriodoEvento(req.params.idPeriodo);
             if(!inscricoesRaw)
