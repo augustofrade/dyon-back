@@ -32,6 +32,7 @@ class Inscricao {
     @prop()
     public confirmadaPor?: string; 
 
+    // TODO: avaliar se é melhor criar um subdoc para identificação do evento para otimização da consulta (remover um populate)
     @prop({ required: true, ref: () => Evento })
     public evento!: Ref<Evento>;
 
@@ -44,12 +45,16 @@ class Inscricao {
     }
 
     public static listarPorPeriodoEvento(this: ReturnModelType<typeof Inscricao>, idEvento: string) {
-        return this.find({ evento: idEvento }).select("participante confirmada -__v -_id");
+        return this.find({ evento: idEvento }).select("participante confirmada -_id");
     }
 
     public static async usuarioJaInscrito(this: ReturnModelType<typeof Inscricao>, idUsuario: string, idPeriodo: string): Promise<boolean> {
         const doc = await this.findOne({ "participante.idUsuario": idUsuario, "periodo": idPeriodo });
         return !!doc;
+    }
+
+    public static dadosInscricao(this: ReturnModelType<typeof Inscricao>, idInscricao: string) {
+        return this.findById(idInscricao).populate("periodo", "inicio termino cancelado").populate("evento", "titulo");
     }
 }
 

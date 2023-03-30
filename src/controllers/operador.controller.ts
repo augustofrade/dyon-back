@@ -1,10 +1,10 @@
-import { InstituicaoModel } from "../model/models";
 import { Request, Response } from "express";
-import Email from "../email/Email";
-import { OperadorModel } from "../model/models";
-import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
-import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { nanoid } from "nanoid";
+
+import Email from "../email/Email";
+import { InstituicaoModel, OperadorModel } from "../model/models";
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
+import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 import validarSenha from "../util/validarSenha";
 
 export default abstract class OperadorController {
@@ -25,7 +25,7 @@ export default abstract class OperadorController {
             await novoOperador.save();
             await InstituicaoModel.findByIdAndUpdate(req.userId, { $push: { operadores: novoOperador._id } });
             Email.Instance.enviarEmailOperador(email, novoOperador.nomeCompleto.split(" ")[0], req.instituicao!.nomeFantasia, senhaToken);
-            res.status(200).json({ msg: "Cadastro realizado com sucesso" });
+            res.status(200).json({ msg: `Cadastro de ${nomeCompleto} realizado com sucesso. Um e-mail de ativação de conta foi enviado.` });
         } catch(erro) {
             res.status(400).json({ msg: "Falha ao realizar cadastro", erro });
         }
@@ -117,7 +117,5 @@ export default abstract class OperadorController {
         }
     }
 
-    // TODO: metodo de exclusao externa de conta em caso de email utilizado sem permissão
-
-    // TODO: método para visualização de eventos com períodos ocorrendo em tempo real 
+    // TODO: método para visualização de eventos com períodos ocorrendo em tempo real
 }

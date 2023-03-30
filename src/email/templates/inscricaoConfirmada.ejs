@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novo cadastro no Dyon por <% nomeInstituicao %></title>
-    <meta description="Novo cadastron no Dyon">
+    <title>Inscrição em <%= nomeEvento %> validada</title>
+    <meta description="Inscrição em evento validada">
 
     <style>
         .text {
@@ -30,29 +30,22 @@
         </tr>
         <tr>
             <td>
-                <h2 class="text" style="margin-block-end: 0; margin-bottom: 0;"><%= nomeUsuario %>, bem-vindo!</h2>
+                <h2 class="text" style="margin-block-end: 0; margin-bottom: 0;">Sua participação em <%= nomeEvento %> foi confirmada </h2>
             </td>
-        </tr>
-        <tr>
-            <td>
-                <h2 class="text">Sua conta foi cadastrada no Dyon por <%= nomeInstituicao %></h2>
-            </td>
-        </tr>
-        <tr>
-            <td></td>
         </tr>
         <tr>
             <td>
                 <span class="text">
-                    Para você poder começar a confirmar inscrições de participantes nos eventos de <%= nomeInstituicao %>,
-                    por favor ative sua conta definindo sua senha clicando  <a href="<%= url %>">aqui</a>
+                    Um operador confirmou sua presença no evento <%= nomeEvento %> realizado por <%= nomeInstituicao %>!
                 </span>
             </td>
         </tr>
         <tr>
             <td>
-                <div class="text">Acesse também pelo link abaixo:</div>
-                <a href="<%= url %>"><%= url %></a>
+                <span class="text">
+                    Agora que sua inscrição foi validada, não se esqueça de escrever uma avaliação para que <%= nomeInstituicao %>
+                    saiba o que você achou desse evento!
+                </span>
             </td>
         </tr>
     </table>    

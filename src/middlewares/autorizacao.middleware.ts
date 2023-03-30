@@ -32,8 +32,12 @@ export const authInstituicao = async (req: Request, res: Response, next: NextFun
 
 export const authOperador = async (req: Request, res: Response, next: NextFunction) => {
     const operador = await OperadorModel.findById(req.userId);
-    if(!operador?.ativo)
+    if(!operador)
         return res.json({ msg: "Não autorizado", erro: true });
+    else if(!operador.confirmado)
+        return res.json({ msg: "Não autorizado: sua conta ainda não foi ativada", erro: true });
+    else if(!operador.ativo)
+        return res.json({ msg: "Não autorizado: Sua conta está bloqueada, contate seu gestor", erro: true });
 
     req.operador = operador;
     next();

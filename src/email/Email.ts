@@ -72,6 +72,17 @@ export default class Email {
             html: template
         });
     }
+
+    public async enviarEmailInscricaoConfirmada(destinatario: string, nomeUsuario: string, nomeEvento: string, nomeInstituicao: string) {
+        const nomeTemplate = TemplateGerenciador.Instance.template("inscricaoConfirmada");
+        const template = ejs.render(nomeTemplate, { nomeUsuario, nomeEvento, nomeInstituicao });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: `Sua inscrição em ${nomeEvento} foi validada`,
+            texto: `Não se esqueça de escrever uma avaliação para que ${nomeInstituicao} saiba o que você achou do evento.`,
+            html: template
+        });
+    }
     
     public async enviarEmailEventoCriacao(destinatario: string, evento: Evento) {
         const nomeTemplate = TemplateGerenciador.Instance.template("eventoCriacao");

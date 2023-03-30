@@ -30,6 +30,9 @@ class TemplateGerenciador {
             },
             falhaSenha: {
                 diretorio: diretorioCompleto("./templates/falhaSenha.ejs")
+            },
+            inscricaoConfirmada: {
+                diretorio: diretorioCompleto("./templates/inscricaoConfirmada.ejs")
             }
         };
     }
