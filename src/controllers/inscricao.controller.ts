@@ -79,11 +79,18 @@ export default abstract class InscricaoController {
             return res.json({ msg: "Não é possível confirmar uma inscrição fora do período do evento em que está inscrito(a)", erro: true });
         
         try {
-            await inscricao.confirmarParticipacao(req.operador!.nomeCompleto);
+            const nomeEvento = (inscricao.evento as Evento).titulo;
             const participante = await ParticipanteModel.findById(inscricao.participante.idUsuario);
-            const evento = inscricao.evento as Evento;
+
+            await inscricao.confirmarParticipacao({
+                nomeOperador: req.operador!.nomeCompleto,
+                nomeEvento,
+                participante,
+                instituicao: req.operador!.instituicao
+            });
+
             const nomeInstituicao = req.operador!.instituicao.nome;
-            Email.Instance.enviarEmailInscricaoConfirmada(participante!.email, participante!.nomeUsuario(), evento.titulo, nomeInstituicao);
+            Email.Instance.enviarEmailInscricaoConfirmada(participante!.email, participante!.nomeUsuario(), nomeEvento, nomeInstituicao);
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
             res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente. ", erro: true, detalhes: err });

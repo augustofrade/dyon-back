@@ -2,7 +2,9 @@ import { DocumentType, modelOptions, post, prop, Ref, ReturnModelType } from "@t
 import QRCode from "qrcode";
 
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
+import { ParticipanteQuery } from "../types/types";
 import { Evento } from "./evento.model";
+import { HistoricoInscricaoModel } from "./HistoricoInscricao.model";
 import { Periodo } from "./periodo.model";
 
 
@@ -37,11 +39,18 @@ class Inscricao {
     public evento!: Ref<Evento>;
 
 
-    public async confirmarParticipacao(this: DocumentType<Inscricao>, nomeOperador: string) {
-        this.confirmadaPor = nomeOperador;
+    public async confirmarParticipacao(this: DocumentType<Inscricao>,
+        dados: { nomeOperador: string, nomeEvento: string, participante: ParticipanteQuery, instituicao: IdentificacaoUsuario }) {
+        // TODO: trocar nomeEvento por IdentificacaoEvento.titulo
+        this.confirmadaPor = dados.nomeOperador;
         this.qrCode = undefined;
         this.confirmada = true;
-        this.save();
+        await this.save();
+        await HistoricoInscricaoModel.create({
+            nomeEvento: dados.nomeEvento,
+            participante: IdentificacaoUsuario.gerarIdentificacao(dados.participante),
+            instituicao: dados.instituicao
+        });
     }
 
     public static listarPorPeriodoEvento(this: ReturnModelType<typeof Inscricao>, idEvento: string) {
