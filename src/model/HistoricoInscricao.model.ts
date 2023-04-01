@@ -14,14 +14,13 @@ class HistoricoInscricao {
     public dataParticipacao!: Date;
 
     
-    public static async usuarioJaParticipou(this: ReturnModelType<typeof HistoricoInscricao>, 
-        // TODO: alterar essa buscar e usar lookup com evento.instituicao.idUsuario
-        idUsuario: string, idsEventos: string[]): Promise<boolean> {
-        const quantia = await HistoricoInscricaoModel.count({
+    public static buscarInscricao(this: ReturnModelType<typeof HistoricoInscricao>, 
+        idUsuario: string, idEvento: string) {
+
+        return this.findOne({
             "participante.idUsuario": idUsuario,
-            "evento._id": idsEventos
+            "evento._id": idEvento
         });
-        return quantia > 0;
     }
 }
 

@@ -30,7 +30,7 @@ export default abstract class InscricaoController {
             const inscricao = new InscricaoModel({
                 participante: IdentificacaoUsuario.gerarIdentificacao(req.participante),
                 periodo: periodo._id,
-                evento: IdentificacaoEvento.gerarIdentificacao(evento, { instituicao: true, banner: true })
+                evento: IdentificacaoEvento.gerarIdentificacao(evento, true, true, true)
             });
             await inscricao.save();
             req.participante!.inscricoes.push(inscricao._id);

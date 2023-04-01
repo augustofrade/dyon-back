@@ -1,3 +1,5 @@
+import { EventoQuery } from "./types";
+
 export interface IUsuario {
     id: string;
     email: string;
@@ -21,6 +23,14 @@ export interface IPeriodo {
     termino: Date;
     inscricoesMaximo?: number;
     inscricoes: number;
+}
+
+export interface IAvaliacao {
+    evento: NonNullable<EventoQuery>;
+    idEvento: string;
+    nota: number;
+    comentario?: string;
+    dataParticipacao: Date;
 }
 
 export interface IEmail {

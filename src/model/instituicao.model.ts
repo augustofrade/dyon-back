@@ -96,6 +96,11 @@ class Instituicao extends Usuario {
         this.eventos = this.eventos.filter(e => e._id != idEvento);
         return this.save();
     }
+
+    public adicionarAvaliacao(this: DocumentType<Instituicao>, idAvaliacao: string) {
+        this.avaliacoes.push(idAvaliacao as any);
+        return this.save();
+    }
 }
 
 

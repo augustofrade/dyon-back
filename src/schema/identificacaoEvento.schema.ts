@@ -26,13 +26,12 @@ class IdentificacaoEvento {
     public instituicao?: IdentificacaoUsuario;
 
     public static gerarIdentificacao(evento: NonNullable<EventoQuery>,
-        opcoes: { banner?: boolean, instituicao?: boolean } = { instituicao: true }) {
-        const { banner, instituicao } = opcoes;
+        banner: boolean, endereco: boolean, instituicao = true) {
         return {
             titulo: evento.titulo,
             rotaPublica: evento._publicId + "/" + evento.slug,
             idEvento: evento._id,
-            endereco: evento.endereco,
+            endereco: endereco ? evento.endereco : undefined,
             instituicao: instituicao ? evento.criador : undefined,
             banner: banner ? evento.banner : undefined
         };

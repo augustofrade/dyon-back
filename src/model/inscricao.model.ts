@@ -37,22 +37,27 @@ class Inscricao {
     @prop({ required: true })
     public evento!: IdentificacaoEvento;
 
+    @prop({ required: true })
+    public dataParticipacao!: Date;
+
 
     public async confirmarParticipacao(this: DocumentType<Inscricao>,
         dados: { nomeOperador: string, participante: ParticipanteQuery, instituicao: IdentificacaoUsuario }) {
         this.confirmadaPor = dados.nomeOperador;
         this.qrCode = undefined;
         this.confirmada = true;
+        this.dataParticipacao = new Date();
         await this.save();
         
         await HistoricoInscricaoModel.create({
             evento: {
                 titulo: this.evento.titulo,
                 idEvento: this.evento.idEvento,
-                instituicao: this.evento.instituicao
+                instituicao: this.evento.instituicao,
             },
             participante: IdentificacaoUsuario.gerarIdentificacao(dados.participante),
-            instituicao: dados.instituicao
+            instituicao: dados.instituicao,
+            dataParticipacao: this.dataParticipacao
         });
     }
 
@@ -67,6 +72,24 @@ class Inscricao {
 
     public static dadosInscricao(this: ReturnModelType<typeof Inscricao>, idInscricao: string) {
         return this.findById(idInscricao).populate("periodo", "inicio termino cancelado");
+    }
+
+    public static async buscarInscricao(this: ReturnModelType<typeof Inscricao>,
+        idUsuario: string, idEvento: string, buscarHistorico = false) {
+        const inscricao = await this.findOne({
+            "participante.idUsuario": idUsuario,
+            "evento._id": idEvento,
+            "confirmada": true
+        });
+        if(inscricao)
+            return { inscricao, noHistorico: false };
+        else if(buscarHistorico) {
+            // inscrição não encontrada, mas pode estar no histórico do participante
+            const historico = await HistoricoInscricaoModel.buscarInscricao(idUsuario, idEvento);
+            return historico ? { inscricao: historico, noHistorico: true } : null;
+        } else {
+            return null;
+        }
     }
 }
 
