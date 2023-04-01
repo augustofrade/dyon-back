@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
 
 import Email from "../email/Email";
-import { Evento } from "../model/evento.model";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { Periodo } from "../model/periodo.model";
+import { IdentificacaoEvento } from "../schema/IdentificacaoEvento";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { IResumoInscricao } from "../types/interface";
 import { eventoDentroPeriodo } from "../util/eventoDentroPeriodo";
@@ -30,7 +30,7 @@ export default abstract class InscricaoController {
             const inscricao = new InscricaoModel({
                 participante: IdentificacaoUsuario.gerarIdentificacao(req.participante),
                 periodo: periodo._id,
-                evento: evento._id
+                evento: IdentificacaoEvento.gerarIdentificacao(evento, { instituicao: true, banner: true })
             });
             await inscricao.save();
             req.participante!.inscricoes.push(inscricao._id);
@@ -54,7 +54,7 @@ export default abstract class InscricaoController {
 
         try {
             await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { inscricoes: idInscricao } });
-            await EventoModel.findByIdAndUpdate(inscricao.evento._id, { $pull: { inscricoes: idInscricao } });
+            await EventoModel.findByIdAndUpdate(inscricao.evento.idEvento, { $pull: { inscricoes: idInscricao } });
             await InscricaoModel.findByIdAndDelete(inscricao._id);
             res.status(200).json({ msg: "Inscrição cancelada com sucesso" });
         } catch (err) {
@@ -79,11 +79,16 @@ export default abstract class InscricaoController {
             return res.json({ msg: "Não é possível confirmar uma inscrição fora do período do evento em que está inscrito(a)", erro: true });
         
         try {
-            await inscricao.confirmarParticipacao(req.operador!.nomeCompleto);
             const participante = await ParticipanteModel.findById(inscricao.participante.idUsuario);
-            const evento = inscricao.evento as Evento;
+
+            await inscricao.confirmarParticipacao({
+                nomeOperador: req.operador!.nomeCompleto,
+                participante,
+                instituicao: req.operador!.instituicao
+            });
+
             const nomeInstituicao = req.operador!.instituicao.nome;
-            Email.Instance.enviarEmailInscricaoConfirmada(participante!.email, participante!.nomeUsuario(), evento.titulo, nomeInstituicao);
+            Email.Instance.enviarEmailInscricaoConfirmada(participante!.email, participante!.nomeUsuario(), inscricao.evento.titulo, nomeInstituicao);
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
             res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente. ", erro: true, detalhes: err });

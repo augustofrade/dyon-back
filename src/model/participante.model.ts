@@ -1,15 +1,16 @@
-import { generoEnum } from "./../types/enums";
-import { prop, Ref, pre, ReturnModelType, DocumentType } from "@typegoose/typegoose";
+import { DocumentType, pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
+import { Types } from "mongoose";
+
 import { Endereco } from "../schema/endereco.schema";
-import { Usuario } from "./usuario.model";
+import { PerfilConfig } from "../schema/perfilConfig.schema";
+import { ICategoria } from "../types/interface";
+import gerarUsername from "../util/gerarUsername";
+import { generoEnum } from "./../types/enums";
 import { Categoria } from "./categoria.model";
-import { Instituicao } from "./instituicao.model";
 import { Evento } from "./evento.model";
 import { Inscricao } from "./inscricao.model";
-import gerarUsername from "../util/gerarUsername";
-import { PerfilConfig } from "../schema/perfilConfig.schema";
-import { Types } from "mongoose";
-import { ICategoria } from "../types/interface";
+import { Instituicao } from "./instituicao.model";
+import { Usuario } from "./usuario.model";
 
 
 const configsPadrao = () => ({
@@ -70,10 +71,10 @@ class Participante extends Usuario {
     private async popularEventosPerfil(this: DocumentType<Participante>) {
         await this.populate({
             path: "inscricoes",
-            select: "periodo evento",
+            select: "periodo",
             populate: {
-                path: "evento",
-                select: "-_id titulo endereco _publicId slug"
+                path: "periodo",
+                select: "-_id inicio termino cancelado"
             }
         });
         await this.populate("acompanhando", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
