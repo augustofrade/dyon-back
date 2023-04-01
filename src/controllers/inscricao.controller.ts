@@ -4,7 +4,7 @@ import Email from "../email/Email";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { Periodo } from "../model/periodo.model";
-import { IdentificacaoEvento } from "../schema/IdentificacaoEvento";
+import { IdentificacaoEvento } from "../schema/identificacaoEvento.schema";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { IResumoInscricao } from "../types/interface";
 import { eventoDentroPeriodo } from "../util/eventoDentroPeriodo";

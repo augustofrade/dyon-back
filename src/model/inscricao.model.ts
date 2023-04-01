@@ -1,7 +1,7 @@
 import { DocumentType, modelOptions, post, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 import QRCode from "qrcode";
 
-import { IdentificacaoEvento } from "../schema/IdentificacaoEvento";
+import { IdentificacaoEvento } from "../schema/identificacaoEvento.schema";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { ParticipanteQuery } from "../types/types";
 import { HistoricoInscricaoModel } from "./historicoInscricao.model";

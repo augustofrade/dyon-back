@@ -1,7 +1,7 @@
 import { getModelForClass, prop, ReturnModelType } from "@typegoose/typegoose";
 
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { IdentificacaoEvento } from "../schema/IdentificacaoEvento";
+import { IdentificacaoEvento } from "../schema/identificacaoEvento.schema";
 
 class HistoricoInscricao {
     @prop({ required: true })
