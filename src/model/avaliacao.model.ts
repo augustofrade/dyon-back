@@ -48,6 +48,14 @@ class Avaliacao {
             comentario: dados.comentario,
         });
     }
+
+    public static async excluirAvaliacao(this: ReturnModelType<typeof Avaliacao>, idAvaliacao: string) {
+        const removida  = await InstituicaoModel.findOneAndUpdate({ "avaliacoes": idAvaliacao }, {
+            $pull: { "avaliacoes": idAvaliacao }
+        })
+        const excluida = await this.findByIdAndDelete(idAvaliacao);
+        return removida || excluida;
+    }
 }
 
 export { Avaliacao };

@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 
+import { Avaliacao } from "../model/avaliacao.model";
+import { Instituicao } from "../model/instituicao.model";
 import { AvaliacaoModel, EventoModel, InscricaoModel } from "../model/models";
+import { UsuarioModel } from "../model/usuario.model";
+import { usuariosEnum } from "../types/enums";
 import { IAvaliacao } from "../types/interface";
 
 export default abstract class AvaliacaoController {
@@ -46,6 +50,39 @@ export default abstract class AvaliacaoController {
 
 
     // TODO: método para listar avaliações de um usuário e exclusão de avaliação
+    public static async listarAvaliacoes(req: Request, res: Response) {
+        try {
+            const { idUsuario } = req.params;
+            const usuario = await UsuarioModel.findById(idUsuario);
+            if(!usuario)
+                return res.json({ msg: "Usuário não encontrado", erro: true });
+            
+            if(usuario.tipo === usuariosEnum.Instituicao) {
+                await usuario.populate("avaliacoes");
+                const avaliacoes = (usuario as unknown as Instituicao).avaliacoes as Avaliacao[];
+                return res.status(200).json({ dados: avaliacoes });
+            } else if(usuario.tipo === usuariosEnum.Participante) {
+                const avaliacoes = await AvaliacaoModel.find({ "autor.idUsuario": idUsuario });
+                return res.status(200).json({ dados: avaliacoes });
+            } else {
+                return res.json({ msg: "Este tipo de usuário não possui avaliações", erro: true });
+            }
+        } catch (err) {
+            return res.json({ msg: "Não foi possível buscar as avaliações deste usuário, tente novamente", erro: true });
+        }
+    }
+
+    public static async excluirAvaliacao(req: Request, res: Response) {
+        try {
+            const excluida = await AvaliacaoModel.excluirAvaliacao(req.params.idAvaliacao);
+            if(excluida)
+                res.json({ msg: "Avaliação excluída com sucesso" });
+            else
+                throw new Error();
+        } catch (err) {
+            return res.json({ msg: "Ocorreu um erro durante a exclusão desta avaliação, tente novamente", erro: true });
+        }
+    }
 
     
 }
