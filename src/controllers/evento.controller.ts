@@ -38,7 +38,6 @@ class EventoController {
 
             res.json({ msg: "Evento criado com sucesso", redirect: `/evento/${novoEvento._publicId}/${novoEvento.slug}` });
         } catch (err) {
-            console.log(err);
             res.json({ msg: "Não foi possível criar o evento", erro: true, detalhes: err });
         }
     }

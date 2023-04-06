@@ -33,4 +33,8 @@ router
     .route("/atualizar")
     .patch(asyncWrapper(authParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
 
+router
+    .route("/historico")
+    .get(asyncWrapper(authParticipante), ParticipanteController.historicoInscricoes);
+
 export default router;

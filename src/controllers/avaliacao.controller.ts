@@ -14,7 +14,7 @@ export default abstract class AvaliacaoController {
         if(!evento)
             return res.status(400).json({ msg: "Evento não encontrado", erro: true });
 
-        const inscricaoExistente = await InscricaoModel.buscarInscricao(req.userId!, req.body.idEvento, true);
+        const inscricaoExistente = await InscricaoModel.buscarInscricaoEvento(req.userId!, req.body.idEvento, true);
         if(inscricaoExistente === null)
             return res.status(400).json({ msg: "Você não pode avaliar um evento que não participou", erro: true });
 

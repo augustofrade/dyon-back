@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import Email from "../email/Email";
+import { HistoricoInscricaoModel } from "../model/historicoInscricao.model";
 import { Inscricao } from "../model/inscricao.model";
 import { ParticipanteModel } from "../model/models";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
@@ -40,6 +41,15 @@ class ParticipanteController {
                 res.status(400).json({ msg: "Falha ao realizar cadastro, este e-mail já está em uso", erro: true });
             else
                 res.status(400).json({ msg: "Falha ao realizar cadastro", erro: true });
+        }
+    }
+
+    static async historicoInscricoes(req: Request, res: Response) {
+        try {
+            const historico = await HistoricoInscricaoModel.historicoParticipante(req.userId!);
+            res.status(200).json({ dados: historico });
+        } catch (err) {
+            res.status(400).json({ msg: "Ocorreu um erro ao buscar seu histórico, tente novamente", erro: true });
         }
     }
 

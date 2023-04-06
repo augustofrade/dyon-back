@@ -22,6 +22,10 @@ class HistoricoInscricao {
             "evento._id": idEvento
         });
     }
+
+    public static historicoParticipante(this: ReturnModelType<typeof HistoricoInscricao>, idParticipante: string) {
+        return this.find({ "participante.idUsuario": idParticipante }).select("-_id -__v");
+    }
 }
 
 const HistoricoInscricaoModel = getModelForClass(HistoricoInscricao);

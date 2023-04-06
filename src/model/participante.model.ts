@@ -65,13 +65,13 @@ class Participante extends Usuario {
 
     public static obterDadosPerfil(this: ReturnModelType<typeof Participante>, username: string) {
         return this.findOne({ username })
-        .select("-_id -tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando")
+        .select("-_id -tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando configuracoes")
     }
 
     private async popularEventosPerfil(this: DocumentType<Participante>) {
         await this.populate({
             path: "inscricoes",
-            select: "periodo",
+            select: "periodo confirmada cancelada evento",
             populate: {
                 path: "periodo",
                 select: "-_id inicio termino cancelado"
@@ -92,10 +92,10 @@ class Participante extends Usuario {
         retorno.categoriasFavoritas = this.categoriasFavoritas.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
 
         if(this._id != idUser) {
-            if(this.configuracoes.exibirCategorias)
+            if(!this.configuracoes.exibirCategorias)
                 retorno.categoriasFavoritas = undefined;
             
-            if(this.configuracoes.exibirInscricoes)
+            if(!this.configuracoes.exibirInscricoes)
                 retorno.inscricoes = undefined;
         }
 

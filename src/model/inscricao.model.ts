@@ -62,7 +62,7 @@ class Inscricao {
     }
 
     public static listarPorPeriodoEvento(this: ReturnModelType<typeof Inscricao>, idEvento: string) {
-        return this.find({ evento: idEvento }).select("participante confirmada -_id");
+        return this.find({ "evento._id": idEvento }).select("participante confirmada -_id");
     }
 
     public static async usuarioJaInscrito(this: ReturnModelType<typeof Inscricao>, idUsuario: string, idPeriodo: string): Promise<boolean> {
@@ -74,8 +74,9 @@ class Inscricao {
         return this.findById(idInscricao).populate("periodo", "inicio termino cancelado");
     }
 
-    public static async buscarInscricao(this: ReturnModelType<typeof Inscricao>,
+    public static async buscarInscricaoEvento(this: ReturnModelType<typeof Inscricao>,
         idUsuario: string, idEvento: string, buscarHistorico = false) {
+        // verifica se o participante já participou alguma vez em tal evento
         const inscricao = await this.findOne({
             "participante.idUsuario": idUsuario,
             "evento._id": idEvento,
@@ -90,6 +91,15 @@ class Inscricao {
         } else {
             return null;
         }
+    }
+
+    public static buscarInscricao(this: ReturnModelType<typeof Inscricao>, idInscricao: string) {
+        return this.findById(idInscricao)
+            .select("-_id -__v -createdAt -updatedAt -confirmadaPor -participante")
+            .populate({
+                path: "periodo",
+                select: "-_id -__v -evento",
+            });
     }
 }
 

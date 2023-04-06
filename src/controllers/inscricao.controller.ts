@@ -109,4 +109,16 @@ export default abstract class InscricaoController {
             return res.json({ msg: "Não foi possível buscar as inscrições para esta ocorrência deste evento, tente novamente", erro: true });
         }
     }
+
+    static async detalhesInscricao(req: Request, res: Response) {
+        try {
+            const inscricao = await InscricaoModel.buscarInscricao(req.params.idInscricao);
+            if(!inscricao)
+                res.json({ msg: "Inscrição não encontrada", erro: true });
+            else
+                res.json({ dados: inscricao });
+        } catch (err) {
+            return res.json({ msg: "Não foi possível buscar os detalhes desta inscrição, tente novamente", erro: true });
+        }
+    }
 }
