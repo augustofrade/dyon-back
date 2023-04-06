@@ -70,7 +70,9 @@ export default class InstituicaoController {
 
             // TODO: verificar melhor maneira de enviar a foto do perfil para o front em todas as rotas
             const fotoPerfil = instituicao!.fotoPerfil ? instituicao!.fotoPerfil?.toString("base64") : undefined;
-            const dados = { ...instituicao!.toObject(), fotoPerfil,
+            const dados = {
+                ...instituicao!.toObject(),
+                fotoPerfil,
                 categoriasRamo: instituicao!.categoriasRamo.map(c => ({ slug: c._id, titulo: c.titulo }))
             };
             res.json({ msg: "Dados atualizados com sucesso", dados });

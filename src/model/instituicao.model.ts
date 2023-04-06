@@ -1,15 +1,17 @@
-import { IInstituicaoConfig } from "../types/interface";
 import { DocumentType, pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
+import { Types } from "mongoose";
 
 import { Endereco } from "../schema/endereco.schema";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
+import { fotoPerfilEnum } from "../types/enums";
+import { IInstituicaoConfig } from "../types/interface";
+import { comprimirImagem } from "../util/comprimirImagem";
+import gerarUsername from "../util/gerarUsername";
+import { Avaliacao } from "./avaliacao.model";
 import { Categoria } from "./categoria.model";
 import { Evento } from "./evento.model";
 import { Operador } from "./operador.model";
 import { Usuario } from "./usuario.model";
-import { ObjectId, Types } from "mongoose";
-import gerarUsername from "../util/gerarUsername";
-import { Avaliacao } from "./avaliacao.model";
 
 
 const configsPadrao = (): IInstituicaoConfig => ({ exibirEndereco: true });
@@ -61,8 +63,10 @@ class Instituicao extends Usuario {
             .populate("avaliacoes");
     }
 
-    public static atualizarPerfil(this: ReturnModelType<typeof Instituicao>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
+    public static async atualizarPerfil(this: ReturnModelType<typeof Instituicao>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
         const username: string | undefined = dados.nomeFantasia ? gerarUsername(dados.nomeFantasia) : undefined;
+        if(fotoPerfil !== undefined)
+                fotoPerfil = await comprimirImagem(fotoPerfil, fotoPerfilEnum.largura, fotoPerfilEnum.altura);
 
         let configuracoesValidadas: Record<string, boolean> | undefined = undefined;
         if(dados.configuracoes) {

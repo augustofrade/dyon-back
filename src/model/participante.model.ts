@@ -4,8 +4,9 @@ import { Types } from "mongoose";
 import { Endereco } from "../schema/endereco.schema";
 import { PerfilConfig } from "../schema/perfilConfig.schema";
 import { ICategoria } from "../types/interface";
+import { comprimirImagem } from "../util/comprimirImagem";
 import gerarUsername from "../util/gerarUsername";
-import { generoEnum } from "./../types/enums";
+import { fotoPerfilEnum, generoEnum } from "./../types/enums";
 import { Categoria } from "./categoria.model";
 import { Evento } from "./evento.model";
 import { Inscricao } from "./inscricao.model";
@@ -102,7 +103,9 @@ class Participante extends Usuario {
         return retorno;
     }
 
-    public static atualizarPerfil(this: ReturnModelType<typeof Participante>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
+    public static async atualizarPerfil(this: ReturnModelType<typeof Participante>, idUsuario: string, dados: Record<string, string>, fotoPerfil: Buffer | undefined) {
+        if(fotoPerfil !== undefined)
+                fotoPerfil = await comprimirImagem(fotoPerfil, fotoPerfilEnum.largura, fotoPerfilEnum.altura);
         const nome: string | undefined = dados.nomeSocial ?? dados.nomeCompleto;
         const username: string | undefined = nome ? gerarUsername(nome) : undefined;
 

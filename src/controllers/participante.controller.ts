@@ -71,13 +71,16 @@ class ParticipanteController {
     static async atualizarDados(req: Request, res: Response) {
         try {
             const novaFoto = req.file ? req.file.buffer : undefined;
+
             const participante = await ParticipanteModel.atualizarPerfil(req.userId as string, req.body, novaFoto);
             if(!participante)
                 throw new Error();
 
             // TODO: verificar melhor maneira de enviar a foto do perfil para o front em todas as rotas
             const fotoPerfil = participante.fotoPerfil ? participante.fotoPerfil?.toString("base64") : undefined;
-            const dados = { ...participante.toObject(), fotoPerfil,
+            const dados = {
+                ...participante.toObject(),
+                fotoPerfil,
                 categoriasFavoritas: participante.categoriasFavoritas.map(c => ({ slug: c._id, titulo: c.titulo }))
             };
             res.json({ msg: "Dados atualizados com sucesso", dados });
@@ -85,6 +88,8 @@ class ParticipanteController {
             res.json({ msg: "Não foi possível atualizar os dados, tente novamente.", erro: true });
         }
     }
+    
+    // TODO: criar método para exibir todas informações na página de configurações conforme tab
     
     static async getAll(req: Request, res: Response) {
         const allUsers = await ParticipanteModel.find();

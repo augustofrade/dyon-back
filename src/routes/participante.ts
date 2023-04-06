@@ -13,7 +13,7 @@ const router = express.Router();
 
 const uploadFotoPerfil = multer({ fileFilter(req, file, cb) {
     cb(null, file.mimetype in formatosImagemValidos);
-}, }).single("fotoPerfil");
+} }).single("fotoPerfil");
 
 router
     .route("/cadastro")
