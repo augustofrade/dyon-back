@@ -56,6 +56,27 @@ class Avaliacao {
         const excluida = await this.findByIdAndDelete(idAvaliacao);
         return removida || excluida;
     }
+
+    public static removerIdentificacaoAutor(this: ReturnModelType<typeof Avaliacao>, idParticipante: string) {
+        return this.updateMany({ "autor.idUsuario": idParticipante }, {
+            "autor": {
+                "nome": "Conta Excluída",
+                "username": undefined,
+                "idUsuario": undefined
+            }
+        });
+    }
+
+    public static removerIdentificacaoInstituicao(this: ReturnModelType<typeof Avaliacao>, idInstituicao: string) {
+        return this.updateMany({ "evento.instituicao.idUsuario": idInstituicao }, {
+            "evento.instituicao": {
+                "nome": "Conta Excluída",
+                "username": undefined,
+                "idUsuario": undefined
+            }
+        });
+    }
+    
 }
 
 export { Avaliacao };

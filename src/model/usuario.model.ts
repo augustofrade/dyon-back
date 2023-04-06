@@ -9,7 +9,7 @@ import { Documento } from "../types/types";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 import { Inscricao } from "./inscricao.model";
 import { Instituicao } from "./instituicao.model";
-import { EventoModel, InscricaoModel, OperadorModel, PeriodoModel } from "./models";
+import { AvaliacaoModel, EventoModel, InscricaoModel, OperadorModel, PeriodoModel } from "./models";
 import { Operador } from "./operador.model";
 import { Participante } from "./participante.model";
 
@@ -39,13 +39,14 @@ import { Participante } from "./participante.model";
         
         InscricaoModel.deleteMany({ "participante._id": this._id });
         EventoModel.updateMany({ "inscricao._id": { $in: inscricoes } });
-        // TODO: editar avaliacoes para "Usuario excluído" e remover ids
+        AvaliacaoModel.removerIdentificacaoAutor(this._id);
     } else if(this.tipo === usuariosEnum.Instituicao) {
         const user = this as unknown as Instituicao;
         const eventos = user.eventos.map((e) => e._id);
         PeriodoModel.deleteMany({ "evento._id": { $in: user.eventos } });
         EventoModel.deleteMany({ "criador._id": this._id });
         OperadorModel.deleteMany({ "instituicao._id": this._id });
+        AvaliacaoModel.removerIdentificacaoInstituicao(this._id);
     }
 }, { document: true, query: false })
 @modelOptions({ schemaOptions: { discriminatorKey: "tipo", timestamps: true } })

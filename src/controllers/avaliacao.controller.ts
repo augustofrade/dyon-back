@@ -48,8 +48,6 @@ export default abstract class AvaliacaoController {
         }
     }
 
-
-    // TODO: método para listar avaliações de um usuário e exclusão de avaliação
     public static async listarAvaliacoes(req: Request, res: Response) {
         try {
             const { idUsuario } = req.params;
@@ -83,6 +81,4 @@ export default abstract class AvaliacaoController {
             return res.json({ msg: "Ocorreu um erro durante a exclusão desta avaliação, tente novamente", erro: true });
         }
     }
-
-    
 }
