@@ -65,7 +65,7 @@ class Participante extends Usuario {
 
     public static obterDadosPerfil(this: ReturnModelType<typeof Participante>, username: string) {
         return this.findOne({ username })
-        .select("-_id -tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando configuracoes")
+        .select("-tipo fotoPerfil nomeCompleto nomeSocial createdAt categoriasFavoritas inscricoes acompanhando configuracoes")
     }
 
     private async popularEventosPerfil(this: DocumentType<Participante>) {

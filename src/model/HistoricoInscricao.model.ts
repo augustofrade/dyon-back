@@ -24,7 +24,11 @@ class HistoricoInscricao {
     }
 
     public static historicoParticipante(this: ReturnModelType<typeof HistoricoInscricao>, idParticipante: string) {
-        return this.find({ "participante.idUsuario": idParticipante }).select("-_id -__v");
+        return this.find({ "participante.idUsuario": idParticipante }).select("-_id -__v -participante");
+    }
+
+    public static contarParticipacoes(this: ReturnModelType<typeof HistoricoInscricao>, idParticipante: string) {
+        return this.count({ "participante.idUsuario": idParticipante });
     }
 }
 

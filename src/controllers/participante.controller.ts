@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 
 import Email from "../email/Email";
 import { HistoricoInscricaoModel } from "../model/historicoInscricao.model";
-import { Inscricao } from "../model/inscricao.model";
 import { ParticipanteModel } from "../model/models";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
@@ -62,7 +61,7 @@ class ParticipanteController {
 
         const retorno = {
             ...participante.toObject(),
-            quantiaEventos: participante.inscricoes.filter(i => (<Inscricao>i).confirmada).length,
+            quantiaEventos: await HistoricoInscricaoModel.contarParticipacoes(participante._id),
             ...camposTrabalhados
         };
 
