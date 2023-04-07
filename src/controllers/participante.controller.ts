@@ -76,7 +76,6 @@ class ParticipanteController {
             if(!participante)
                 throw new Error();
 
-            // TODO: verificar melhor maneira de enviar a foto do perfil para o front em todas as rotas
             const fotoPerfil = participante.fotoPerfil ? participante.fotoPerfil?.toString("base64") : undefined;
             const dados = {
                 ...participante.toObject(),

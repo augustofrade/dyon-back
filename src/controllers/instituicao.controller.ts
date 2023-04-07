@@ -68,7 +68,6 @@ export default class InstituicaoController {
             const novaFoto = req.file ? req.file.buffer : undefined;
             const instituicao = await InstituicaoModel.atualizarPerfil(req.userId as string, req.body, novaFoto);
 
-            // TODO: verificar melhor maneira de enviar a foto do perfil para o front em todas as rotas
             const fotoPerfil = instituicao!.fotoPerfil ? instituicao!.fotoPerfil?.toString("base64") : undefined;
             const dados = {
                 ...instituicao!.toObject(),
