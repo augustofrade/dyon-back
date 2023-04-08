@@ -3,7 +3,7 @@ import express from "express";
 import OperadorController from "../controllers/operador.controller";
 import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
-import { authInstituicao } from "../middlewares/autorizacao.middleware";
+import { authInstituicao, authOperador } from "../middlewares/autorizacao.middleware";
 import {
     validacaoAlternarOperador,
     validacaoAtivacaoOperador,
@@ -20,6 +20,11 @@ router
     .post(validacao(validacaoAtivacaoOperador), OperadorController.ativacaoUnica);
 
 router.use(authAcessToken);
+
+router
+    .route("/pagina-inicial")
+    .get(asyncWrapper(authOperador), OperadorController.paginaInicial);
+
 router.use(asyncWrapper(authInstituicao));
 
 router

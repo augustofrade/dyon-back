@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { nanoid } from "nanoid";
 
 import Email from "../email/Email";
-import { InstituicaoModel, OperadorModel } from "../model/models";
+import { EventoModel, InstituicaoModel, OperadorModel } from "../model/models";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 import validarSenha from "../util/validarSenha";
@@ -138,6 +138,15 @@ export default abstract class OperadorController {
             res.status(200).json({ dados: operadores });
         } catch (err) {
             res.status(400).json({ msg: "Não foi possível buscar os operadores em sua instituição, tente novamente", erro: true });
+        }
+    }
+
+    static async paginaInicial(req: Request, res: Response) {
+        try {
+            const eventos = await EventoModel.gerarCardsPorPeriodo({ operadores: req.userId }, true);
+            res.status(200).json({ dados: eventos });
+        } catch (err) {
+            res.status(400).json({ msg: "Ocorreu um erro ao buscar os eventos em que você está atribuído, tente novamente", erro: true });
         }
     }
 

@@ -55,6 +55,13 @@ export interface IEmailTemplate {
     template?: string;
 }
 
+export interface IIdentificacaoUsuario {
+    nome: string;
+    idUsuario?: string;
+    username?: string;
+}
+
+
 /**
  * Estrutura dos objetos de categorias que serão enviados ao front-end
  */
@@ -73,10 +80,31 @@ export interface IResumoInscricao {
     confirmada: boolean;
 }
 
+export interface ICardEvento {
+    id: string;
+    titulo: string;
+    banner: string;
+    criador: IIdentificacaoUsuario;
+    periodo: {
+        inicio: Date;
+        termino: Date;
+    };
+    endereco: IEndereco;
+}
+
 export interface IInfoResumida {
     nome: string;
     username: string
     fotoPerfil: string | null;
     instituicao?: string;
     id: string;
+}
+
+export interface IEndereco {
+    logradouro: string;
+    bairro: string;
+    uf: string;
+    cep:string;
+    numero?: string;
+    referencia?: string;
 }

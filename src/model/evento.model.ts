@@ -1,16 +1,17 @@
 import { DocumentType, pre, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
-import { Types } from "mongoose";
 import { DateTime } from "luxon";
+import { Types } from "mongoose";
 
 import { Endereco } from "../schema/endereco.schema";
-import { Periodo } from "./periodo.model";
+import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
+import { ICardEvento } from "../types/interface";
 import gerarIdAleatorio from "../util/gerarIDAleatorio";
 import gerarSlug from "../util/gerarSlug";
 import { Categoria } from "./categoria.model";
 import { Inscricao } from "./inscricao.model";
 import { PeriodoModel } from "./models";
 import { Operador } from "./operador.model";
-import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
+import { Periodo } from "./periodo.model";
 
 @pre<Evento>("save", function() {
     this.slug = gerarSlug(this.titulo);
@@ -98,6 +99,34 @@ class Evento {
             return false;
         const dataInicial = (<Array<Periodo>>this.periodosOcorrencia)[0].inicio
         return DateTime.now().plus({ hours: 24 }) > DateTime.fromJSDate(dataInicial);
+    }
+
+    public static async gerarCardsPorPeriodo(this: ReturnModelType<typeof Evento>,
+        query: Record<string, unknown>, exibirApenasOcorrendo = false): Promise<ICardEvento[]> {
+        const resultado = await this.find(query).populate("periodosOcorrencia");
+        const dataAtual = new Date();
+        const cards: ICardEvento[] = []
+        resultado.forEach(evento => {
+            const periodosEvento = evento.periodosOcorrencia as Periodo[];
+            periodosEvento.forEach((periodo: Periodo) => {
+                const condicao = exibirApenasOcorrendo ? dataAtual >= periodo.inicio && dataAtual < periodo.termino : true;
+                if(condicao) {
+                    const card = {
+                        id: evento._id,
+                        titulo: evento.titulo,
+                        banner: evento.banner ? evento.banner.toString("base64") : "",
+                        criador: evento.criador,
+                        periodo: {
+                            inicio: periodo.inicio,
+                            termino: periodo.termino
+                        },
+                        endereco: evento.endereco
+                    };
+                    cards.push(card);
+                }
+            });
+        });
+        return cards;
     }
 }
 
