@@ -37,7 +37,7 @@ class Inscricao {
     @prop({ required: true })
     public evento!: IdentificacaoEvento;
 
-    @prop({ required: true })
+    @prop()
     public dataParticipacao!: Date;
 
 

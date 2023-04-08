@@ -19,10 +19,6 @@ export const validacaoAlternarOperador = [
     idObrigatorio  
 ];
 
-export const validacaoExcluirOperador = [
-    idObrigatorio
-];
-
 export const validacaoTrocaSenhaOperador = [
     idObrigatorio
 ];

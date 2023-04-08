@@ -8,8 +8,7 @@ import {
     validacaoAlternarOperador,
     validacaoAtivacaoOperador,
     validacaoCadastroOperador,
-    validacaoExcluirOperador,
-    validacaoTrocaSenhaOperador
+    validacaoTrocaSenhaOperador,
 } from "../validation/operador.validation";
 import validacao from "../validation/validacao";
 
@@ -27,18 +26,24 @@ router
     .route("/cadastro")
     .post(validacao(validacaoCadastroOperador), OperadorController.cadastro);
 
-// TODO: método de edição de dados
+router
+    .route("/atualizar/:idOperador")
+    .put(validacao(validacaoCadastroOperador), OperadorController.atualizarConta);
 
 router
     .route("/alternar-estado")
     .post(validacao(validacaoAlternarOperador), OperadorController.alternarEstadoConta);
 
 router
-    .route("/excluir")
-    .get(validacao(validacaoExcluirOperador), OperadorController.excluirConta);
+    .route("/excluir/:idOperador")
+    .get(OperadorController.excluirConta);
 
 router
     .route("/solicitar-troca-senha")
     .post(validacao(validacaoTrocaSenhaOperador), OperadorController.solicitarTrocaSenha);
+
+router
+    .route("/listar")
+    .get(OperadorController.listarOperadores);
 
 export default router;

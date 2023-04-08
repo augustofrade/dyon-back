@@ -1,4 +1,4 @@
-import { prop } from "@typegoose/typegoose";
+import { prop, ReturnModelType, DocumentType } from "@typegoose/typegoose";
 
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { Usuario } from "./usuario.model";
@@ -18,6 +18,19 @@ class Operador extends Usuario {
 
     @prop({ required: true })
     public instituicao!: IdentificacaoUsuario;
+
+    public static listarPorInstituicao(this: ReturnModelType<typeof Operador>, idInstituicao: string) {
+        return this.find({ "instituicao.idUsuario": idInstituicao }).select("-instituicao -__v ");
+    }
+
+    public ativarConta(this: DocumentType<Operador>, novaSenha: string) {
+        this.senhaToken = undefined;
+        this.senha = novaSenha;
+        this.ativo = true;
+        this.confirmado = true;
+        this.emailConfirmado = true;
+        return this.save();
+    }
 }
 
 export { Operador };

@@ -31,6 +31,25 @@ export default abstract class OperadorController {
         }
     }
 
+    static async atualizarConta(req: Request, res: Response) {
+        const { nomeCompleto, telefone, email } = req.body;
+        const idOperador = req.params.idOperador;
+        try {
+            const operador = await OperadorModel.findByIdAndUpdate(idOperador, {
+                nomeCompleto,
+                telefone,
+                email
+            });
+            
+            if(operador)
+                res.status(200).json({ msg: "Dados do operador salvos com sucesso" });
+            else
+                res.json({ msg: "Operador não encontrado, tente novamente", erro: true });
+        } catch (err) {
+            res.json({ msg: "Ocorreu um erro ao tentar salvar os dados deste operador, tente novamente", erro: true });
+        }
+    }
+
     static async alternarEstadoConta(req: Request, res: Response) {
         try {
             const operador = await OperadorModel.findById(req.body.idOperador);
@@ -52,12 +71,14 @@ export default abstract class OperadorController {
     
     static async excluirConta(req: Request, res: Response) {
         try {
-            if(!req.instituicao!.operadores.includes(req.body.idOperador))
+            const { idOperador } = req.params;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            if(!req.instituicao!.operadores.includes(idOperador as any))
                 return res.json({ msg: "Não autorizado: este operador não pertence à sua instituição", erro: true });
 
-            const deletada = await OperadorModel.findByIdAndDelete(req.body.idOperador);
+            const deletada = await OperadorModel.findByIdAndDelete(idOperador);
             if(deletada) {
-                req.instituicao!.operadores = req.instituicao!.operadores.filter(o => o._id !== req.body.idOperador);
+                req.instituicao!.operadores = req.instituicao!.operadores.filter(o => o._id !== idOperador);
                 await req.instituicao!.save();
                 res.status(200).json({ msg: "A conta deste operador foi excluída com sucesso " });
             }
@@ -100,20 +121,23 @@ export default abstract class OperadorController {
             return res.status(400).json({ msg: "As senhas não conferem", erro: true });
         else if(!validarSenha(req.body.senha))
             return res.status(400).json({ msg: "A senha não atende todos os requisitos de força de senha", erro: true });
-        
-        operador.senhaToken = undefined;
-        operador.senha = req.body.senha;
-        operador.ativo = true;
-        operador.confirmado = true;
-        operador.emailConfirmado = true;
 
         try {
-            await operador.save();
+            await operador.ativarConta(req.body.senha);
             Email.Instance.enviarEmailAlteracaoSenha(operador.email, operador.nomeCompleto);
             res.status(201).json({ msg: "Senha definida e conta ativada com sucesso" });
         } catch (err) {
             Email.Instance.enviarEmailFalhaSenha(operador.email, operador.nomeCompleto);
             res.status(400).json({ msg: "Não foi possível ativar sua conta, contate seu gestor" });
+        }
+    }
+
+    static async listarOperadores(req: Request, res: Response) {
+        try {
+            const operadores = await OperadorModel.listarPorInstituicao(req.userId!);
+            res.status(200).json({ dados: operadores });
+        } catch (err) {
+            res.status(400).json({ msg: "Não foi possível buscar os operadores em sua instituição, tente novamente", erro: true });
         }
     }
 
