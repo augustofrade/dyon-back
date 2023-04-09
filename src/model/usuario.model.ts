@@ -35,18 +35,21 @@ import { Participante } from "./participante.model";
 })
 @pre<Usuario>("remove", async function() {
     if(this.tipo === usuariosEnum.Participante) {
+
         const inscricoes: string[] = await InscricaoModel.find({ "participante._id": this._id }).map((i: Documento<Inscricao>) => i._id);
         
         InscricaoModel.deleteMany({ "participante._id": this._id });
         EventoModel.updateMany({ "inscricao._id": { $in: inscricoes } });
         AvaliacaoModel.removerIdentificacaoAutor(this._id);
+
     } else if(this.tipo === usuariosEnum.Instituicao) {
+
         const user = this as unknown as Instituicao;
         const eventos = user.eventos.map((e) => e._id);
         PeriodoModel.deleteMany({ "evento._id": { $in: user.eventos } });
         EventoModel.deleteMany({ "criador._id": this._id });
         OperadorModel.deleteMany({ "instituicao._id": this._id });
-        AvaliacaoModel.removerIdentificacaoInstituicao(this._id);
+        AvaliacaoModel.deleteMany({ "evento.instituicao.idUsuario": this._id });
     }
 }, { document: true, query: false })
 @modelOptions({ schemaOptions: { discriminatorKey: "tipo", timestamps: true } })

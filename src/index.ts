@@ -3,6 +3,7 @@ import routes from "./routes/router";
 import * as dotenv from "dotenv";
 import dbConnect from "./db";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 
 dotenv.config();
 
@@ -14,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("./public"));
-// TODO: colocar CORS depois (já instalado)
+app.use(cors());
 
 app.use("/api", routes);
 

@@ -66,16 +66,6 @@ class Avaliacao {
             }
         });
     }
-
-    public static removerIdentificacaoInstituicao(this: ReturnModelType<typeof Avaliacao>, idInstituicao: string) {
-        return this.updateMany({ "evento.instituicao.idUsuario": idInstituicao }, {
-            "evento.instituicao": {
-                "nome": "Conta Excluída",
-                "username": undefined,
-                "idUsuario": undefined
-            }
-        });
-    }
     
 }
 
