@@ -12,16 +12,16 @@ import avaliacaoRouter from "./avaliacao";
 import senhaRouter from "./senha";
 
 const router = express.Router();
-router.use("/evento", eventoRouter);
-router.use("/usuario", usuarioRouter);
-router.use("/participante", participanteRouter);
-router.use("/instituicao", instituicaoRouter);
-router.use("/categoria", categoriaRouter);
+router.use("/eventos", eventoRouter);
+router.use("/usuarios", usuarioRouter);
+router.use("/participantes", participanteRouter);
+router.use("/instituicoes", instituicaoRouter);
+router.use("/categorias", categoriaRouter);
 router.use("/auth", authRouter);
 router.use("/email", emailRouter);
-router.use("/operador", operadorRouter);
-router.use("/inscricao", inscricaoRouter);
-router.use("/avaliacao", avaliacaoRouter);
+router.use("/operadores", operadorRouter);
+router.use("/inscricoes", inscricaoRouter);
+router.use("/avaliacoes", avaliacaoRouter);
 router.use("/senha", senhaRouter);
 
 export default router;

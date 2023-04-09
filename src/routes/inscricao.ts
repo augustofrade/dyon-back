@@ -3,7 +3,7 @@ import express from "express";
 import InscricaoController from "../controllers/inscricao.controller";
 import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
-import { authOperador, authParticipante } from "../middlewares/autorizacao.middleware";
+import { authInstitucional, authOperador, authParticipante, authUsuario } from "../middlewares/autorizacao.middleware";
 import validacao from "../validation/validacao";
 import {
     validacaoCancelarInscricao,
@@ -29,9 +29,8 @@ router
     .route("/detalhes/:idInscricao")
     .get(authAcessToken, asyncWrapper(authParticipante), InscricaoController.detalhesInscricao);
 
-// TODO: adicionar validacao de instituicao ou operador
 router
     .route("/por-periodo/:idPeriodo")
-    .get(authAcessToken, InscricaoController.listarPorPeriodoEvento);
+    .get(authAcessToken, asyncWrapper(authUsuario), asyncWrapper(authInstitucional), InscricaoController.listarPorPeriodoEvento);
 
 export default router;

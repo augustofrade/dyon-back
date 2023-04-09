@@ -41,7 +41,7 @@ router
 
 router
     .route("/excluir/:idOperador")
-    .get(OperadorController.excluirConta);
+    .delete(OperadorController.excluirConta);
 
 router
     .route("/solicitar-troca-senha")
