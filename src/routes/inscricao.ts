@@ -5,30 +5,27 @@ import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
 import { authInstitucional, authOperador, authParticipante, authUsuario } from "../middlewares/autorizacao.middleware";
 import validacao from "../validation/validacao";
-import {
-    validacaoCancelarInscricao,
-    validacaoConfirmarInscricao,
-    validacaoNovaInscricao,
-} from "./../validation/inscricao.validation";
+import { validacaoNovaInscricao } from "./../validation/inscricao.validation";
 
 const router = express.Router();
 
 router
-    .route("/novo")
+    .route("/")
     .post(authAcessToken, asyncWrapper(authParticipante), validacao(validacaoNovaInscricao), InscricaoController.novaInscricao);
 
 router
-    .route("/cancelar")
-    .post(authAcessToken, asyncWrapper(authParticipante), validacao(validacaoCancelarInscricao),  InscricaoController.cancelarInscricao);
+    .route("/:idInscricao/cancelar")
+    .post(authAcessToken, asyncWrapper(authParticipante),  InscricaoController.cancelarInscricao);
 
 router
-    .route("/confirmar/:idInscricao")
-    .post(authAcessToken, asyncWrapper(authOperador), validacao(validacaoConfirmarInscricao), InscricaoController.confirmarInscricao);
+    .route("/:idInscricao/confirmar")
+    .post(authAcessToken, asyncWrapper(authOperador), InscricaoController.confirmarInscricao);
 
 router
-    .route("/detalhes/:idInscricao")
+    .route("/:idInscricao")
     .get(authAcessToken, asyncWrapper(authParticipante), InscricaoController.detalhesInscricao);
 
+// TODO: mudar para evento
 router
     .route("/por-periodo/:idPeriodo")
     .get(authAcessToken, asyncWrapper(authUsuario), asyncWrapper(authInstitucional), InscricaoController.listarPorPeriodoEvento);

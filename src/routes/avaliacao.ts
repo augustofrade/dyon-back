@@ -8,17 +8,19 @@ import { authParticipante } from "../middlewares/autorizacao.middleware";
 const router = express.Router();
 
 router
-    .route("/nova")
+    .route("/")
     .post(authAcessToken, asyncWrapper(authParticipante), AvaliacaoController.novaAvaliacao);
 
 router
-    .route("/editar/:idAvaliacao")
+    .route("/:idAvaliacao")
     .put(authAcessToken, asyncWrapper(authParticipante), AvaliacaoController.editarAvaliacao);
 
 router
-    .route("/excluir/:idAvaliacao")
+    .route("/:idAvaliacao")
     .delete(authAcessToken, asyncWrapper(authParticipante), AvaliacaoController.excluirAvaliacao);
 
+
+// TODO: colocar em usuario.ts
 router
     .route("/listar/:idUsuario")
     .get(AvaliacaoController.listarAvaliacoes);

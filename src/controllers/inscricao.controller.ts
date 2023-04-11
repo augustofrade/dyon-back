@@ -45,7 +45,7 @@ export default abstract class InscricaoController {
 
     static async cancelarInscricao(req: Request, res: Response) {
         // Cancelamento de inscrição por parte do participante
-        const idInscricao = req.body.idInscricao;
+        const idInscricao = req.params.idInscricao;
         const inscricao = await InscricaoModel.findById(idInscricao);
         if(!inscricao || inscricao.participante.idUsuario !== req.userId)
             return res.json({ msg: "Você não está inscrito neste evento", erro: true });

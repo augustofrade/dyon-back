@@ -16,25 +16,23 @@ const uploadFotoPerfil = multer({ fileFilter(req, file, cb) {
 } }).single("fotoPerfil");
 
 router
+    .route("/")
+    .get(ParticipanteController.getAll);
+
+router
     .route("/cadastro")
     .post(authValidarRefreshToken, ParticipanteController.cadastro);
 
 router
-    .route("/perfil/:username")
-    .get(authOpcional, ParticipanteController.obterDadosPerfil);
-
-router
-    .route("/all")
-    .get(ParticipanteController.getAll);
-
-router.use(authAcessToken);
-
-router
     .route("/atualizar")
-    .patch(asyncWrapper(authParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
+    .patch(authAcessToken, asyncWrapper(authParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
 
 router
     .route("/historico")
-    .get(asyncWrapper(authParticipante), ParticipanteController.historicoInscricoes);
+    .get(authAcessToken, asyncWrapper(authParticipante), ParticipanteController.historicoInscricoes);
+
+router
+    .route("/:username/perfil")
+    .get(authOpcional, ParticipanteController.obterDadosPerfil);
 
 export default router;

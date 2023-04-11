@@ -16,31 +16,31 @@ router
     .get(EventoController.getAll);
 
 router
-    .route("/novo")
+    .route("/")
     .post(authAcessToken, asyncWrapper(authInstituicao), EventoController.novoEvento);
 
 router
-    .route("/editar")
-    .patch(authAcessToken, asyncWrapper(authInstituicao), EventoController.editarEvento);
-
-router
-    .route("/excluir")
-    .delete(authAcessToken, asyncWrapper(authInstituicao), EventoController.excluirEvento);
-
-router
-    .route("/cancelar")
-    .delete(authAcessToken, asyncWrapper(authInstituicao), EventoController.cancelarEvento);
-
-router
-    .route("/acompanhar/:idEvento")
-    .put(authAcessToken, asyncWrapper(authParticipante), EventoController.acompanharEvento);
-
-router
-    .route("/dados/:id")
+    .route("/:idPublico")
     .get(EventoController.dadosEvento);
 
 router
-    .route("/periodos/:idEvento")
+    .route("/:idEvento")
+    .put(authAcessToken, asyncWrapper(authInstituicao), EventoController.editarEvento);
+
+router
+    .route("/:idEvento")
+    .delete(authAcessToken, asyncWrapper(authInstituicao), EventoController.excluirEvento);
+
+router
+    .route("/:idEvento/cancelar")
+    .delete(authAcessToken, asyncWrapper(authInstituicao), EventoController.cancelarEvento);
+
+router
+    .route("/:idEvento/acompanhar")
+    .put(authAcessToken, asyncWrapper(authParticipante), EventoController.acompanharEvento);
+
+router
+    .route("/:idEvento/periodos")
     .get(EventoController.listarPeriodos);
 
 export default router;

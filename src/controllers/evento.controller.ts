@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { DateTime } from "luxon";
 import { Types } from "mongoose";
@@ -44,18 +45,19 @@ class EventoController {
 
     public static async editarEvento(req: Request, res: Response) {
         const dados = req.body;
+        const { idEvento } = req.params;
 
-        if(!req.instituicao!.eventos.includes(dados.idEvento))
+        if(!req.instituicao!.eventos.includes(idEvento as any))
             return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
         
         if(dados.inscricoesInicio > dados.inscricoesTermino)
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a data final", erro: true });
         
-        // Adicionar exceção para cancelamento de ocorrência em um período
+        // TODO: Adicionar exceção para cancelamento de ocorrência em um período
         try {
-            const periodos = await PeriodoModel.atualizar(dados.periodos, dados.idEvento);
+            const periodos = await PeriodoModel.atualizar(dados.periodos, idEvento);
 
-            const editado = await EventoModel.findByIdAndUpdate(dados.idEvento, {
+            const editado = await EventoModel.findByIdAndUpdate(idEvento, {
                 criador: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 titulo: dados.titulo,
                 descricao: dados.descricao,
@@ -77,18 +79,19 @@ class EventoController {
     }
 
     public static async excluirEvento(req: Request, res: Response) {
-        // TODO: reavaliar este método
-        const evento = await EventoModel.findById(req.body.idEvento);
+        // TODO: reavaliar usos deste método, como quando não houver nenhuma inscrição
+        const { idEvento } = req.params;
+        const evento = await EventoModel.findById(idEvento);
 
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
 
-        if(!req.instituicao!.eventos.includes(req.body.idEvento))
+        if(!req.instituicao!.eventos.includes(idEvento as any))
             return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
         
         if(evento.permiteAlteracoes()) {
             try {
-                const sucesso = await evento.delete() && await req.instituicao!.removerEvento(req.body.idEvento);
+                const sucesso = await evento.delete() && await req.instituicao!.removerEvento(idEvento);
                 if(!sucesso)
                     throw new Error();
 
@@ -101,11 +104,12 @@ class EventoController {
     }
 
     public static async cancelarEvento(req: Request, res: Response) {
-        const evento = await EventoModel.findById(req.body.idEvento);
+        const { idEvento } = req.params;
+        const evento = await EventoModel.findById(idEvento);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
 
-        if(!req.instituicao!.eventos.includes(req.body.idEvento))
+        if(!req.instituicao!.eventos.includes(idEvento as any))
             return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
 
         

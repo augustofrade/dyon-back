@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import { nanoid } from "nanoid";
 
@@ -51,12 +52,13 @@ export default abstract class OperadorController {
     }
 
     static async alternarEstadoConta(req: Request, res: Response) {
+        const { idOperador } = req.params;
         try {
-            const operador = await OperadorModel.findById(req.body.idOperador);
+            const operador = await OperadorModel.findById(idOperador);
             if(!operador)
                 return res.status(404).json({ msg: "Operador não encontrado", erro: true });
                 
-            if(!req.instituicao!.operadores.includes(req.body.idOperador))
+            if(!req.instituicao!.operadores.includes(idOperador as any))
                 return res.json({ msg: "Não autorizado: este operador não pertence à sua instituição", erro: true });
             
             operador.ativo = !(operador.ativo);
@@ -72,7 +74,6 @@ export default abstract class OperadorController {
     static async excluirConta(req: Request, res: Response) {
         try {
             const { idOperador } = req.params;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             if(!req.instituicao!.operadores.includes(idOperador as any))
                 return res.json({ msg: "Não autorizado: este operador não pertence à sua instituição", erro: true });
 
@@ -90,7 +91,7 @@ export default abstract class OperadorController {
     }
 
     static async solicitarTrocaSenha(req: Request, res: Response) {
-        const operador = await OperadorModel.findById(req.body.idOperador);
+        const operador = await OperadorModel.findById(req.params.idOperador as any);
         if(!operador)
             return res.json({ msg: "Operador não encontrado", erro: true });
         

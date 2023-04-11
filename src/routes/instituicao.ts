@@ -6,8 +6,8 @@ import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
 import authOpcional from "../middlewares/authOpcional.middleware";
 import authValidarRefreshToken from "../middlewares/authValidarRefreshToken";
-import { formatosImagemValidos } from "../types/enums";
 import { authInstituicao, authParticipante } from "../middlewares/autorizacao.middleware";
+import { formatosImagemValidos } from "../types/enums";
 
 const router = express.Router();
 
@@ -20,21 +20,19 @@ router
     .post(authValidarRefreshToken, InstituicaoController.cadastro);
 
 router
-    .route("/perfil/:username")
-    .get(authOpcional, InstituicaoController.obterDadosPerfil);
-
-router.use(authAcessToken);
-
-router
     .route("/atualizar")
-    .patch(asyncWrapper(authInstituicao), uploadFotoPerfil, InstituicaoController.atualizarDados);
-
-router
-    .route("/seguir/:username")
-    .put(asyncWrapper(authParticipante), InstituicaoController.seguirInstituicao);
+    .patch(authAcessToken, asyncWrapper(authInstituicao), uploadFotoPerfil, InstituicaoController.atualizarDados);
 
 router
     .route("/endereco")
-    .get(asyncWrapper(authInstituicao), InstituicaoController.obterEndereco);
+    .get(authAcessToken, asyncWrapper(authInstituicao), InstituicaoController.obterEndereco);
+
+router
+    .route("/:username/perfil")
+    .get(authOpcional, InstituicaoController.obterDadosPerfil);
+
+router
+    .route("/:username/seguir")
+    .post(authAcessToken, asyncWrapper(authParticipante), InstituicaoController.seguirInstituicao);
 
 export default router;
