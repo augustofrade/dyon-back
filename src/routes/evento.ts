@@ -1,9 +1,9 @@
-import { authParticipante } from "../middlewares/autorizacao.middleware";
-import { authInstituicao } from "../middlewares/autorizacao.middleware";
 import express from "express";
+
 import EventoController from "../controllers/evento.controller";
 import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
+import { authInstitucional, authInstituicao, authParticipante, authUsuario } from "../middlewares/autorizacao.middleware";
 
 const router = express.Router();
 
@@ -42,5 +42,9 @@ router
 router
     .route("/:idEvento/periodos")
     .get(EventoController.listarPeriodos);
+
+router
+    .route("/periodo/:idPeriodo/inscricoes")
+    .get(authAcessToken, asyncWrapper(authUsuario), asyncWrapper(authInstitucional), EventoController.inscricoesNoPeriodo);
 
 export default router;

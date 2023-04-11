@@ -1,12 +1,10 @@
 import { Request, Response } from "express";
 
 import Email from "../email/Email";
-import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { Periodo } from "../model/periodo.model";
 import { IdentificacaoEvento } from "../schema/identificacaoEvento.schema";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { IResumoInscricao } from "../types/interface";
 import { eventoDentroPeriodo } from "../util/eventoDentroPeriodo";
 
 export default abstract class InscricaoController {
@@ -92,21 +90,6 @@ export default abstract class InscricaoController {
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
             res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente. ", erro: true, detalhes: err });
-        }
-    }
-
-    static async listarPorPeriodoEvento(req: Request, res: Response) {
-        // Listagem de participantes no evento que a instituição ou operador podem ver
-        try {
-            const inscricoesRaw = await InscricaoModel.listarPorPeriodoEvento(req.params.idPeriodo);
-            if(!inscricoesRaw)
-                throw new Error();
-            const inscricoes: Array<IResumoInscricao> = inscricoesRaw.map((i: Inscricao) =>
-                ({ confirmada: i.confirmada, nomeUsuario: i.participante.nome })
-            );
-            return res.json(inscricoes);
-        } catch (err) {
-            return res.json({ msg: "Não foi possível buscar as inscrições para esta ocorrência deste evento, tente novamente", erro: true });
         }
     }
 

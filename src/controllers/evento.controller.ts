@@ -3,12 +3,12 @@ import { Request, Response } from "express";
 import { DateTime } from "luxon";
 import { Types } from "mongoose";
 
-import { PeriodoModel } from "../model/models";
+import { Inscricao } from "../model/inscricao.model";
+import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { IPeriodo } from "../types/interface";
-import { buscarIdOperadores } from "../util/buscarIdOperadores";
-import { EventoModel, InscricaoModel, ParticipanteModel } from "../model/models";
+import { IPeriodo, IResumoInscricao } from "../types/interface";
 import { buscarCategorias } from "../util/buscarCategorias";
+import { buscarIdOperadores } from "../util/buscarIdOperadores";
 
 class EventoController {
 
@@ -196,6 +196,21 @@ class EventoController {
             }
         ]);
         res.json(inscricoes);
+    }
+
+    static async inscricoesNoPeriodo(req: Request, res: Response) {
+        // Listagem de participantes no evento que a instituição ou operador podem ver
+        try {
+            const inscricoesRaw = await InscricaoModel.listarPorPeriodoEvento(req.params.idPeriodo);
+            if(!inscricoesRaw)
+                throw new Error();
+            const inscricoes: Array<IResumoInscricao> = inscricoesRaw.map((i: Inscricao) =>
+                ({ confirmada: i.confirmada, nomeUsuario: i.participante.nome })
+            );
+            return res.json(inscricoes);
+        } catch (err) {
+            return res.json({ msg: "Não foi possível buscar as inscrições para esta ocorrência deste evento, tente novamente", erro: true });
+        }
     }
 }
 

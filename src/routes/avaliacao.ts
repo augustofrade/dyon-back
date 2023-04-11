@@ -19,10 +19,4 @@ router
     .route("/:idAvaliacao")
     .delete(authAcessToken, asyncWrapper(authParticipante), AvaliacaoController.excluirAvaliacao);
 
-
-// TODO: colocar em usuario.ts
-router
-    .route("/listar/:idUsuario")
-    .get(AvaliacaoController.listarAvaliacoes);
-
 export default router;

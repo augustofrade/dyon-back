@@ -19,4 +19,9 @@ router
     .route("/excluir-conta")
     .delete(authAcessToken, asyncWrapper(authUsuario), UsuarioController.excluirConta);
 
+router
+    .route("/:idUsuario/avaliacoes")
+    .get(UsuarioController.listarAvaliacoes);
+
+
 export default router;
