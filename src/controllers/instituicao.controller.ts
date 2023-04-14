@@ -5,22 +5,22 @@ import { Evento } from "../model/evento.model";
 import { ICategoria } from "../types/interface";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
+import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 import validarSenha from "../util/validarSenha";
 import { InstituicaoModel, ParticipanteModel } from "./../model/models";
-import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 
 export default class InstituicaoController {
 
     static async cadastro(req: Request, res: Response) {
         const { email, senha, telefone, nomeFantasia,
-            nomeRepresentante, cnpj, categoriasRamo, endereco } = req.body;
+            nomeRepresentante, documento, categoriasRamo, endereco } = req.body;
         if(!validarSenha(senha))
             return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         try {
             const emailToken = gerarTokenGenerico();
             const novaInstituicao = new InstituicaoModel({
                 email, senha, nomeFantasia, telefone,
-                nomeRepresentante, cnpj, categoriasRamo,
+                nomeRepresentante, documento, categoriasRamo,
                 endereco: endereco,
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });
@@ -105,6 +105,24 @@ export default class InstituicaoController {
             res.json(req.instituicao!.endereco);
         } catch (err) {
             res.json({ msg: "Não foi possível buscar os dados do endereço", erro: true });
+        }
+    }
+
+    static async listarInstituicoes(req: Request, res: Response) {
+        try {
+            const pesquisa = req.query.search?.toString();
+            let query = {};
+            if(pesquisa) {
+                query = {
+                    nomeFantasia: new RegExp(pesquisa.trim(), "gi")
+                };
+            }
+            const instituicoes = await InstituicaoModel.find(query).select("nomeFantasia fotoPerfil -_id username");
+            
+            res.status(200).send({ dados: instituicoes });
+        } catch (err) {
+            console.log(err);
+            res.status(400).send({ msg: "Não foi possível buscar as instituições, tente novamente", erro: true });
         }
     }
     

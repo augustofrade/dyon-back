@@ -33,7 +33,7 @@ class Instituicao extends Usuario {
     public fotoPerfil?: Buffer;
 
     @prop({ required: true,  })
-    public cnpj!: string;
+    public documento!: string;
 
     @prop({ default: () => configsPadrao() })
     public configuracoes!: PerfilConfig;
@@ -58,7 +58,7 @@ class Instituicao extends Usuario {
 
     public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         return this.findOne({ username })
-            .select("-_id -senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -nomeRepresentante -operadores -cnpj -configuracoes -telefone -updatedAt -__v")
+            .select("-_id -senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -nomeRepresentante -operadores -documento -configuracoes -telefone -updatedAt -__v")
             .populate("eventos", "-_id titulo endereco publicId slug visivel periodosOcorrencia")
             .populate("avaliacoes");
     }

@@ -13,14 +13,14 @@ import validarSenha from "../util/validarSenha";
 class ParticipanteController {
 
     static async cadastro(req: Request, res: Response) {
-        const { email, senha, nomeCompleto, cpf, telefone, endereco, dataNascimento, genero, categoriasFavoritas } = req.body;
+        const { email, senha, nomeCompleto, documento, telefone, endereco, dataNascimento, genero, categoriasFavoritas } = req.body;
         if(!validarSenha(senha))
             return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         try {
             const emailToken = gerarTokenGenerico();
             const novoParticipante = new ParticipanteModel({
                 email, senha, nomeCompleto, telefone, genero,
-                cpf, dataNascimento,
+                documento, dataNascimento,
                 categoriasFavoritas: await buscarCategorias(categoriasFavoritas),
                 endereco,
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
@@ -87,8 +87,6 @@ class ParticipanteController {
             res.json({ msg: "Não foi possível atualizar os dados, tente novamente.", erro: true });
         }
     }
-    
-    // TODO: criar método para exibir todas informações na página de configurações conforme tab
     
     static async getAll(req: Request, res: Response) {
         const allUsers = await ParticipanteModel.find();

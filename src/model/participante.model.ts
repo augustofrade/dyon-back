@@ -41,7 +41,7 @@ class Participante extends Usuario {
     public genero!: string;
 
     @prop({ required: true, minLength: 14, maxLength: 14 })
-    public cpf!: string;
+    public documento!: string;
 
     @prop({ required: true })
     public dataNascimento!: Date;
@@ -78,7 +78,14 @@ class Participante extends Usuario {
                 select: "-_id inicio termino cancelado"
             }
         });
-        await this.populate("acompanhando", "-_id titulo endereco publicId slug visivel periodosOcorrencia");
+        await this.populate({
+            path: "acompanhando",
+            select: "-_id titulo endereco publicId slug visivel periodosOcorrencia",
+            populate: {
+                path: "periodosOcorrencia",
+                select: "-_id inicio"
+            }
+        });
 
     }
 

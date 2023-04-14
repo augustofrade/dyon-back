@@ -28,6 +28,10 @@ router
     .get(authAcessToken, asyncWrapper(authInstituicao), InstituicaoController.obterEndereco);
 
 router
+    .route("/")
+    .get(InstituicaoController.listarInstituicoes);
+
+router
     .route("/:username/perfil")
     .get(authOpcional, InstituicaoController.obterDadosPerfil);
 
