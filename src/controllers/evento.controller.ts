@@ -181,10 +181,7 @@ class EventoController {
                     from: InscricaoModel.collection.collectionName,
                     localField: "_id",
                     foreignField: "periodo",
-                    as: "inscricoesPeriodo",
-                    pipeline: [{
-                        $match: { "cancelada": false }
-                    }]
+                    as: "inscricoesPeriodo"
                 }
             },
             {

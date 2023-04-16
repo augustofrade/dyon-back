@@ -5,7 +5,7 @@ import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
 import { authOperador, authParticipante } from "../middlewares/autorizacao.middleware";
 import validacao from "../validation/validacao";
-import { validacaoNovaInscricao } from "./../validation/inscricao.validation";
+import { validacaoConfirmacaoInscricao, validacaoNovaInscricao } from "./../validation/inscricao.validation";
 
 const router = express.Router();
 
@@ -15,11 +15,11 @@ router
 
 router
     .route("/:idInscricao/cancelar")
-    .post(authAcessToken, asyncWrapper(authParticipante),  InscricaoController.cancelarInscricao);
+    .delete(authAcessToken, asyncWrapper(authParticipante),  InscricaoController.cancelarInscricao);
 
 router
     .route("/:idInscricao/confirmar")
-    .post(authAcessToken, asyncWrapper(authOperador), InscricaoController.confirmarInscricao);
+    .post(authAcessToken, asyncWrapper(authOperador), validacao(validacaoConfirmacaoInscricao), InscricaoController.confirmarInscricao);
 
 router
     .route("/:idInscricao")

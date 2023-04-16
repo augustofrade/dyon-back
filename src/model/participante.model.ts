@@ -72,7 +72,7 @@ class Participante extends Usuario {
     private async popularEventosPerfil(this: DocumentType<Participante>) {
         await this.populate({
             path: "inscricoes",
-            select: "periodo confirmada cancelada evento",
+            select: "periodo confirmada evento",
             populate: {
                 path: "periodo",
                 select: "-_id inicio termino cancelado"

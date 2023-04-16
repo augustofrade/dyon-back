@@ -10,3 +10,10 @@ export const validacaoNovaInscricao = [
         .bail()
         .isString().withMessage("Formato de ID de período inválido")
 ];
+
+export const validacaoConfirmacaoInscricao = [
+    body("idEvento")
+        .notEmpty().withMessage("O ID de evento é obrigatório")
+        .bail()
+        .isString().withMessage("Formato de ID de evento inválido"),
+];

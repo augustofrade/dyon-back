@@ -35,7 +35,8 @@ export default abstract class InscricaoController {
             await req.participante!.save();
             evento.inscricoes.push(inscricao._id);
             await evento.save();
-            res.status(200).json({ msg: "Inscrição realizada com sucesso" });
+            const dadosInscricao = await InscricaoModel.buscarInscricao(inscricao._id);
+            res.status(200).json({ msg: "Inscrição realizada com sucesso", dados: dadosInscricao });
         } catch (err) {
             res.json({ msg: "Não foi possível realizar sua inscrição neste evento, tente novamente.", erro: true, detalhes: err });
         }
@@ -62,7 +63,8 @@ export default abstract class InscricaoController {
 
     static async confirmarInscricao(req: Request, res: Response) {
         // Confirmação de inscrição por parte do operador
-        const operadorAtribuido = await EventoModel.findOne({ "operadores": req.userId });
+        const idEvento: string = req.body.idEvento;
+        const operadorAtribuido = await EventoModel.findOne({ "_id": idEvento, "operadores": req.userId });
 
         if(!operadorAtribuido)
             return res.json({ msg: "Não autorizado: você não foi atribuído à este evento", erro: true });
@@ -70,6 +72,8 @@ export default abstract class InscricaoController {
         const inscricao = await InscricaoModel.dadosInscricao(req.params.idInscricao);
         if(!inscricao)
             return res.json({ msg: "Inscricão inválida, contate seu gestor", erro: true });
+        else if(inscricao.evento.idEvento !== idEvento)
+            return res.json({ msg: "Inscricão inválida: esta inscrição não foi feita neste evento", erro: true });
         else if(inscricao.confirmada)
             return res.json({ msg: "Esta inscrição já está confirmada", erro: true });
         
@@ -89,7 +93,7 @@ export default abstract class InscricaoController {
             Email.Instance.enviarEmailInscricaoConfirmada(participante!.email, participante!.nomeUsuario(), inscricao.evento.titulo, nomeInstituicao);
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
-            res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente. ", erro: true, detalhes: err });
+            res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente.", erro: true, detalhes: err });
         }
     }
 

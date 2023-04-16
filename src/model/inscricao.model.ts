@@ -28,9 +28,6 @@ class Inscricao {
     @prop({ default: false })
     public confirmada!: boolean;
 
-    @prop({ default: false })
-    public cancelada!: boolean;
-
     @prop()
     public confirmadaPor?: string; 
 
