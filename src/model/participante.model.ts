@@ -40,7 +40,7 @@ class Participante extends Usuario {
     @prop({ required: true, enum: generoEnum })
     public genero!: string;
 
-    @prop({ required: true, minLength: 14, maxLength: 14 })
+    @prop({ required: true, minLength: 14, maxLength: 18 })
     public documento!: string;
 
     @prop({ required: true })

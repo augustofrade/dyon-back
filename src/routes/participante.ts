@@ -8,6 +8,8 @@ import authOpcional from "../middlewares/authOpcional.middleware";
 import authValidarRefreshToken from "../middlewares/authValidarRefreshToken";
 import { authParticipante } from "../middlewares/autorizacao.middleware";
 import { formatosImagemValidos } from "../types/enums";
+import { validacaoAtualizarParticipante, validacaoCadastroParticipante } from "../validation/participante.validation";
+import validacao from "../validation/validacao";
 
 const router = express.Router();
 
@@ -21,11 +23,11 @@ router
 
 router
     .route("/cadastro")
-    .post(authValidarRefreshToken, ParticipanteController.cadastro);
+    .post(authValidarRefreshToken, validacao(validacaoCadastroParticipante), ParticipanteController.cadastro);
 
 router
     .route("/atualizar")
-    .patch(authAcessToken, asyncWrapper(authParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
+    .patch(authAcessToken, asyncWrapper(authParticipante), validacao(validacaoAtualizarParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
 
 router
     .route("/historico")

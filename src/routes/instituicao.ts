@@ -8,6 +8,8 @@ import authOpcional from "../middlewares/authOpcional.middleware";
 import authValidarRefreshToken from "../middlewares/authValidarRefreshToken";
 import { authInstituicao, authParticipante } from "../middlewares/autorizacao.middleware";
 import { formatosImagemValidos } from "../types/enums";
+import { validacaoAtualizarInstituicao, validacaoCadastroInstituicao } from "../validation/instituicao.validation";
+import validacao from "../validation/validacao";
 
 const router = express.Router();
 
@@ -17,11 +19,11 @@ const uploadFotoPerfil = multer({ fileFilter(req, file, cb) {
 
 router
     .route("/cadastro")
-    .post(authValidarRefreshToken, InstituicaoController.cadastro);
+    .post(authValidarRefreshToken, validacao(validacaoCadastroInstituicao), InstituicaoController.cadastro);
 
 router
     .route("/atualizar")
-    .patch(authAcessToken, asyncWrapper(authInstituicao), uploadFotoPerfil, InstituicaoController.atualizarDados);
+    .patch(authAcessToken, asyncWrapper(authInstituicao), validacao(validacaoAtualizarInstituicao), uploadFotoPerfil, InstituicaoController.atualizarDados);
 
 router
     .route("/endereco")
