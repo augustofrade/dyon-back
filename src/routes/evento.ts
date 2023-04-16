@@ -8,7 +8,7 @@ import { authInstitucional, authInstituicao, authParticipante, authUsuario } fro
 const router = express.Router();
 
 router
-    .route("/pesquisa")
+    .route("/")
     .get(EventoController.pesquisa);
 
 router

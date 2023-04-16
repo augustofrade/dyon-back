@@ -121,7 +121,6 @@ export default class InstituicaoController {
             
             res.status(200).send({ dados: instituicoes });
         } catch (err) {
-            console.log(err);
             res.status(400).send({ msg: "Não foi possível buscar as instituições, tente novamente", erro: true });
         }
     }

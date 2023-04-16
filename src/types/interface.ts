@@ -61,6 +61,12 @@ export interface IIdentificacaoUsuario {
     username?: string;
 }
 
+export interface IPesquisaEvento {
+    search?: string;
+    category?: string;
+    uf?: string;
+}
+
 
 /**
  * Estrutura dos objetos de categorias que serão enviados ao front-end

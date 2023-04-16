@@ -6,7 +6,7 @@ import { Types } from "mongoose";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { IPeriodo, IResumoInscricao } from "../types/interface";
+import { IPeriodo, IPesquisaEvento, IResumoInscricao } from "../types/interface";
 import { buscarCategorias } from "../util/buscarCategorias";
 import { buscarIdOperadores } from "../util/buscarIdOperadores";
 
@@ -136,10 +136,9 @@ class EventoController {
         res.json(resposta);
     }
 
-    public static async pesquisa(req: Request, res: Response) {
-        const { pesquisa, categoria, estado } = req.body;
+    public static async pesquisa(req: Request<unknown, unknown, unknown, IPesquisaEvento>, res: Response) {
         try {
-            const resPesquisa = await EventoModel.pesquisar(pesquisa, categoria, estado);
+            const resPesquisa = await EventoModel.pesquisar(req.query);
             res.json(resPesquisa);
         } catch(err) {
             res.json({ msg: "Ocorreu um erro ao tentar pesquisar os eventos, tente novamente", erro: true, detalhes: err });

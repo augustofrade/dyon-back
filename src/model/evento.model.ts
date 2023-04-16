@@ -4,8 +4,9 @@ import { Types } from "mongoose";
 
 import { Endereco } from "../schema/endereco.schema";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { ICardEvento } from "../types/interface";
+import { ICardEvento, IPesquisaEvento } from "../types/interface";
 import gerarIdAleatorio from "../util/gerarIDAleatorio";
+import { gerarQueryEventos } from "../util/gerarQueryEventos";
 import gerarSlug from "../util/gerarSlug";
 import { Categoria } from "./categoria.model";
 import { Inscricao } from "./inscricao.model";
@@ -70,16 +71,11 @@ class Evento {
             .select("-__v -operadores")
     }
 
-    public static pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: string, categoria?: string, estado?: string) {
-        return this.find({
-            $or: [
-                { "titulo": new RegExp(pesquisa, "i") },
-                { "endereco.cidade" : new RegExp(pesquisa, "i") },
-            ],
-            categorias: categoria ? categoria : {},
-            estado: estado ? estado : {},
-            cancelado: false
-        });
+    public static pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: IPesquisaEvento) {
+        const query = gerarQueryEventos(pesquisa);
+        return this.find(query as any)
+            .select("-_id _publicId banner titulo criador endereco periodosOcorrencia")
+            .populate("periodosOcorrencia", "-_id inicio termino");
     }
 
     public async cancelarEvento(this: DocumentType<Evento>) {
