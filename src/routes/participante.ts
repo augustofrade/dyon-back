@@ -27,7 +27,7 @@ router
 
 router
     .route("/atualizar")
-    .patch(authAcessToken, asyncWrapper(authParticipante), validacao(validacaoAtualizarParticipante), uploadFotoPerfil, ParticipanteController.atualizarDados);
+    .patch(authAcessToken, asyncWrapper(authParticipante), uploadFotoPerfil, validacao(validacaoAtualizarParticipante), ParticipanteController.atualizarDados);
 
 router
     .route("/historico")

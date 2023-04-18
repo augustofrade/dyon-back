@@ -1,11 +1,19 @@
 import express from "express";
+import multer from "multer";
 
 import EventoController from "../controllers/evento.controller";
 import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
 import { authInstitucional, authInstituicao, authParticipante, authUsuario } from "../middlewares/autorizacao.middleware";
+import { formatosImagemValidos } from "../types/enums";
+import { validacaoEdicaoEvento, validacaoNovoEvento } from "../validation/evento.validation";
+import validacao from "../validation/validacao";
 
 const router = express.Router();
+
+const uploadBanner = multer({ fileFilter(req, file, cb) {
+    cb(null, file.mimetype in formatosImagemValidos);
+}, }).single("banner");
 
 router
     .route("/")
@@ -17,7 +25,7 @@ router
 
 router
     .route("/")
-    .post(authAcessToken, asyncWrapper(authInstituicao), EventoController.novoEvento);
+    .post(authAcessToken, asyncWrapper(authInstituicao), uploadBanner, validacao(validacaoNovoEvento), EventoController.novoEvento);
 
 router
     .route("/:idPublico")
@@ -25,7 +33,7 @@ router
 
 router
     .route("/:idEvento")
-    .put(authAcessToken, asyncWrapper(authInstituicao), EventoController.editarEvento);
+    .put(authAcessToken, asyncWrapper(authInstituicao), uploadBanner, validacao(validacaoEdicaoEvento), EventoController.editarEvento);
 
 router
     .route("/:idEvento")

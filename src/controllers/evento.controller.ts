@@ -2,6 +2,7 @@
 import { Request, Response } from "express";
 import { DateTime } from "luxon";
 import { Types } from "mongoose";
+import sharp from "sharp";
 
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
@@ -13,21 +14,23 @@ import { buscarIdOperadores } from "../util/buscarIdOperadores";
 class EventoController {
 
     public static async novoEvento(req: Request, res: Response) {
-        
+        req.body.periodos = JSON.parse(req.body.periodos);
         const dados = req.body;
+        const banner = req.file;
+        if(!banner)
+            return res.json({ msg: "É obrigatório adicionar um banner ao evento à ser criado" });
         
         if(DateTime.fromJSDate(dados.inscricoesInicio) > DateTime.fromJSDate(dados.inscricoesTermino))
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a final", erro: true });
-        
         try {
             const novoEvento = new EventoModel({
                 criador: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 titulo: dados.titulo,
                 descricao: dados.descricao,
-                banner: dados.banner,
+                banner: await sharp(banner.buffer).jpeg({ quality: 50 }).toBuffer(),
                 endereco: dados.endereco,
-                inscricoesInicio: dados.inscricoesInicio,
-                inscricoesTermino: dados.inscricoesTermino,
+                inscricoesInicio: new Date(dados.inscricoesInicio),
+                inscricoesTermino: new Date(dados.inscricoesTermino),
                 categorias: await buscarCategorias(dados.categorias),
                 operadores: await buscarIdOperadores(dados.operadores)
             });
@@ -46,6 +49,7 @@ class EventoController {
     public static async editarEvento(req: Request, res: Response) {
         const dados = req.body;
         const { idEvento } = req.params;
+        const banner = req.file;
 
         if(!req.instituicao!.eventos.includes(idEvento as any))
             return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
@@ -56,19 +60,20 @@ class EventoController {
         // TODO: Adicionar exceção para cancelamento de ocorrência em um período
         try {
             const periodos = await PeriodoModel.atualizar(dados.periodos, idEvento);
-
-            const editado = await EventoModel.findByIdAndUpdate(idEvento, {
+            
+            const editado = await EventoModel.findByIdAndUpdate(idEvento, { $set: {
                 criador: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 titulo: dados.titulo,
                 descricao: dados.descricao,
-                banner: dados.banner,
+                banner: banner ? await sharp(banner.buffer).jpeg({ quality: 50 }).toBuffer() : undefined,
                 endereco: dados.endereco,
-                inscricoesInicio: dados.inscricoesInicio,
-                inscricoesTermino: dados.inscricoesTermino,
+                inscricoesInicio: new Date(dados.inscricoesInicio),
+                inscricoesTermino: new Date(dados.inscricoesTermino),
                 periodosOcorrencia: periodos,
                 categorias: await buscarCategorias(dados.categorias),
                 operadores: await buscarIdOperadores(dados.operadores)
-            }, { new: true });
+            }
+        }, { new: true });
             
             if(!editado) throw new Error();
 

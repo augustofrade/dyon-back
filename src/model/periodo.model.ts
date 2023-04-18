@@ -22,8 +22,8 @@ class Periodo {
     public static criarParaEvento(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[], idEvento: string) {
         return this.create(periodos.map((p: IPeriodo) => ({
             evento: idEvento,
-            inicio: p.inicio,
-            termino: p.termino,
+            inicio: new Date(p.inicio),
+            termino: new Date(p.termino),
             inscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
         })));
     }

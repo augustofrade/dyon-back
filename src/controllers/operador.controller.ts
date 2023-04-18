@@ -150,6 +150,4 @@ export default abstract class OperadorController {
             res.status(400).json({ msg: "Ocorreu um erro ao buscar os eventos em que você está atribuído, tente novamente", erro: true });
         }
     }
-
-    // TODO: método para visualização de eventos com períodos ocorrendo em tempo real
 }

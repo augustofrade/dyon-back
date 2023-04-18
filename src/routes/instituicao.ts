@@ -23,7 +23,7 @@ router
 
 router
     .route("/atualizar")
-    .patch(authAcessToken, asyncWrapper(authInstituicao), validacao(validacaoAtualizarInstituicao), uploadFotoPerfil, InstituicaoController.atualizarDados);
+    .patch(authAcessToken, asyncWrapper(authInstituicao), uploadFotoPerfil, validacao(validacaoAtualizarInstituicao), InstituicaoController.atualizarDados);
 
 router
     .route("/endereco")
