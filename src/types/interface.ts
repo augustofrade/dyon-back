@@ -17,15 +17,6 @@ export interface IParticipanteConfig {
 }
 
 export interface IPeriodo {
-    _id: string;
-    evento: string; // id
-    inicio: Date;
-    termino: Date;
-    inscricoesMaximo?: number;
-    inscricoes: number;
-}
-
-export interface IPeriodoRequest {
     id?: string;
     inicio: Date;
     termino: Date;
@@ -33,8 +24,8 @@ export interface IPeriodoRequest {
 }
 
 export interface IPeriodoAtualizacao {
-    adicionar?: IPeriodoRequest[];
-    atualizar?: IPeriodoRequest[];
+    adicionar?: IPeriodo[];
+    atualizar?: IPeriodo[];
     deletar?: { id: string }[];
 }
 

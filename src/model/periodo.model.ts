@@ -1,6 +1,6 @@
 import { DocumentType, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
 
-import { IPeriodoRequest } from "./../types/interface";
+import { IPeriodo } from "./../types/interface";
 import { Evento } from "./evento.model";
 import { InscricaoModel } from "./models";
 
@@ -20,8 +20,8 @@ class Periodo {
     @prop({ default: false })
     public cancelado!: boolean;
 
-    public static criarParaEvento(this: ReturnModelType<typeof Periodo>, periodos: IPeriodoRequest[], idEvento: string) {
-        return this.create(periodos.map((p: IPeriodoRequest) => ({
+    public static criarParaEvento(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[], idEvento: string) {
+        return this.create(periodos.map((p: IPeriodo) => ({
             evento: idEvento,
             inicio: new Date(p.inicio),
             termino: new Date(p.termino),
@@ -29,7 +29,7 @@ class Periodo {
         })));
     }
 
-    public static async atualizarPeriodos(this: ReturnModelType<typeof Periodo>, periodos: IPeriodoRequest[]): Promise<string[]> {
+    public static async atualizarPeriodos(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[]): Promise<string[]> {
         const idsPeriodos: string[] = [];
         for(const p of periodos) {
             const periodo = await this.findByIdAndUpdate(p.id, { $set: {

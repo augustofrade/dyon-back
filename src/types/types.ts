@@ -1,11 +1,7 @@
 import { EventoModel, InstituicaoModel, OperadorModel, ParticipanteModel } from "../model/models";
 import { UsuarioModel } from "../model/usuario.model";
-import { IPeriodo } from "./interface"
 
 export type Documento<T> = T & { _id: string, createdAt?: string }
-
-export type IPeriodoSaida = Omit<IPeriodo, "evento">
-
 
 const retornoUsuario = async () => await UsuarioModel.findById({});
 const retornoParticipante = async () => await ParticipanteModel.findById({});

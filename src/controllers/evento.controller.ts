@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { IPeriodoAtualizacao, IPeriodoRequest, IPesquisaEvento, IResumoInscricao } from "../types/interface";
+import { IPeriodoAtualizacao, IPeriodo, IPesquisaEvento, IResumoInscricao } from "../types/interface";
 import { buscarCategorias } from "../util/buscarCategorias";
 import { buscarIdOperadores } from "../util/buscarIdOperadores";
 
@@ -36,7 +36,7 @@ class EventoController {
             });
             await novoEvento.save();
             await req.instituicao!.adicionarEvento(novoEvento._id);
-            const periodos = await PeriodoModel.criarParaEvento(dados.periodos as Array<IPeriodoRequest>, novoEvento._id);
+            const periodos = await PeriodoModel.criarParaEvento(dados.periodos as Array<IPeriodo>, novoEvento._id);
             novoEvento.periodosOcorrencia = periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()).map(p => p._id);
             await novoEvento.save();
 
@@ -204,7 +204,7 @@ class EventoController {
 
     public static async listarPeriodos(req: Request, res: Response) {
         const idEvento = req.params.idEvento;
-        const inscricoes = await PeriodoModel.aggregate<{ inscricoes: number } & IPeriodoRequest>([
+        const inscricoes = await PeriodoModel.aggregate<{ inscricoes: number } & IPeriodo>([
             {
                 $match: { "evento": new Types.ObjectId(idEvento) }
             },
