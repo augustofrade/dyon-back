@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { IPeriodo, IPesquisaEvento, IResumoInscricao } from "../types/interface";
+import { IPeriodoAtualizacao, IPeriodoRequest, IPesquisaEvento, IResumoInscricao } from "../types/interface";
 import { buscarCategorias } from "../util/buscarCategorias";
 import { buscarIdOperadores } from "../util/buscarIdOperadores";
 
@@ -36,7 +36,7 @@ class EventoController {
             });
             await novoEvento.save();
             await req.instituicao!.adicionarEvento(novoEvento._id);
-            const periodos = await PeriodoModel.criarParaEvento(dados.periodos as Array<IPeriodo>, novoEvento._id);
+            const periodos = await PeriodoModel.criarParaEvento(dados.periodos as Array<IPeriodoRequest>, novoEvento._id);
             novoEvento.periodosOcorrencia = periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime()).map(p => p._id);
             await novoEvento.save();
 
@@ -44,6 +44,37 @@ class EventoController {
         } catch (err) {
             res.json({ msg: "Não foi possível criar o evento", erro: true, detalhes: err });
         }
+    }
+
+    public static async atualizarPeriodos(req: Request<{ idEvento: string }, unknown, IPeriodoAtualizacao>, res: Response) {
+        const { idEvento } = req.params;
+        const dados = req.body;
+        const evento = await EventoModel.findById(idEvento);
+        if(!evento)
+            return res.status(404).json({ msg: "Evento não encontrado", erro: true });
+        
+        let idsPeriodos: string[] = evento.periodosOcorrencia.map(p => p._id.toString());
+
+        if(dados.adicionar) {
+            (await PeriodoModel.criarParaEvento(dados.adicionar, idEvento)).map(p => {
+                idsPeriodos.push(p._id.toString());
+            });
+        }
+        // TODO: Adicionar exceção para cancelamento de ocorrência em um período
+        if(dados.atualizar) {
+            await PeriodoModel.atualizarPeriodos(dados.atualizar);
+        }
+        if(dados.deletar) {
+            for(const p of dados.deletar) {
+                const deletado = await PeriodoModel.findByIdAndDelete(p.id);
+                if(deletado)
+                    idsPeriodos = idsPeriodos.filter(id => id !== p.id);
+            }
+        }
+        evento.periodosOcorrencia = idsPeriodos as any; // typescript dá erro dizendo que Ref<Periodo>[] não pode ser string[]
+        evento.save();
+
+        res.send({ dados: idsPeriodos });
     }
 
     public static async editarEvento(req: Request, res: Response) {
@@ -57,10 +88,7 @@ class EventoController {
         if(dados.inscricoesInicio > dados.inscricoesTermino)
             return res.json({ msg: "A data de inscrições inicial não pode ser menor que a data final", erro: true });
         
-        // TODO: Adicionar exceção para cancelamento de ocorrência em um período
         try {
-            const periodos = await PeriodoModel.atualizar(dados.periodos, idEvento);
-            
             const editado = await EventoModel.findByIdAndUpdate(idEvento, { $set: {
                 criador: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 titulo: dados.titulo,
@@ -69,7 +97,6 @@ class EventoController {
                 endereco: dados.endereco,
                 inscricoesInicio: new Date(dados.inscricoesInicio),
                 inscricoesTermino: new Date(dados.inscricoesTermino),
-                periodosOcorrencia: periodos,
                 categorias: await buscarCategorias(dados.categorias),
                 operadores: await buscarIdOperadores(dados.operadores)
             }
@@ -177,7 +204,7 @@ class EventoController {
 
     public static async listarPeriodos(req: Request, res: Response) {
         const idEvento = req.params.idEvento;
-        const inscricoes = await PeriodoModel.aggregate<IPeriodo>([
+        const inscricoes = await PeriodoModel.aggregate<{ inscricoes: number } & IPeriodoRequest>([
             {
                 $match: { "evento": new Types.ObjectId(idEvento) }
             },

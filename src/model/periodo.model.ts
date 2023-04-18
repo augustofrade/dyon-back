@@ -1,7 +1,8 @@
-import { IPeriodo } from './../types/interface';
-import { DocumentType, prop, ReturnModelType, Ref } from "@typegoose/typegoose";
-import { InscricaoModel } from './models';
-import { Evento } from './evento.model';
+import { DocumentType, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
+
+import { IPeriodoRequest } from "./../types/interface";
+import { Evento } from "./evento.model";
+import { InscricaoModel } from "./models";
 
 class Periodo {
     @prop({ required: true, ref: () => Evento })
@@ -19,8 +20,8 @@ class Periodo {
     @prop({ default: false })
     public cancelado!: boolean;
 
-    public static criarParaEvento(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[], idEvento: string) {
-        return this.create(periodos.map((p: IPeriodo) => ({
+    public static criarParaEvento(this: ReturnModelType<typeof Periodo>, periodos: IPeriodoRequest[], idEvento: string) {
+        return this.create(periodos.map((p: IPeriodoRequest) => ({
             evento: idEvento,
             inicio: new Date(p.inicio),
             termino: new Date(p.termino),
@@ -28,28 +29,21 @@ class Periodo {
         })));
     }
 
-    public static async atualizar(this: ReturnModelType<typeof Periodo>, periodos: IPeriodo[], idEvento: string): Promise<string[]> {
-        // TODO: refatorar
-        const ids: string[] = [];
-        periodos.forEach(async (p: IPeriodo) => {
-            const dadosPeriodo: Omit<IPeriodo, "_id" | "inscricoes"> = {
-                evento: idEvento,
-                inicio: p.inicio,
-                termino: p.termino,
+    public static async atualizarPeriodos(this: ReturnModelType<typeof Periodo>, periodos: IPeriodoRequest[]): Promise<string[]> {
+        const idsPeriodos: string[] = [];
+        for(const p of periodos) {
+            const periodo = await this.findByIdAndUpdate(p.id, { $set: {
+                inicio: p.inicio ? new Date(p.inicio) : undefined,
+                termino: p.termino ? new Date(p.termino) : undefined,
                 inscricoesMaximo: p.inscricoesMaximo && p.inscricoesMaximo > 0 ? p.inscricoesMaximo : undefined
-            };
-            
-            if(p._id) {
-                ids.push(p._id);
-                await this.findByIdAndUpdate(p._id, { $set: dadosPeriodo });
-            } else {
-                const novoPeriodo = await this.create(dadosPeriodo);
-                ids.push(novoPeriodo._id);
-            }
-        });
-
-        return ids;
+            } });
+            if(periodo)
+                idsPeriodos.push(periodo._id)
+        }
+        return idsPeriodos;
     }
+    
+
 
     public async limiteInscricoesAtingido(this: DocumentType<Periodo>): Promise<boolean> {
         if(!this.inscricoesMaximo)

@@ -25,6 +25,19 @@ export interface IPeriodo {
     inscricoes: number;
 }
 
+export interface IPeriodoRequest {
+    id?: string;
+    inicio: Date;
+    termino: Date;
+    inscricoesMaximo?: number;
+}
+
+export interface IPeriodoAtualizacao {
+    adicionar?: IPeriodoRequest[];
+    atualizar?: IPeriodoRequest[];
+    deletar?: { id: string }[];
+}
+
 export interface IAvaliacao {
     evento: NonNullable<EventoQuery>;
     idEvento: string;

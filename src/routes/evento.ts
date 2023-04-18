@@ -4,7 +4,13 @@ import multer from "multer";
 import EventoController from "../controllers/evento.controller";
 import asyncWrapper from "../middlewares/asyncWrapper";
 import authAcessToken from "../middlewares/authAcessToken.middleware";
-import { authInstitucional, authInstituicao, authParticipante, authUsuario } from "../middlewares/autorizacao.middleware";
+import {
+    authInstitucional,
+    authInstituicao,
+    authParticipante,
+    authProprietarioEvento,
+    authUsuario,
+} from "../middlewares/autorizacao.middleware";
 import { formatosImagemValidos } from "../types/enums";
 import { validacaoEdicaoEvento, validacaoNovoEvento } from "../validation/evento.validation";
 import validacao from "../validation/validacao";
@@ -50,6 +56,10 @@ router
 router
     .route("/:idEvento/periodos")
     .get(EventoController.listarPeriodos);
+
+router
+    .route("/:idEvento/periodos")
+    .put(authAcessToken, asyncWrapper(authInstituicao), asyncWrapper(authProprietarioEvento), EventoController.atualizarPeriodos);
 
 router
     .route("/periodo/:idPeriodo/inscricoes")

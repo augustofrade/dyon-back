@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 
 import { InstituicaoModel, OperadorModel, ParticipanteModel } from "../model/models";
@@ -49,4 +50,11 @@ export const authInstitucional = async (req: Request, res: Response, next: NextF
         next();
     else
         res.status(403).json({ msg: "Não autorizado: você não faz parte de uma instituição", erro: true });
+};
+
+export const authProprietarioEvento = async (req: Request, res: Response, next: NextFunction) => {
+        if(!req.instituicao!.eventos.includes(req.params.idEvento as any))
+            return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
+        else
+            next();
 };
