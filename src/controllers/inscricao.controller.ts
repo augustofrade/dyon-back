@@ -18,6 +18,9 @@ export default abstract class InscricaoController {
             const periodo = await PeriodoModel.findById(req.body.idPeriodo);
             if(!periodo)
                 return res.json({ msg: "ID de Período inválido", erro: true });
+
+            if(!evento.periodosOcorrencia.includes(periodo._id))
+                return res.json({ msg: "Este evento não ocorre no período selecionado", erro: true });
             
             if(await InscricaoModel.usuarioJaInscrito(req.userId as string, periodo._id))
                 return res.json({ msg: "Não é possível se inscrever em um determinado período de um evento mais de uma vez", erro: true });
@@ -28,7 +31,7 @@ export default abstract class InscricaoController {
             const inscricao = new InscricaoModel({
                 participante: IdentificacaoUsuario.gerarIdentificacao(req.participante),
                 periodo: periodo._id,
-                evento: IdentificacaoEvento.gerarIdentificacao(evento, true, true, true)
+                evento: IdentificacaoEvento.gerarIdentificacao(evento, false, true, true)
             });
             await inscricao.save();
             req.participante!.inscricoes.push(inscricao._id);
