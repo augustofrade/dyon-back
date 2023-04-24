@@ -82,18 +82,17 @@ class Evento {
         this.cancelado = true;
         const eventoCancelado = await this.save();
         if(eventoCancelado) {   
-            const periodosCancelados = await PeriodoModel.updateMany({
-                _id: { $in: this.periodosOcorrencia }
-            });
+            const periodosCancelados = await PeriodoModel.updateMany({ evento: this._id }, { cancelado: true });
             return periodosCancelados;
         }
-        return eventoCancelado;
+        throw new Error();
     }
 
     public permiteAlteracoes(this: DocumentType<Evento>) {
         if(!this.populated("periodosOcorrencia"))
             return false;
-        const dataInicial = (<Array<Periodo>>this.periodosOcorrencia)[0].inicio
+        const periodos = this.periodosOcorrencia as Array<Periodo>;
+        const dataInicial = periodos.sort((a, b) => new Date(a.inicio).getTime() - new Date(b.inicio).getTime())[0].inicio;
         return DateTime.now().plus({ hours: 24 }) > DateTime.fromJSDate(dataInicial);
     }
 

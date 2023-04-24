@@ -7,7 +7,7 @@ import sharp from "sharp";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
-import { IPeriodoAtualizacao, IPeriodo, IPesquisaEvento, IResumoInscricao } from "../types/interface";
+import { IPeriodo, IPeriodoAtualizacao, IPesquisaEvento, IResumoInscricao } from "../types/interface";
 import { buscarCategorias } from "../util/buscarCategorias";
 import { buscarIdOperadores } from "../util/buscarIdOperadores";
 
@@ -121,6 +121,7 @@ class EventoController {
         if(!req.instituicao!.eventos.includes(idEvento as any))
             return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
         
+        // TODO: testar
         if(evento.permiteAlteracoes()) {
             try {
                 const sucesso = await evento.delete() && await req.instituicao!.removerEvento(idEvento);
@@ -143,13 +144,18 @@ class EventoController {
 
         if(!req.instituicao!.eventos.includes(idEvento as any))
             return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
-
         
-        const sucesso = await evento.cancelarEvento();
-        if(sucesso)
-            res.json({ msg: `${evento.titulo} cancelado com sucesso` });
-        else
-            res.json({ msg: "Não foi possível cancelar este evento", erro: true });
+        try {
+            const sucesso = await evento.cancelarEvento();
+            if(sucesso) {
+                // TODO: adicionar envio de e-mail de cancelamento do evento
+                res.json({ msg: `${evento.titulo} cancelado com sucesso` });
+            } else {
+                res.json({ msg: "Não foi possível cancelar este evento", erro: true });
+            }
+        } catch (err) {
+            res.json({ msg: "Ocorreu um erro ao tentar cancelar este evento, tente novamente", erro: true });
+        }
     }
 
     public static async dadosEvento(req: Request, res: Response) {
