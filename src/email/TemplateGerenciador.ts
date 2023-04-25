@@ -33,6 +33,12 @@ class TemplateGerenciador {
             },
             inscricaoConfirmada: {
                 diretorio: diretorioCompleto("./templates/inscricaoConfirmada.ejs")
+            },
+            avisoCancelamentoPeriodo: {
+                diretorio: diretorioCompleto("./templates/avisoCancelamentoPeriodo.ejs")
+            },
+            avisoCancelamentoEvento: {
+                diretorio: diretorioCompleto("./templates/avisoCancelamentoEvento.ejs")
             }
         };
     }

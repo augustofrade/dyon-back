@@ -1,13 +1,14 @@
 /* eslint-disable no-useless-escape */
-import { IEmailCadastro } from "./../types/interface";
-
-import { IEmail, ITokenGenerico } from "../types/interface";
+import ejs from "ejs";
+import { DateTime } from "luxon";
 import nodemailer from "nodemailer";
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import path from "path";
-import ejs from "ejs";
-import { DateTime } from "luxon";
+
 import { Evento } from "../model/evento.model";
+import { Periodo } from "../model/periodo.model";
+import { IEmail, ITokenGenerico } from "../types/interface";
+import { IEmailCadastro } from "./../types/interface";
 import TemplateGerenciador from "./TemplateGerenciador";
 
 export default class Email {
@@ -131,7 +132,7 @@ export default class Email {
     public async enviarEmailAlteracaoSenha(destinatario: string, nomeUsuario: string) {
         const nomeTemplate = TemplateGerenciador.Instance.template("alteracaoSenha");
         const url = "https://localhost:3000/senha/esqueci-minha-senha";
-        const dataAlteracao = DateTime.now().toFormat("dd/MM/yyyy à\s HH:mm:ss");
+        const dataAlteracao = DateTime.now().toFormat("dd/MM/yyyy 'às' HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {
@@ -144,13 +145,52 @@ export default class Email {
 
     public async enviarEmailFalhaSenha(destinatario: string, nomeUsuario: string) {
         const nomeTemplate = TemplateGerenciador.Instance.template("falhaSenha");
-        const dataAlteracao = DateTime.now().toFormat("dd/MM/yyyy à\s HH:mm:ss");
+        const dataAlteracao = DateTime.now().toFormat("dd/MM/yyyy 'às' HH:mm:ss");
         const template = ejs.render(nomeTemplate, { nomeUsuario, dataAlteracao });
 
         return this.enviarEmailGenerico(destinatario, {
             assunto: "Aviso de Tentativa de Alteração de Senha",
             texto: `Houve uma tentativa de alteração de senha em sua conta em ${dataAlteracao},
                 considere atualizá-la nas configurações de seu perfil`,
+            html: template
+        });
+    }
+
+    public async enviarAvisoCancelamentoPeriodo(destinatario: string, detalhesEvento: Evento, periodo: Periodo) {
+        const rawHTML = TemplateGerenciador.Instance.template("avisoPeriodoCancelamento");
+        const url = `https://localhost:3000/evento/${detalhesEvento._publicId}/${detalhesEvento.slug}`;
+        const evento = {
+            titulo: detalhesEvento.titulo,
+            url,
+            instituicao: detalhesEvento.criador.nome,
+            inicio: DateTime.fromJSDate(periodo.inicio).toFormat("dd/MM/yyyy 'às' HH:mm:ss"),
+            termino: DateTime.fromJSDate(periodo.termino).toFormat("dd/MM/yyyy 'às' HH:mm:ss"),
+        };
+        const template = ejs.render(rawHTML, { evento });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: `${detalhesEvento.titulo} foi cancelado`,
+            texto: `O evento ${evento.titulo} sediado pela instituição ${evento.instituicao}
+            no período de ${evento.inicio} até ${evento.termino} foi cancelado. Confira a página do evento para mais detalhes: ${evento.url}`,
+            html: template
+        });
+    }
+
+    public async enviarAvisoCancelamentoEvento(destinatario: string, detalhesEvento: Evento, periodo: Periodo) {
+        const rawHTML = TemplateGerenciador.Instance.template("avisoCancelamentoEvento");
+        const url = `https://localhost:3000/evento/${detalhesEvento._publicId}/${detalhesEvento.slug}`;
+        const evento = {
+            titulo: detalhesEvento.titulo,
+            url,
+            instituicao: detalhesEvento.criador.nome,
+            data: DateTime.fromJSDate(periodo.inicio).toFormat("dd/MM/yyyy 'às' HH:mm"),
+        };
+        const template = ejs.render(rawHTML, { evento });
+
+        return this.enviarEmailGenerico(destinatario, {
+            assunto: `${detalhesEvento.titulo} foi cancelado`,
+            texto: `O evento ${evento.titulo} sediado pela instituição ${evento.instituicao}
+            no dia ${evento.data} foi cancelado. Confira a página do evento para mais detalhes: ${evento.url}`,
             html: template
         });
     }

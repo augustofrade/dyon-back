@@ -4,8 +4,11 @@ import { DateTime } from "luxon";
 import { Types } from "mongoose";
 import sharp from "sharp";
 
+import Email from "../email/Email";
+import { Evento } from "../model/evento.model";
 import { Inscricao } from "../model/inscricao.model";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
+import { Periodo } from "../model/periodo.model";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { IPeriodo, IPeriodoAtualizacao, IPesquisaEvento, IResumoInscricao } from "../types/interface";
 import { buscarCategorias } from "../util/buscarCategorias";
@@ -141,14 +144,19 @@ class EventoController {
         const evento = await EventoModel.findById(idEvento);
         if(!evento)
             return res.json({ msg: "Evento não encontrado", erro: true });
-
+        
         if(!req.instituicao!.eventos.includes(idEvento as any))
             return res.json({ msg: "Não autorizado: você não é proprietário(a) deste evento", erro: true });
         
         try {
             const sucesso = await evento.cancelarEvento();
             if(sucesso) {
-                // TODO: adicionar envio de e-mail de cancelamento do evento
+                const inscricoes = await InscricaoModel.find({ "evento.idEvento": idEvento }).populate("periodo");
+                for(const i of inscricoes) {
+                    const participante = await ParticipanteModel.findById(i.participante.idUsuario);
+                    if(participante)
+                        Email.Instance.enviarAvisoCancelamentoEvento(participante.email, evento as Evento, i.periodo as Periodo);
+                }
                 res.json({ msg: `${evento.titulo} cancelado com sucesso` });
             } else {
                 res.json({ msg: "Não foi possível cancelar este evento", erro: true });
