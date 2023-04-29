@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "tsnd --files ./src/index.ts"
+    "dev": "tsnd --files ./src/index.ts",
+    "build": "tsc",
+    "start": "node ./build/index.js"
   },
   "keywords": [],
   "author": "",

@@ -2,3 +2,4 @@ node_modules
 public
 .ENV
 .vscode
+build

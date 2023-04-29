@@ -29,5 +29,5 @@
         "camelcase": "warn",
         "@typescript-eslint/no-non-null-assertion": "off"
     },
-    "ignorePatterns": ["src/types/**/*.ts", "src/model/*.ts", "src/util/popularCategorias.ts"]
+    "ignorePatterns": ["src/types/**/*.ts", "src/model/*.ts", "src/util/popularCategorias.ts", "build"]
 }
