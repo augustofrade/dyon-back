@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { DateTime } from "luxon";
 
 import Email from "../email/Email";
 import { EventoModel, InscricaoModel, ParticipanteModel, PeriodoModel } from "../model/models";
@@ -24,6 +25,14 @@ export default abstract class InscricaoController {
             
             if(await InscricaoModel.usuarioJaInscrito(req.userId as string, periodo._id))
                 return res.json({ msg: "Não é possível se inscrever em um determinado período de um evento mais de uma vez", erro: true });
+
+            if(new Date() < evento.inscricoesInicio) {
+                const data = DateTime.fromJSDate(evento.inscricoesInicio).toFormat("dd/MM/yyyy 'às' HH:mm:ss");
+                return res.json({ msg: "Não é possível se inscrever neste evento: as inscrições começam " + data, erro: true });
+            } else if(new Date > evento.inscricoesTermino) {
+                const data = DateTime.fromJSDate(evento.inscricoesTermino).toFormat("dd/MM/yyyy 'às' HH:mm:ss");
+                return res.json({ msg: "Não é possível se inscrever neste evento: as inscrições acabaram " + data, erro: true });
+            }
 
             if(await periodo.limiteInscricoesAtingido())
                 return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis.", erro: true });
