@@ -42,8 +42,6 @@ class Periodo {
         }
         return idsPeriodos;
     }
-    
-
 
     public async limiteInscricoesAtingido(this: DocumentType<Periodo>): Promise<boolean> {
         if(!this.inscricoesMaximo)
@@ -51,6 +49,11 @@ class Periodo {
 
         const numeroInscricoes = await InscricaoModel.count({ "periodo._id": this._id });
         return numeroInscricoes >= this.inscricoesMaximo;
+    }
+
+    public async cancelar(this: DocumentType<Periodo>) {
+        this.cancelado = true;
+        return this.save();
     }
 }
 

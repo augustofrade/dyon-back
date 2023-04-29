@@ -47,7 +47,7 @@ router
 
 router
     .route("/:idEvento/cancelar")
-    .delete(authAcessToken, asyncWrapper(authInstituicao), EventoController.cancelarEvento);
+    .post(authAcessToken, asyncWrapper(authInstituicao), EventoController.cancelarEvento);
 
 router
     .route("/:idEvento/acompanhar")
@@ -64,5 +64,9 @@ router
 router
     .route("/periodo/:idPeriodo/inscricoes")
     .get(authAcessToken, asyncWrapper(authUsuario), asyncWrapper(authInstitucional), EventoController.inscricoesNoPeriodo);
+
+router
+    .route("/periodo/:idPeriodo/cancelar")
+    .post(authAcessToken, asyncWrapper(authInstituicao), EventoController.cancelarPeriodo);
 
 export default router;

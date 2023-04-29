@@ -7,7 +7,7 @@ import path from "path";
 
 import { Evento } from "../model/evento.model";
 import { Periodo } from "../model/periodo.model";
-import { IEmail, ITokenGenerico } from "../types/interface";
+import { IEmail, IIdentificacaoEvento, ITokenGenerico } from "../types/interface";
 import { IEmailCadastro } from "./../types/interface";
 import TemplateGerenciador from "./TemplateGerenciador";
 
@@ -156,13 +156,13 @@ export default class Email {
         });
     }
 
-    public async enviarAvisoCancelamentoPeriodo(destinatario: string, detalhesEvento: Evento, periodo: Periodo) {
-        const rawHTML = TemplateGerenciador.Instance.template("avisoPeriodoCancelamento");
-        const url = `https://localhost:3000/evento/${detalhesEvento._publicId}/${detalhesEvento.slug}`;
+    public async enviarAvisoCancelamentoPeriodo(destinatario: string, detalhesEvento: IIdentificacaoEvento, periodo: Periodo) {
+        const rawHTML = TemplateGerenciador.Instance.template("avisoCancelamentoPeriodo");
+        const url = `https://localhost:3000/evento/${detalhesEvento.rotaPublica}`;
         const evento = {
             titulo: detalhesEvento.titulo,
             url,
-            instituicao: detalhesEvento.criador.nome,
+            instituicao: detalhesEvento.instituicao.nome,
             inicio: DateTime.fromJSDate(periodo.inicio).toFormat("dd/MM/yyyy 'às' HH:mm:ss"),
             termino: DateTime.fromJSDate(periodo.termino).toFormat("dd/MM/yyyy 'às' HH:mm:ss"),
         };

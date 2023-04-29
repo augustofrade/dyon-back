@@ -1,10 +1,12 @@
 import { DocumentType, modelOptions, post, prop, Ref, ReturnModelType } from "@typegoose/typegoose";
+import { Types } from "mongoose";
 import QRCode from "qrcode";
 
 import { IdentificacaoEvento } from "../schema/identificacaoEvento.schema";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { ParticipanteQuery } from "../types/types";
 import { HistoricoInscricaoModel } from "./historicoInscricao.model";
+import { ParticipanteModel } from "./models";
 import { Periodo } from "./periodo.model";
 
 
@@ -97,6 +99,30 @@ class Inscricao {
                 path: "periodo",
                 select: "-_id -__v -evento",
             });
+    }
+
+    public static buscarTodosInscritos(this: ReturnModelType<typeof Inscricao>, idPeriodo: string) {
+        return this.aggregate([
+            {
+                $lookup: {
+                    from: ParticipanteModel.collection.collectionName,
+                    as: "inscritos",
+                    localField: "_id",
+                    foreignField: "inscricoes"
+                }
+            },
+            {
+                $match: {
+                    "periodo": new Types.ObjectId(idPeriodo)
+                }
+            },
+            {
+                $project: {
+                    "inscritos.email": 1, "inscritos.nomeCompleto": 1,
+                    "evento.titulo": 1, "evento.rotaPublica": 1, "evento.instituicao.nome": 1
+                }
+            }
+        ]);
     }
 }
 

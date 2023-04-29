@@ -65,6 +65,13 @@ export interface IIdentificacaoUsuario {
     username?: string;
 }
 
+export interface IIdentificacaoEvento {
+    titulo: string;
+    rotaPublica: string;
+    instituicao: IIdentificacaoUsuario;
+    [x: string]: unknown;
+}
+
 export interface IPesquisaEvento {
     search?: string;
     category?: string;
