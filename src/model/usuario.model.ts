@@ -122,7 +122,7 @@ class Usuario {
     }
 
     public async dadosCabecalho(this: DocumentType<Usuario>): Promise<IInfoResumida> {
-        const retorno: IInfoResumida = { id: this._id, username: this.username, fotoPerfil: null, nome: "" }
+        const retorno: IInfoResumida = { id: this._id, username: this.username, fotoPerfil: null, nome: "", tipo: this.tipo }
         if(this.tipo === usuariosEnum.Instituicao) {
             const u = <unknown>this as Instituicao;
             retorno.nome = u.nomeFantasia,

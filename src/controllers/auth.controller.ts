@@ -37,7 +37,8 @@ class AuthController {
         usuario.refreshToken.push(refreshToken);
         usuario.save();
 
-        res.cookie("token", refreshToken, { expires: dataExpiracao });
+        // colocar secure: true em produção em https
+        res.cookie("token", refreshToken, { expires: dataExpiracao, httpOnly: false });
         return res.json({ token: accessToken });
     }
 

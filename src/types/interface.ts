@@ -115,6 +115,7 @@ export interface IInfoResumida {
     fotoPerfil: string | null;
     instituicao?: string;
     id: string;
+    tipo: string
 }
 
 export interface IEndereco {
