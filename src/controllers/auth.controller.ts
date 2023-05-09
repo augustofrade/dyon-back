@@ -39,7 +39,7 @@ class AuthController {
 
         // colocar secure: true em produção em https
         res.cookie("token", refreshToken, { expires: dataExpiracao, httpOnly: false });
-        return res.json({ token: accessToken });
+        return res.json({ dados: { accessToken: accessToken } });
     }
 
     /**
@@ -82,7 +82,7 @@ class AuthController {
                 }
                 else {
                     const novoAccessToken = gerarAccesToken({ id: usuarioComToken._id, email: usuarioComToken.email });
-                    return res.json({ token: novoAccessToken });
+                    return res.json({ dados: { accessToken: novoAccessToken } });
                 }
             }
         );
