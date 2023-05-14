@@ -138,7 +138,7 @@ class EventoController {
     public static async dadosEvento(req: Request, res: Response) {
         const evento = await EventoModel.dadosPublicos(req.params.idPublico);
         if(!evento)
-            return res.json({ msg: "Evento não encontrado", erro: true });
+            return res.status(404).json({ msg: "Evento não encontrado", erro: true });
         
         const camposDeletar = { criador: undefined };
         const resposta = {
@@ -207,7 +207,11 @@ class EventoController {
                 $unset: ["inscricoesPeriodo", "__v", "evento"]
             }
         ]);
-        res.json(inscricoes);
+        
+        if(!inscricoes)
+            res.status(404).json({ msg: "Períodos não encontrados", erro: true });
+        else
+            res.json(inscricoes);
     }
 
     static async inscricoesNoPeriodo(req: Request, res: Response) {

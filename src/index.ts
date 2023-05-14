@@ -17,15 +17,13 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.static("./public"));
 
-app.use(cors({ origin:true, credentials:true }));
-
-app.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", dominiosPermitidos);
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Credentials", true as any);
-    next();
-});
-
+app.use(cors({
+    origin: dominiosPermitidos,
+    credentials:true,
+    preflightContinue: true,
+    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
+    exposedHeaders: "*"
+}));
 
 
 app.use("/api", routes);

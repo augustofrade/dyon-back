@@ -38,7 +38,7 @@ class AuthController {
         usuario.save();
 
         // colocar secure: true em produção em https
-        res.cookie("token", refreshToken, { expires: dataExpiracao, httpOnly: false });
+        res.cookie("token", refreshToken, { expires: dataExpiracao });
         return res.json({ dados: { accessToken: accessToken } });
     }
 
@@ -48,12 +48,12 @@ class AuthController {
      */
     public static async logout(req: Request, res: Response) {
         if(!req.cookies?.token)
-            return res.status(404).json({ msg: "Usuário não está autenticado" });
+            return res.status(401).json({ msg: "Usuário não está autenticado" });
         
         const refreshToken: string = req.cookies.token;
         const usuarioComToken = await UsuarioModel.findOne({ refreshToken });
         if(!usuarioComToken)
-            return res.status(404).json({ msg: "Token inválido" });
+            return res.status(401).json({ msg: "Token inválido" });
 
         usuarioComToken.removerRefreshToken(refreshToken);
 

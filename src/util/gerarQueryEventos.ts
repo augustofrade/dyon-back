@@ -1,3 +1,4 @@
+import { categoriaLista } from "../types/enums/categoriasEnum";
 import { IPesquisaEvento } from "./../types/interface";
 
 export const gerarQueryEventos = (pesquisa: IPesquisaEvento) => {
@@ -22,7 +23,9 @@ export const gerarQueryEventos = (pesquisa: IPesquisaEvento) => {
         ];
     }
     if(pesquisa.category) {
-        query["categorias.titulo"] = pesquisa.category;
+        const tituloCategoria = categoriaLista().filter((v) => v[0] === pesquisa.category);
+        if(tituloCategoria.length > 0)
+            query["categorias.titulo"] = tituloCategoria[0][1];
     }
     if(pesquisa.uf) {
         query["endereco.uf"] = pesquisa.uf;

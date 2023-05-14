@@ -74,7 +74,7 @@ class Evento {
     public static pesquisar(this: ReturnModelType<typeof Evento>, pesquisa: IPesquisaEvento) {
         const query = gerarQueryEventos(pesquisa);
         return this.find(query as any)
-            .select("-_id _publicId banner titulo criador endereco periodosOcorrencia")
+            .select("-_id _publicId banner titulo criador endereco periodosOcorrencia _publicId slug")
             .populate("periodosOcorrencia", "-_id inicio termino");
     }
 
