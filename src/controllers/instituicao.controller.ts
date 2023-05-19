@@ -48,7 +48,7 @@ export default class InstituicaoController {
             return res.json({ msg: "Instituição não encontrada", erro: true });
         
         const categoriasRamo: ICategoria[] = instituicao.categoriasRamo.map(c => <ICategoria>{ slug: c._id, titulo: c.titulo });
-        const eventos = instituicao._id === req.userId ? instituicao.eventos : instituicao.eventos.map((e => (<Evento>e).visivel));
+        const eventos = instituicao._id === req.userId ? instituicao.eventos : instituicao.eventos.filter((e => (<Evento>e).visivel));
         const avaliacaoMedia = instituicao.avaliacaoMedia();
 
         const retorno = {
@@ -57,7 +57,7 @@ export default class InstituicaoController {
             categoriasRamo,
             eventos,
             avaliacaoMedia,
-            endereco: instituicao.configuracoes.exibirEndereco ? instituicao.endereco: undefined
+            endereco: instituicao.configuracoes?.exibirEndereco ? instituicao.endereco: undefined
         };
         
         res.status(201).json(retorno);

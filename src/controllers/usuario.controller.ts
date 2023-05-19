@@ -17,7 +17,7 @@ class UsuarioController {
             const usuario = await UsuarioModel.findById(req.userId);
             if(!usuario)
                 throw new Error();
-            res.json({ data: usuario.dadosCabecalho() });
+            res.json({ dados: await usuario.dadosCabecalho() });
         } catch (err) {
             res.json({ msg: "Não foi possível exibir seus dados", erro: true });
         }

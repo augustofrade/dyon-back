@@ -21,7 +21,7 @@ app.use(cors({
     origin: dominiosPermitidos,
     credentials:true,
     preflightContinue: true,
-    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
+    allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization"],
     exposedHeaders: "*"
 }));
 

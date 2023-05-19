@@ -59,7 +59,11 @@ class Instituicao extends Usuario {
     public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         return this.findOne({ username })
             .select("-_id -senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -nomeRepresentante -operadores -documento -configuracoes -telefone -updatedAt -__v")
-            .populate("eventos", "-_id titulo endereco publicId slug visivel periodosOcorrencia")
+            .populate({
+                path: "eventos",
+                select: "_id titulo cancelado endereco _publicId slug visivel periodosOcorrencia",
+                populate: "periodosOcorrencia"
+            })
             .populate("avaliacoes");
     }
 
@@ -82,13 +86,15 @@ class Instituicao extends Usuario {
         }, { new: true }).select("-senha -_id -__v -emailToken -senhaToken -refreshToken -operadores -eventos -updatedAt");
     }
 
-    public avaliacaoMedia(this: DocumentType<Instituicao>) : string {
+    public avaliacaoMedia(this: DocumentType<Instituicao>) : number {
         let media = 0;
         if(this.populated("avaliacoes")) {
             media = (<Avaliacao[]>this.avaliacoes).reduce((valor: number, avaliacao: Avaliacao) => valor + avaliacao.nota, 0);
             media = media / this.avaliacoes.length;
+            if(isNaN(media))
+                media = 0;
         }
-        return media.toFixed(2);
+        return media;
     }
 
     public adicionarEvento(this: DocumentType<Instituicao>, idEvento: string) {

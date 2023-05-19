@@ -14,38 +14,33 @@ router
     .route("/ativacao")
     .post(validacao(validacaoAtivacaoOperador), OperadorController.ativacaoUnica);
 
-router.use(authAcessToken);
-
 router
     .route("/pagina-inicial")
-    .get(asyncWrapper(authOperador), OperadorController.paginaInicial);
-
-
-router.use(asyncWrapper(authInstituicao));
+    .get(authAcessToken, asyncWrapper(authOperador), OperadorController.paginaInicial);
 
 router
     .route("/listar")
-    .get(OperadorController.listarOperadores);
+    .get(authAcessToken, OperadorController.listarOperadores);
 
 router
     .route("/")
-    .post(validacao(validacaoCadastroOperador), OperadorController.cadastro);
+    .post(authAcessToken, validacao(validacaoCadastroOperador), asyncWrapper(authInstituicao), OperadorController.cadastro);
 
 router
     .route("/:idOperador")
-    .put(validacao(validacaoCadastroOperador), OperadorController.atualizarConta);
+    .put(authAcessToken, validacao(validacaoCadastroOperador), asyncWrapper(authInstituicao), OperadorController.atualizarConta);
 
 router
     .route("/:idOperador")
-    .delete(OperadorController.excluirConta);
+    .delete(authAcessToken, asyncWrapper(authInstituicao), OperadorController.excluirConta);
 
 router
     .route("/:idOperador/solicitar-troca-senha")
-    .post(OperadorController.solicitarTrocaSenha);
+    .post(authAcessToken, asyncWrapper(authInstituicao), OperadorController.solicitarTrocaSenha);
 
 router
     .route("/:idOperador/alternar-estado")
-    .post(OperadorController.alternarEstadoConta);
+    .post(authAcessToken, asyncWrapper(authInstituicao), OperadorController.alternarEstadoConta);
 
 
 export default router;

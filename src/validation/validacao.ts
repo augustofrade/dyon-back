@@ -9,8 +9,8 @@ const validacao = (validacoes: ValidationChain[]) => {
         if (result.isEmpty())
             return next();
 
-        return res.send({
-            msg: result.array(),
+        return res.status(400).send({
+            detalhes: result.array(),
             erro: true
         });
     };
