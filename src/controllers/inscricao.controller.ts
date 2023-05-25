@@ -18,24 +18,24 @@ export default abstract class InscricaoController {
         try {
             const periodo = await PeriodoModel.findById(req.body.idPeriodo);
             if(!periodo)
-                return res.json({ msg: "ID de Período inválido", erro: true });
+                return res.status(404).json({ msg: "ID de Período inválido", erro: true });
 
             if(!evento.periodosOcorrencia.includes(periodo._id))
-                return res.json({ msg: "Este evento não ocorre no período selecionado", erro: true });
+                return res.status(400).json({ msg: "Este evento não ocorre no período selecionado", erro: true });
             
             if(await InscricaoModel.usuarioJaInscrito(req.userId as string, periodo._id))
-                return res.json({ msg: "Não é possível se inscrever em um determinado período de um evento mais de uma vez", erro: true });
+                return res.status(403).json({ msg: "Não é possível se inscrever em um determinado período de um evento mais de uma vez", erro: true });
 
             if(new Date() < evento.inscricoesInicio) {
                 const data = DateTime.fromJSDate(evento.inscricoesInicio).toFormat("dd/MM/yyyy 'às' HH:mm:ss");
-                return res.json({ msg: "Não é possível se inscrever neste evento: as inscrições começam " + data, erro: true });
+                return res.status(400).json({ msg: "Não é possível se inscrever neste evento: as inscrições começam " + data, erro: true });
             } else if(new Date > evento.inscricoesTermino) {
                 const data = DateTime.fromJSDate(evento.inscricoesTermino).toFormat("dd/MM/yyyy 'às' HH:mm:ss");
-                return res.json({ msg: "Não é possível se inscrever neste evento: as inscrições acabaram " + data, erro: true });
+                return res.status(400).json({ msg: "Não é possível se inscrever neste evento: as inscrições acabaram " + data, erro: true });
             }
 
             if(await periodo.limiteInscricoesAtingido())
-                return res.json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis.", erro: true });
+                return res.status(403).json({ msg: "Não foi possível realizar sua inscrição neste evento, pois não há mais inscrições disponíveis.", erro: true });
             
             const inscricao = new InscricaoModel({
                 participante: IdentificacaoUsuario.gerarIdentificacao(req.participante),
@@ -50,7 +50,7 @@ export default abstract class InscricaoController {
             const dadosInscricao = await InscricaoModel.buscarInscricao(inscricao._id);
             res.status(200).json({ msg: "Inscrição realizada com sucesso", dados: dadosInscricao });
         } catch (err) {
-            res.json({ msg: "Não foi possível realizar sua inscrição neste evento, tente novamente.", erro: true, detalhes: err });
+            res.status(400).json({ msg: "Não foi possível realizar sua inscrição neste evento, tente novamente.", erro: true, detalhes: err });
         }
     }
 
@@ -79,18 +79,18 @@ export default abstract class InscricaoController {
         const operadorAtribuido = await EventoModel.findOne({ "_id": idEvento, "operadores": req.userId });
 
         if(!operadorAtribuido)
-            return res.json({ msg: "Não autorizado: você não foi atribuído à este evento", erro: true });
+            return res.status(403).json({ msg: "Não autorizado: você não foi atribuído à este evento", erro: true });
         
         const inscricao = await InscricaoModel.dadosInscricao(req.params.idInscricao);
         if(!inscricao)
-            return res.json({ msg: "Inscricão inválida, contate seu gestor", erro: true });
+            return res.status(400).json({ msg: "Inscricão inválida, contate seu gestor", erro: true });
         else if(inscricao.evento.idEvento !== idEvento)
-            return res.json({ msg: "Inscricão inválida: esta inscrição não foi feita neste evento", erro: true });
+            return res.status(403).json({ msg: "Inscricão inválida: esta inscrição não foi feita neste evento", erro: true });
         else if(inscricao.confirmada)
-            return res.json({ msg: "Esta inscrição já está confirmada", erro: true });
+            return res.status(400).json({ msg: "Esta inscrição já está confirmada", erro: true });
         
         if(!eventoDentroPeriodo(inscricao.periodo as Periodo))
-            return res.json({ msg: "Não é possível confirmar uma inscrição fora do período do evento em que está inscrito(a)", erro: true });
+            return res.status(403).json({ msg: "Não é possível confirmar uma inscrição fora do período do evento em que está inscrito(a)", erro: true });
         
         try {
             const participante = await ParticipanteModel.findById(inscricao.participante.idUsuario);
@@ -105,7 +105,7 @@ export default abstract class InscricaoController {
             Email.Instance.enviarEmailInscricaoConfirmada(participante!.email, participante!.nomeUsuario(), inscricao.evento.titulo, nomeInstituicao);
             res.status(201).json({ msg: "Inscrição confirmada com sucesso" });
         } catch (err) {
-            res.json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente.", erro: true, detalhes: err });
+            res.status(400).json({ msg: "Não foi possível confirmar esta inscrição de evento, tente novamente.", erro: true, detalhes: err });
         }
     }
 

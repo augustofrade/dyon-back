@@ -34,6 +34,10 @@ router
     .get(authAcessToken, asyncWrapper(authParticipante), ParticipanteController.historicoInscricoes);
 
 router
+    .route("/inscricoes/:idEvento")
+    .get(authAcessToken, asyncWrapper(authParticipante), ParticipanteController.inscricoesEvento);
+
+router
     .route("/:username/perfil")
     .get(authOpcional, ParticipanteController.obterDadosPerfil);
 

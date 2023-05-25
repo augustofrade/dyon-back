@@ -169,19 +169,33 @@ class EventoController {
     public static async acompanharEvento(req: Request, res: Response) {
         const evento = await EventoModel.findById(req.params.idEvento);
         if(!evento)
-            return res.json({ msg: "Evento não encontrado", erro: true });
+            return res.status(404).json({ msg: "Evento não encontrado", erro: true });
 
         try {
             if(req.participante!.acompanhando.includes(evento._id)) {
                 await ParticipanteModel.findByIdAndUpdate(req.userId, { $pull: { acompanhando: evento._id } });
-                res.status(200).json({ msg: `Deixou de acompanhar o evento "${evento.titulo}"` });
+                res.status(200).json({ msg: `Deixou de acompanhar o evento "${evento.titulo}"`, dados: { acompanhando: false } });
             } else {
                 await ParticipanteModel.findByIdAndUpdate(req.userId, { $push: { acompanhando: evento._id } });
-                res.status(200).json({ msg: `Começou a acompanhar o evento "${evento.titulo}"` });
+                res.status(200).json({ msg: `Começou a acompanhar o evento "${evento.titulo}"`, dados: { acompanhando: true } });
             }
 
         } catch(err) {
             res.status(400).json({ msg: `Ocorreu um erro ao tentar acompanhar o evento "${evento.titulo}"`, erro: true });
+        }
+    }
+
+    public static async estaAcompanhandoEvento(req: Request, res: Response) {
+        const evento = await EventoModel.findOne({ _publicId: req.params.idPublico });
+        if(!evento)
+            return res.json({ msg: "Evento não encontrado", erro: true });
+
+        try {
+            const acompanhando = req.participante!.acompanhando.includes(evento._id);
+            res.status(200).json({ dados: { acompanhando } });
+
+        } catch(err) {
+            res.status(400).json({ msg: `Ocorreu um erro ao verificar se está acompanhando o evento "${evento.titulo}"`, erro: true });
         }
     }
 

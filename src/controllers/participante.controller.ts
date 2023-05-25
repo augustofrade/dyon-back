@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import Email from "../email/Email";
 import { HistoricoInscricaoModel } from "../model/historicoInscricao.model";
-import { ParticipanteModel } from "../model/models";
+import { InscricaoModel, ParticipanteModel } from "../model/models";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import { buscarCategorias } from "../util/buscarCategorias";
@@ -85,6 +85,19 @@ class ParticipanteController {
             res.json({ msg: "Dados atualizados com sucesso", dados });
         } catch (err) {
             res.json({ msg: "Não foi possível atualizar os dados, tente novamente.", erro: true });
+        }
+    }
+
+    static async inscricoesEvento(req: Request, res: Response) {
+        try {
+            const { idEvento } = req.params;
+            const inscricoesPeriodos = await InscricaoModel.find({
+                "participante.idUsuario": req.userId,
+                "evento.idEvento": idEvento
+            }).select("-_id periodo");
+            res.status(200).json({ dados: inscricoesPeriodos.map(p => p.periodo) });
+        } catch (err) {
+            res.status(400).json({ msg: "Não foi possível buscar suas inscrições neste evento, tente novamente", erro: true });
         }
     }
     

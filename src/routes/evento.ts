@@ -54,6 +54,10 @@ router
     .put(authAcessToken, asyncWrapper(authParticipante), EventoController.acompanharEvento);
 
 router
+    .route("/:idPublico/acompanhando")
+    .get(authAcessToken, asyncWrapper(authParticipante), EventoController.estaAcompanhandoEvento);
+
+router
     .route("/:idEvento/periodos")
     .get(EventoController.listarPeriodos);
 
