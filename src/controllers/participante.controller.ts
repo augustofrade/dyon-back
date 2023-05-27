@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import Email from "../email/Email";
 import { HistoricoInscricaoModel } from "../model/historicoInscricao.model";
-import { InscricaoModel, ParticipanteModel } from "../model/models";
+import { EventoModel, InscricaoModel, ParticipanteModel } from "../model/models";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import { buscarCategorias } from "../util/buscarCategorias";
@@ -90,10 +90,13 @@ class ParticipanteController {
 
     static async inscricoesEvento(req: Request, res: Response) {
         try {
-            const { idEvento } = req.params;
+            const { idPublico } = req.params;
+            const evento = await EventoModel.findOne({ _publicId: idPublico });
+            if(!evento)
+                throw new Error();
             const inscricoesPeriodos = await InscricaoModel.find({
                 "participante.idUsuario": req.userId,
-                "evento.idEvento": idEvento
+                "evento.idEvento": evento._id
             }).select("-_id periodo");
             res.status(200).json({ dados: inscricoesPeriodos.map(p => p.periodo) });
         } catch (err) {

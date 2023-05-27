@@ -21,17 +21,17 @@ export default abstract class InscricaoController {
                 return res.status(404).json({ msg: "ID de Período inválido", erro: true });
 
             if(!evento.periodosOcorrencia.includes(periodo._id))
-                return res.status(400).json({ msg: "Este evento não ocorre no período selecionado", erro: true });
+                return res.status(401).json({ msg: "Este evento não ocorre no período selecionado", erro: true });
             
             if(await InscricaoModel.usuarioJaInscrito(req.userId as string, periodo._id))
                 return res.status(403).json({ msg: "Não é possível se inscrever em um determinado período de um evento mais de uma vez", erro: true });
 
             if(new Date() < evento.inscricoesInicio) {
                 const data = DateTime.fromJSDate(evento.inscricoesInicio).toFormat("dd/MM/yyyy 'às' HH:mm:ss");
-                return res.status(400).json({ msg: "Não é possível se inscrever neste evento: as inscrições começam " + data, erro: true });
+                return res.status(401).json({ msg: "Não é possível se inscrever neste evento: as inscrições começam " + data, erro: true });
             } else if(new Date > evento.inscricoesTermino) {
                 const data = DateTime.fromJSDate(evento.inscricoesTermino).toFormat("dd/MM/yyyy 'às' HH:mm:ss");
-                return res.status(400).json({ msg: "Não é possível se inscrever neste evento: as inscrições acabaram " + data, erro: true });
+                return res.status(401).json({ msg: "Não é possível se inscrever neste evento: as inscrições acabaram " + data, erro: true });
             }
 
             if(await periodo.limiteInscricoesAtingido())
@@ -50,7 +50,7 @@ export default abstract class InscricaoController {
             const dadosInscricao = await InscricaoModel.buscarInscricao(inscricao._id);
             res.status(200).json({ msg: "Inscrição realizada com sucesso", dados: dadosInscricao });
         } catch (err) {
-            res.status(400).json({ msg: "Não foi possível realizar sua inscrição neste evento, tente novamente.", erro: true, detalhes: err });
+            res.status(401).json({ msg: "Não foi possível realizar sua inscrição neste evento, tente novamente.", erro: true, detalhes: err });
         }
     }
 

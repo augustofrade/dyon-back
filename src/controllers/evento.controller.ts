@@ -12,6 +12,7 @@ import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { IIdentificacaoEvento, IPeriodo, IPeriodoAtualizacao, IPesquisaEvento, IResumoInscricao } from "../types/interface";
 import { buscarCategorias } from "../util/buscarCategorias";
 import { buscarIdOperadores } from "../util/buscarIdOperadores";
+import limparHTML from "../util/limparHTML";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 class EventoController {
@@ -29,7 +30,7 @@ class EventoController {
             const novoEvento = new EventoModel({
                 criador: IdentificacaoUsuario.gerarIdentificacao(req.instituicao),
                 titulo: dados.titulo,
-                descricao: dados.descricao,
+                descricao: limparHTML(dados.descricao),
                 banner: await sharp(banner.buffer).jpeg({ quality: 50 }).toBuffer(),
                 endereco: dados.endereco,
                 inscricoesInicio: new Date(dados.inscricoesInicio),
