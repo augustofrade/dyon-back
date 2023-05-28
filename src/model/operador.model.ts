@@ -19,10 +19,6 @@ class Operador extends Usuario {
     @prop({ required: true })
     public instituicao!: IdentificacaoUsuario;
 
-    public static listarPorInstituicao(this: ReturnModelType<typeof Operador>, idInstituicao: string) {
-        return this.find({ "instituicao.idUsuario": idInstituicao }).select("-instituicao -__v ");
-    }
-
     public ativarConta(this: DocumentType<Operador>, novaSenha: string) {
         this.senhaToken = undefined;
         this.senha = novaSenha;

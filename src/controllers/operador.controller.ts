@@ -135,7 +135,10 @@ export default abstract class OperadorController {
 
     static async listarOperadores(req: Request, res: Response) {
         try {
-            const operadores = await OperadorModel.listarPorInstituicao(req.userId!);
+            const operadores = await OperadorModel.find({
+                "instituicao.idUsuario": req.userId!,
+                ativo: true
+            }).select("_id nomeCompleto");
             res.status(200).json({ dados: operadores });
         } catch (err) {
             res.status(400).json({ msg: "Não foi possível buscar os operadores em sua instituição, tente novamente", erro: true });
