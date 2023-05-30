@@ -7,11 +7,16 @@ import { EventoModel, InstituicaoModel, OperadorModel } from "../model/models";
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 import validarSenha from "../util/validarSenha";
+import { UsuarioModel } from "../model/usuario.model";
 
 export default abstract class OperadorController {
 
     static async cadastro(req: Request, res: Response) {
         const { nomeCompleto, telefone, email } = req.body;
+        const emailEmUso = await UsuarioModel.findOne({ email: email });
+        if(emailEmUso)
+            return res.status(400).json({ msg: "O e-mail fornecido já está em uso no Dyon", erro: true });
+
         try {
             const senhaToken = gerarTokenGenerico(180);
 
@@ -45,9 +50,9 @@ export default abstract class OperadorController {
             if(operador)
                 res.status(200).json({ msg: "Dados do operador salvos com sucesso" });
             else
-                res.json({ msg: "Operador não encontrado, tente novamente", erro: true });
+                res.status(400).json({ msg: "Operador não encontrado, tente novamente", erro: true });
         } catch (err) {
-            res.json({ msg: "Ocorreu um erro ao tentar salvar os dados deste operador, tente novamente", erro: true });
+            res.status(400).json({ msg: "Ocorreu um erro ao tentar salvar os dados deste operador, tente novamente", erro: true });
         }
     }
 
@@ -129,16 +134,15 @@ export default abstract class OperadorController {
             res.status(201).json({ msg: "Senha definida e conta ativada com sucesso" });
         } catch (err) {
             Email.Instance.enviarEmailFalhaSenha(operador.email, operador.nomeCompleto);
-            res.status(400).json({ msg: "Não foi possível ativar sua conta, contate seu gestor" });
+            res.status(400).json({ msg: "Não foi possível ativar sua conta, contate seu gestor", erro: true });
         }
     }
 
     static async listarOperadores(req: Request, res: Response) {
         try {
             const operadores = await OperadorModel.find({
-                "instituicao.idUsuario": req.userId!,
-                ativo: true
-            }).select("_id nomeCompleto");
+                "instituicao.idUsuario": req.userId!
+            }).select("_id nomeCompleto email ativo confirmado telefone");
             res.status(200).json({ dados: operadores });
         } catch (err) {
             res.status(400).json({ msg: "Não foi possível buscar os operadores em sua instituição, tente novamente", erro: true });

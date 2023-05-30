@@ -19,7 +19,7 @@ router
     .get(authAcessToken, asyncWrapper(authOperador), OperadorController.paginaInicial);
 
 router
-    .route("/listar")
+    .route("/")
     .get(authAcessToken, OperadorController.listarOperadores);
 
 router

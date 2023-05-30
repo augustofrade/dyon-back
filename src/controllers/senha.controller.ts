@@ -41,6 +41,23 @@ export default abstract class SenhaController {
         res.json({ msg: "Foi enviado um e-mail de recuperação de senha", erro: true });
     }
 
+    static async tokenRecuperacaoSenhaValido(req: Request, res: Response) {
+        const token = req.params.token;
+        try {
+            const usuario = await UsuarioModel.findOne({ "senhaToken._id": token });
+            if(!usuario)
+                return res.status(404).json({ msg: "Token de Recuperação de senha inválido", erro: true });
+            else if(!usuario.senhaToken)
+                return res.status(404).json({ msg: "Você não solicitou um token de recuperação de senha", erro: true });
+            else if(new Date() > usuario.senhaToken.expiracao)
+                return res.status(403).json({ msg: "O token de recuperação de senha já expirou", erro: true });
+            else
+                return res.status(200).json({ msg: "Token válido", dados: { nomeOperador: usuario.nomeUsuario() } });
+        } catch (err) {
+            res.status(400).json({ msg: "Não foi possível validar o token de recuperação de senha", erro: true });
+        }
+    }
+
     static async recuperarSenha(req: Request, res: Response) {
         const usuario = await UsuarioModel.findOne({ "senhaToken._id": req.body.token });
 

@@ -58,10 +58,10 @@ class Instituicao extends Usuario {
 
     public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         return this.findOne({ username })
-            .select("-_id -senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -nomeRepresentante -operadores -documento -configuracoes -telefone -updatedAt -__v")
+            .select("-senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -nomeRepresentante -operadores -documento -configuracoes -telefone -updatedAt -__v")
             .populate({
                 path: "eventos",
-                select: "_id titulo cancelado endereco _publicId slug visivel periodosOcorrencia",
+                select: "_id titulo cancelado banner endereco _publicId slug visivel periodosOcorrencia",
                 populate: "periodosOcorrencia"
             })
             .populate("avaliacoes");

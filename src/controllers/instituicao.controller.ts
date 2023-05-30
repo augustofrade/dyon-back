@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import Email from "../email/Email";
 import { Evento } from "../model/evento.model";
 import { ICategoria } from "../types/interface";
+import { EventoQuery } from "../types/types";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
@@ -55,7 +56,7 @@ export default class InstituicaoController {
             ...instituicao.toObject(),
             quantiaEventos: instituicao.eventos.length,
             categoriasRamo,
-            eventos,
+            eventos: eventos.map(e => (e as NonNullable<EventoQuery>).toObject()),
             avaliacaoMedia,
             endereco: instituicao.configuracoes?.exibirEndereco ? instituicao.endereco: undefined
         };

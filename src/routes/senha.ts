@@ -19,6 +19,11 @@ router
     .route("/enviar-email")
     .get(validacao(validacaoTokenSenha), SenhaController.gerarTokenSenha);
 
+// Verificar se o token de recuperação é válido
+router
+    .route("/token-valido/:token")
+    .get(SenhaController.tokenRecuperacaoSenhaValido);
+
 // Alterar senha na página de recuperação de senha
 router
     .route("/recuperar")

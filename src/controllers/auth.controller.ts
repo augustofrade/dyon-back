@@ -6,6 +6,7 @@ import { UsuarioModel } from "../model/usuario.model";
 
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
+import { Operador } from "../model/operador.model";
 
 
 class AuthController {
@@ -28,6 +29,15 @@ class AuthController {
             return res.status(404).json({ msg: "Usuário não encontrado" });
         
         const senhaCorreta = await usuario.verificarSenha(senha);
+        
+        if(usuario.tipo === "Operador") {
+            const usuarioOperador = usuario as unknown as Operador;
+            if(!usuarioOperador.confirmado) // precisa definir a senha
+                return res.status(403).json({ msg: "Sua conta ainda não foi ativada. Verifique seu e-mail para definir sua senha e ativá-la." });
+            else if(!usuarioOperador.ativo)
+                return res.status(403).json({ msg: "Não foi possível fazer o login, sua conta está bloqueada, contate seu gestor" });
+        }
+
         if(!senhaCorreta)
             return res.status(400).json({ msg: "Senha incorreta" });
         

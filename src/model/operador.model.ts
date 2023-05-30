@@ -1,8 +1,14 @@
-import { prop, ReturnModelType, DocumentType } from "@typegoose/typegoose";
+import { DocumentType, pre, prop } from "@typegoose/typegoose";
 
 import { IdentificacaoUsuario } from "../schema/identificacaoUsuario.schema";
+import gerarUsername from "../util/gerarUsername";
 import { Usuario } from "./usuario.model";
 
+@pre<Operador>("save", function() {
+    if(this.isModified("nomeCompleto")) {
+        this.username = gerarUsername(this.nomeCompleto);
+    }
+})
 class Operador extends Usuario {
     @prop({ required: true, minlength: 10, maxLength: 50 })
     public nomeCompleto!: string;

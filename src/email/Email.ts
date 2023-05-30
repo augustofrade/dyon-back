@@ -10,6 +10,7 @@ import { Periodo } from "../model/periodo.model";
 import { IEmail, IIdentificacaoEvento, ITokenGenerico } from "../types/interface";
 import { IEmailCadastro } from "./../types/interface";
 import TemplateGerenciador from "./TemplateGerenciador";
+import { appURL } from "../config";
 
 export default class Email {
     private static _instance: Email;
@@ -36,7 +37,7 @@ export default class Email {
 
     public async enviarEmailCadastro(destinatario: IEmailCadastro, nomeUsuario: string, token: ITokenGenerico) {
         const nomeTemplate = TemplateGerenciador.Instance.template("cadastro");
-        const url = `https://localhost:3000/email/${token.hash}`;
+        const url = `${appURL}/email/${token.hash}`;
         const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataExpiracao, tipo: destinatario.tipo });
 
@@ -49,7 +50,7 @@ export default class Email {
 
 
     public async enviarEmailOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string, token: ITokenGenerico) {
-        const url = `https://localhost:3000/operador/ativacao/${token.hash}`;
+        const url = `${appURL}/operador/ativacao/${token.hash}`;
         const nomeTemplate = TemplateGerenciador.Instance.template("operador");
         const template = ejs.render(nomeTemplate, { nomeUsuario, nomeInstituicao, url });
 
@@ -62,7 +63,7 @@ export default class Email {
     }
 
     public async enviarEmailAtivacaoOperador(destinatario: string, nomeUsuario: string, nomeInstituicao: string, token: ITokenGenerico) {
-        const url = `https://localhost:3000/operador/ativacao/${token.hash}`;
+        const url = `${appURL}/operador/ativacao/${token.hash}`;
         const nomeTemplate = TemplateGerenciador.Instance.template("ativacaoOperador");
         const template = ejs.render(nomeTemplate, { nomeUsuario, nomeInstituicao, url });
 
@@ -87,7 +88,7 @@ export default class Email {
     
     public async enviarEmailEventoCriacao(destinatario: string, evento: Evento) {
         const nomeTemplate = TemplateGerenciador.Instance.template("eventoCriacao");
-        const url = `https://localhost:3000/email/${evento._publicId}/${evento.slug}`;
+        const url = `${appURL}/email/${evento._publicId}/${evento.slug}`;
         const template = ejs.render(nomeTemplate, { });
 
         return this.enviarEmailGenerico(destinatario, {
@@ -104,7 +105,7 @@ export default class Email {
 
     public async enviarEmailConfirmacao(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
         const nomeTemplate = TemplateGerenciador.Instance.template("confirmacaoEmail");
-        const url = `https://localhost:3000/email/${token.hash}`;
+        const url = `${appURL}/email/${token.hash}`;
         const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataExpiracao });
 
@@ -117,7 +118,7 @@ export default class Email {
 
     public async enviarEmailRecuperacaoSenha(destinatario: string, nomeUsuario: string, token: ITokenGenerico) {
         const nomeTemplate = TemplateGerenciador.Instance.template("recuperacaoSenha");
-        const url = `https://localhost:3000/recuperar-senha/${token.hash}`;
+        const url = `${appURL}/recuperar-senha/${token.hash}`;
         const dataExpiracao = DateTime.fromJSDate(token.expiracao).toFormat("HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataExpiracao });
 
@@ -131,7 +132,7 @@ export default class Email {
 
     public async enviarEmailAlteracaoSenha(destinatario: string, nomeUsuario: string) {
         const nomeTemplate = TemplateGerenciador.Instance.template("alteracaoSenha");
-        const url = "https://localhost:3000/senha/esqueci-minha-senha";
+        const url = "${appURL}/senha/esqueci-minha-senha";
         const dataAlteracao = DateTime.now().toFormat("dd/MM/yyyy 'às' HH:mm:ss");
         const template = ejs.render(nomeTemplate, { url, nomeUsuario, dataAlteracao });
 
@@ -158,7 +159,7 @@ export default class Email {
 
     public async enviarAvisoCancelamentoPeriodo(destinatario: string, detalhesEvento: IIdentificacaoEvento, periodo: Periodo) {
         const rawHTML = TemplateGerenciador.Instance.template("avisoCancelamentoPeriodo");
-        const url = `https://localhost:3000/evento/${detalhesEvento.rotaPublica}`;
+        const url = `${appURL}/evento/${detalhesEvento.rotaPublica}`;
         const evento = {
             titulo: detalhesEvento.titulo,
             url,
@@ -178,7 +179,7 @@ export default class Email {
 
     public async enviarAvisoCancelamentoEvento(destinatario: string, detalhesEvento: Evento, periodo: Periodo) {
         const rawHTML = TemplateGerenciador.Instance.template("avisoCancelamentoEvento");
-        const url = `https://localhost:3000/evento/${detalhesEvento._publicId}/${detalhesEvento.slug}`;
+        const url = `${appURL}/evento/${detalhesEvento._publicId}/${detalhesEvento.slug}`;
         const evento = {
             titulo: detalhesEvento.titulo,
             url,
