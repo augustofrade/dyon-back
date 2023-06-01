@@ -19,7 +19,7 @@ class HistoricoInscricao {
 
         return this.findOne({
             "participante.idUsuario": idUsuario,
-            "evento._id": idEvento
+            "evento.idEvento": idEvento
         });
     }
 

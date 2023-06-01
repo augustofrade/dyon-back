@@ -67,6 +67,11 @@ class Avaliacao {
         });
     }
     
+    public static buscarAvaliacoesUsuario(this: ReturnModelType<typeof Avaliacao>, idParticipante: string) {
+        return this.find({
+            "autor.idUsuario": idParticipante
+        });
+    }
 }
 
 export { Avaliacao };

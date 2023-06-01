@@ -43,7 +43,6 @@ class Inscricao {
     public async confirmarParticipacao(this: DocumentType<Inscricao>,
         dados: { nomeOperador: string, participante: ParticipanteQuery, instituicao: IdentificacaoUsuario }) {
         this.confirmadaPor = dados.nomeOperador;
-        this.qrCode = undefined;
         this.confirmada = true;
         this.dataParticipacao = new Date();
         await this.save();
@@ -78,7 +77,7 @@ class Inscricao {
         // verifica se o participante já participou alguma vez em tal evento
         const inscricao = await this.findOne({
             "participante.idUsuario": idUsuario,
-            "evento._id": idEvento,
+            "evento.idEvento": idEvento,
             "confirmada": true
         });
         if(inscricao)

@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 
 import Email from "../email/Email";
 import { HistoricoInscricaoModel } from "../model/historicoInscricao.model";
-import { EventoModel, InscricaoModel, ParticipanteModel } from "../model/models";
+import { AvaliacaoModel, EventoModel, InscricaoModel, ParticipanteModel } from "../model/models";
+import { EventoQuery } from "../types/types";
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import { buscarCategorias } from "../util/buscarCategorias";
@@ -46,7 +47,14 @@ class ParticipanteController {
     static async historicoInscricoes(req: Request, res: Response) {
         try {
             const historico = await HistoricoInscricaoModel.historicoParticipante(req.userId!);
-            res.status(200).json({ dados: historico });
+            const avaliacoes = await AvaliacaoModel.buscarAvaliacoesUsuario(req.userId!);
+            const idEventos = avaliacoes.map(a => a.evento.idEvento);
+            const historicoFormatado = historico.map(h => ({
+                    ...h.toObject(),
+                    avaliado: idEventos.includes(h.evento.idEvento)
+            }));
+            
+            res.status(200).json({ dados: historicoFormatado });
         } catch (err) {
             res.status(400).json({ msg: "Ocorreu um erro ao buscar seu histórico, tente novamente", erro: true });
         }
@@ -62,7 +70,9 @@ class ParticipanteController {
         const retorno = {
             ...participante.toObject(),
             quantiaEventos: await HistoricoInscricaoModel.contarParticipacoes(participante._id),
-            ...camposTrabalhados
+            ...camposTrabalhados,
+            inscricoes: participante.inscricoes.map(i => (i as unknown as NonNullable<EventoQuery>).toObject()),
+            acompanhando: participante.acompanhando.map(a => (a as unknown as NonNullable<EventoQuery>).toObject()),
         };
 
         res.status(201).json(retorno);
