@@ -13,15 +13,14 @@ import { InstituicaoModel, ParticipanteModel } from "./../model/models";
 export default class InstituicaoController {
 
     static async cadastro(req: Request, res: Response) {
-        const { email, senha, telefone, nomeFantasia,
-            nomeRepresentante, documento, categoriasRamo, endereco } = req.body;
+        const { email, senha, nomeFantasia, documento, categoriasRamo, endereco } = req.body;
         if(!validarSenha(senha))
             return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         try {
             const emailToken = gerarTokenGenerico();
             const novaInstituicao = new InstituicaoModel({
-                email, senha, nomeFantasia, telefone,
-                nomeRepresentante, documento, categoriasRamo,
+                email, senha, nomeFantasia,
+                documento, categoriasRamo,
                 endereco: endereco,
                 emailToken: { _id: emailToken.hash, expiracao: emailToken.expiracao }
             });

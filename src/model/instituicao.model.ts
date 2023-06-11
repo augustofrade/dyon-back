@@ -26,9 +26,6 @@ class Instituicao extends Usuario {
     @prop({ required: true, minlength: 3, maxLength: 40 })
     public nomeFantasia!: string;
 
-    @prop({ required: true, maxLength: 80 })
-    public nomeRepresentante!: string;
-
     @prop()
     public fotoPerfil?: Buffer;
 
@@ -37,9 +34,6 @@ class Instituicao extends Usuario {
 
     @prop({ default: () => configsPadrao() })
     public configuracoes!: PerfilConfig;
-
-    @prop({ required: true, minlength: 10, maxlength: 16 })
-    public telefone!: string;
 
     @prop({ required: true, default: [], type: [Categoria] })
     public categoriasRamo!: Types.Array<Categoria>;
@@ -58,7 +52,7 @@ class Instituicao extends Usuario {
 
     public static obterDadosPerfil(this: ReturnModelType<typeof Instituicao>, username: string) {
         return this.findOne({ username })
-            .select("-senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -nomeRepresentante -operadores -documento -configuracoes -telefone -updatedAt -__v")
+            .select("-senha -email -emailConfirmado -emailToken -senhaToken -refreshToken -tipo -operadores -documento -configuracoes -updatedAt -__v")
             .populate({
                 path: "eventos",
                 select: "_id titulo cancelado banner endereco _publicId slug visivel periodosOcorrencia",

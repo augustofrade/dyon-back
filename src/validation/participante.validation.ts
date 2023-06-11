@@ -11,11 +11,6 @@ export const validacaoCadastroParticipante = [
     body("senha")
         .trim()
         .notEmpty().withMessage("É obrigatório informar a senha"),
-    body("telefone")
-        .trim()
-        .notEmpty().withMessage("É obrigatório informar o Número de Telefone")
-        .bail()
-        .isLength({ min: 10, max: 16 }).withMessage("O número de Telefone deve ter entre 10 e 16 caracteres"),
     body("nomeCompleto")
         .trim()
         .notEmpty().withMessage("É obrigatório informar o Nome Completo")
@@ -41,10 +36,6 @@ export const validacaoAtualizarParticipante = [
         .optional()
         .trim()
         .isEmail().withMessage("Formato inválido de e-mail"),
-    body("telefone")
-        .optional()
-        .trim()
-        .isLength({ min: 10, max: 16 }).withMessage("O número de Telefone deve ter entre 10 e 16 caracteres"),
     body("dataNascimento")
         .optional()
         .trim()

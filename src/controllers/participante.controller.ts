@@ -14,13 +14,13 @@ import validarSenha from "../util/validarSenha";
 class ParticipanteController {
 
     static async cadastro(req: Request, res: Response) {
-        const { email, senha, nomeCompleto, documento, telefone, endereco, dataNascimento, genero, categoriasFavoritas } = req.body;
+        const { email, senha, nomeCompleto, documento, endereco, dataNascimento, genero, categoriasFavoritas } = req.body;
         if(!validarSenha(senha))
             return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
         try {
             const emailToken = gerarTokenGenerico();
             const novoParticipante = new ParticipanteModel({
-                email, senha, nomeCompleto, telefone, genero,
+                email, senha, nomeCompleto, genero,
                 documento, dataNascimento,
                 categoriasFavoritas: await buscarCategorias(categoriasFavoritas),
                 endereco,
