@@ -13,6 +13,7 @@ import { Inscricao } from "./inscricao.model";
 import { PeriodoModel } from "./models";
 import { Operador } from "./operador.model";
 import { Periodo } from "./periodo.model";
+import { Documento } from "../types/types";
 
 @pre<Evento>("save", function() {
     this.slug = gerarSlug(this.titulo);
@@ -112,6 +113,7 @@ class Evento {
                         banner: evento.banner ? evento.banner.toString("base64") : "",
                         criador: evento.criador,
                         periodo: {
+                            id: (periodo as unknown as any)._id,
                             inicio: periodo.inicio,
                             termino: periodo.termino
                         },

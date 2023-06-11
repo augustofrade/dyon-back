@@ -155,7 +155,7 @@ class EventoController {
     public static async pesquisa(req: Request<unknown, unknown, unknown, IPesquisaEvento>, res: Response) {
         try {
             const resPesquisa = await EventoModel.pesquisar(req.query);
-            res.json(resPesquisa);
+            res.json([ ...resPesquisa.map(e => e.toObject()) ]);
         } catch(err) {
             res.json({ msg: "Ocorreu um erro ao tentar pesquisar os eventos, tente novamente", erro: true, detalhes: err });
         }
@@ -229,10 +229,25 @@ class EventoController {
             res.json(inscricoes);
     }
 
+    static async inscricoesNoEvento(req: Request, res: Response) {
+        // Listagem de participantes no evento que a instituição ou operador podem ver
+        try {
+            const inscricoesRaw = await InscricaoModel.listarPorEvento(req.params.idEvento);
+            if(!inscricoesRaw)
+                throw new Error();
+            const inscricoes: Array<IResumoInscricao> = inscricoesRaw.map((i: Inscricao) =>
+                ({ confirmada: i.confirmada, nomeUsuario: i.participante.nome })
+            );
+            return res.json(inscricoes);
+        } catch (err) {
+            return res.json({ msg: "Não foi possível buscar as inscrições para esta ocorrência deste evento, tente novamente", erro: true });
+        }
+    }
+
     static async inscricoesNoPeriodo(req: Request, res: Response) {
         // Listagem de participantes no evento que a instituição ou operador podem ver
         try {
-            const inscricoesRaw = await InscricaoModel.listarPorPeriodoEvento(req.params.idPeriodo);
+            const inscricoesRaw = await InscricaoModel.listarPorPeriodo(req.params.idPeriodo);
             if(!inscricoesRaw)
                 throw new Error();
             const inscricoes: Array<IResumoInscricao> = inscricoesRaw.map((i: Inscricao) =>

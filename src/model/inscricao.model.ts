@@ -59,8 +59,12 @@ class Inscricao {
         });
     }
 
-    public static listarPorPeriodoEvento(this: ReturnModelType<typeof Inscricao>, idEvento: string) {
+    public static listarPorEvento(this: ReturnModelType<typeof Inscricao>, idEvento: string) {
         return this.find({ "evento.idEvento": idEvento }).select("participante confirmada -_id");
+    }
+
+    public static listarPorPeriodo(this: ReturnModelType<typeof Inscricao>, idPeriodo: string) {
+        return this.find({ "periodo": idPeriodo }).select("participante confirmada -_id");
     }
 
     public static async usuarioJaInscrito(this: ReturnModelType<typeof Inscricao>, idUsuario: string, idPeriodo: string): Promise<boolean> {

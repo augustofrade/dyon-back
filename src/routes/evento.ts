@@ -58,6 +58,10 @@ router
     .get(authAcessToken, asyncWrapper(authParticipante), EventoController.estaAcompanhandoEvento);
 
 router
+    .route("/:idEvento/inscritos")
+    .get(authAcessToken, asyncWrapper(authInstituicao), EventoController.inscricoesNoEvento);
+
+router
     .route("/:idEvento/periodos")
     .get(EventoController.listarPeriodos);
 
@@ -66,7 +70,7 @@ router
     .put(authAcessToken, asyncWrapper(authInstituicao), asyncWrapper(authProprietarioEvento), EventoController.atualizarPeriodos);
 
 router
-    .route("/periodo/:idPeriodo/inscricoes")
+    .route("/periodo/:idPeriodo/inscritos")
     .get(authAcessToken, asyncWrapper(authUsuario), asyncWrapper(authInstitucional), EventoController.inscricoesNoPeriodo);
 
 router
