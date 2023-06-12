@@ -12,6 +12,10 @@ router
 
 router
     .route("/confirmar")
-    .post(authAcessToken, EmailController.confirmarEmail);
+    .post(EmailController.confirmarEmail);
+
+router
+    .route("/token-valido/:token")
+    .get(EmailController.tokenConfirmacaoEmailValido);
 
 export default router;

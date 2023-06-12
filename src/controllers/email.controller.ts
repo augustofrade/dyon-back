@@ -20,13 +20,12 @@ export default abstract class EmailController {
             return res.status(400).json({ msg: "O token de confirmação de e-mail já expirou", erro: true });
         
         try {
-
             usuario.emailToken = undefined;
             usuario.emailConfirmado = true;
             usuario.save();
             res.status(200).json({ msg: "E-mail confirmado com sucesso" });
         } catch (err) {
-            res.json({ msg: "Não foi possível confirmar seu e-mail, tente novamente.", erro: true });
+            res.status(400).json({ msg: "Não foi possível confirmar seu e-mail, tente novamente.", erro: true });
         }
     }
 
@@ -47,5 +46,22 @@ export default abstract class EmailController {
         usuario.save();
         Email.Instance.enviarEmailConfirmacao(usuario.email, usuario.nomeUsuario(), novoToken);
         res.json({ msg: "Um novo token para confirmar seu e-mail foi gerado, verifique seu e-mail" });
+    }
+
+    static async tokenConfirmacaoEmailValido(req: Request, res: Response) {
+        const token = req.params.token;
+        try {
+            const usuario = await UsuarioModel.findOne({ "emailToken._id": token });
+            if(!usuario)
+                return res.status(404).json({ msg: "Token de Confirmação de e-mail inválido", erro: true });
+            else if(!usuario.emailToken)
+                return res.status(404).json({ msg: "Você não solicitou um token de confirmação de e-mail", erro: true });
+            else if(new Date() > usuario.emailToken.expiracao)
+                return res.status(403).json({ msg: "O token de confirmação de e-mail já expirou", erro: true });
+            else
+                return res.status(200).json({ msg: "Token válido", dados: { nomeUsuario: usuario.nomeUsuario() } });
+        } catch (err) {
+            res.status(400).json({ msg: "Não foi possível validar o token de confirmação de e-mail", erro: true });
+        }
     }
 }

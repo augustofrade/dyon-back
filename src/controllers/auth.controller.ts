@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request, Response } from "express";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
+import Email from "../email/Email";
+import { Operador } from "../model/operador.model";
 import { UsuarioModel } from "../model/usuario.model";
-
 import gerarAccesToken from "../util/auth/gerarAccessToken";
 import gerarRefreshToken from "../util/auth/gerarRefreshToken";
-import { Operador } from "../model/operador.model";
+import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 
 
 class AuthController {
@@ -36,6 +37,14 @@ class AuthController {
                 return res.status(403).json({ msg: "Sua conta ainda não foi ativada. Verifique seu e-mail para definir sua senha e ativá-la." });
             else if(!usuarioOperador.ativo)
                 return res.status(403).json({ msg: "Não foi possível fazer o login, sua conta está bloqueada, contate seu gestor" });
+        } else if(usuario.emailConfirmado === false) {
+            // participante e instituição
+            // TODO: criar função separada
+            const emailToken = gerarTokenGenerico();
+            usuario.emailToken = { _id: emailToken.hash, expiracao: emailToken.expiracao };
+            await usuario.save();
+            Email.Instance.enviarEmailCadastro({ email, tipo: "Participante" }, usuario.nomeUsuario().split(" ")[0], emailToken);
+            return res.status(403).json({ msg: "Seu e-mail ainda não foi confirmado, cheque sua caixa de entrada" });
         }
 
         if(!senhaCorreta)
