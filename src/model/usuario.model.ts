@@ -1,4 +1,4 @@
-import { DocumentType, getModelForClass, modelOptions, pre, prop } from "@typegoose/typegoose";
+import { DocumentType, ReturnModelType, getModelForClass, modelOptions, pre, prop } from "@typegoose/typegoose";
 import bcrypt from "bcrypt";
 import { Types } from "mongoose";
 
@@ -139,6 +139,11 @@ class Usuario {
             retorno.instituicao = u.instituicao.nome;
         }
         return retorno;
+    }
+
+    public static async emailEmUso(this: ReturnModelType<typeof Usuario>, email: string): Promise<boolean> {
+        const usuario = await this.findOne({ email });
+        return usuario === null;
     }
 }
 

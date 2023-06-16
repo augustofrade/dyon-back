@@ -3,9 +3,8 @@ import { Request, Response } from "express";
 import Email from "../email/Email";
 import { HistoricoInscricaoModel } from "../model/historicoInscricao.model";
 import { AvaliacaoModel, EventoModel, InscricaoModel, ParticipanteModel } from "../model/models";
+import { UsuarioModel } from "../model/usuario.model";
 import { EventoQuery } from "../types/types";
-import gerarAccesToken from "../util/auth/gerarAccessToken";
-import gerarRefreshToken from "../util/auth/gerarRefreshToken";
 import { buscarCategorias } from "../util/buscarCategorias";
 import { gerarTokenGenerico } from "../util/gerarTokenGenerico";
 import validarSenha from "../util/validarSenha";
@@ -15,8 +14,13 @@ class ParticipanteController {
 
     static async cadastro(req: Request, res: Response) {
         const { email, senha, nomeCompleto, documento, endereco, dataNascimento, genero, categoriasFavoritas } = req.body;
+        
+        const emailEmUso = await UsuarioModel.emailEmUso(email);
+        if(emailEmUso)
+            return res.status(400).json({ msg: "O e-mail fornecido já está em uso", erro: true });
         if(!validarSenha(senha))
             return res.status(400).json({ msg: "A nova senha não atende todos os requisitos de força de senha", erro: true });
+
         try {
             const emailToken = gerarTokenGenerico();
             const novoParticipante = new ParticipanteModel({
@@ -29,12 +33,7 @@ class ParticipanteController {
             await novoParticipante.save();
             Email.Instance.enviarEmailCadastro({ email, tipo: "Participante" }, novoParticipante.nomeCompleto.split(" ")[0], emailToken);
 
-            const { token: refreshToken, dataExpiracao } = gerarRefreshToken({ id: novoParticipante._id, email: novoParticipante.email });
-            const accessToken = gerarAccesToken({ id: novoParticipante._id, email: novoParticipante.email });
-            novoParticipante.adicionarRefreshToken(refreshToken);
-            
-            res.cookie("token", refreshToken, { expires: dataExpiracao });
-            res.status(200).json({ msg: "Cadastro realizado com sucesso", token: accessToken });
+            res.status(200).json({ msg: "Cadastro realizado com sucesso, verifique a caixa de entrada do seu e-mail" });
         } catch(err: unknown) {
             const erro = err as Record<string, Record<string, unknown>>; 
             if(erro.keyValue.email)

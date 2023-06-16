@@ -13,7 +13,7 @@ export default abstract class OperadorController {
 
     static async cadastro(req: Request, res: Response) {
         const { nomeCompleto, telefone, email } = req.body;
-        const emailEmUso = await UsuarioModel.findOne({ email: email });
+        const emailEmUso = await UsuarioModel.emailEmUso(email);
         if(emailEmUso)
             return res.status(400).json({ msg: "O e-mail fornecido já está em uso no Dyon", erro: true });
 

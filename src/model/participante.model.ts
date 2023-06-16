@@ -80,7 +80,7 @@ class Participante extends Usuario {
         });
         await this.populate({
             path: "acompanhando",
-            select: "titulo endereco publicId slug visivel periodosOcorrencia",
+            select: "titulo endereco _publicId slug visivel periodosOcorrencia",
             populate: {
                 path: "periodosOcorrencia",
                 select: "-_id inicio"

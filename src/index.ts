@@ -8,7 +8,10 @@ import { dominiosPermitidos } from "./config";
 
 dotenv.config();
 
-dbConnect(process.env.DB_DEV as string);
+// Banco Remoto
+// dbConnect(process.env.DB_DEV as string);
+// Banco local
+dbConnect(process.env.DB_LOCAL as string);
 
 const PORT = process.env.PORT || 3000;
 
